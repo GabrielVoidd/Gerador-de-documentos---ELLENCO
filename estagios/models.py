@@ -163,13 +163,13 @@ class Candidato(models.Model):
     nome_responsavel_legal = models.CharField(max_length=70, null=True, blank=True, help_text='Pai, mãe ou guardião(ã)')
     telefone_responsavel_legal = models.CharField(max_length=11, null=True, blank=True)
     email_responsavel_legal = models.EmailField(null=True, blank=True)
-    idade_responsavel_legal = models.CharField(null=True, blank=True)
-    profissao_responsavel_legal = models.CharField(null=True, blank=True)
+    idade_responsavel_legal = models.PositiveSmallIntegerField(null=True, blank=True)
+    profissao_responsavel_legal = models.CharField(max_length=100, null=True, blank=True)
     nome_responsavel_legal2 = models.CharField(max_length=70, null=True, blank=True)
     telefone_responsavel_legal2 = models.CharField(max_length=11, null=True, blank=True)
     email_responsavel_legal2 = models.EmailField(null=True, blank=True)
-    idade_responsavel_legal2 = models.CharField(null=True, blank=True)
-    profissao_responsavel_legal2 = models.CharField(null=True, blank=True)
+    idade_responsavel_legal2 = models.PositiveSmallIntegerField(null=True, blank=True)
+    profissao_responsavel_legal2 = models.CharField(max_length=100, null=True, blank=True)
 
     # --- INFORMAÇÕES PARA O(A) RECRUTADOR (A) ---
     observacoes = models.TextField(null=True, blank=True)
