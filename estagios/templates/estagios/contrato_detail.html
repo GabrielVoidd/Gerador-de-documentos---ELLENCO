@@ -1,0 +1,26 @@
+{% extends 'estagios/base.html' %}
+
+{% block title %}Detalhes do Contrato {{ contrato.numero_contrato }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalhes do Contrato: {{ contrato.numero_contrato }}</h2>
+    <div class="card">
+        <div class="card-header">
+            <strong>Estagiário(a):</strong> {{ contrato.estagiário.nome }} | <strong>Empresa:</strong> {{ contrato.parte_concedente.razao_social }}
+        </div>
+        <div class="card-body">
+            <p><strong>Setor:</strong> {{ contrato.setor }}</p>
+            <p><strong>Início:</strong> {{ contrato.data_inicio|date:"d/m/Y" }} | <strong>Término Previsto:</strong> {{ contrato.data_termino_prevista|date:"d/m/Y" }}</p>
+            </div>
+        <div class="card-footer">
+            <strong>Ações:</strong>
+            <a href="{% url 'contrato-visualizar-termo' pk=contrato.pk %}" target="_blank" class="btn btn-secondary">Visualizar Termo HTML</a>
+            <a href="{% url 'contrato-gerar-termo-compromisso-pdf' pk=contrato.pk %}" class="btn btn-danger">Gerar PDF</a>
+            <a href="{% url 'contrato-editar' pk=contrato.pk %}" class="btn btn-warning">Editar</a>
+            <a href="{% url 'contrato-excluir' pk=contrato.pk %}" class="btn btn-outline-danger">Excluir</a>
+        </div>
+    </div>
+    <a href="{% url 'contrato-lista' %}" class="btn btn-link mt-3">Voltar para a lista</a>
+</div>
+{% endblock %}

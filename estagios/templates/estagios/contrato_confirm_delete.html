@@ -1,0 +1,15 @@
+{% extends 'estagios/base.html' %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Confirmar Exclusão</h2>
+    <p>Você tem certeza que deseja excluir o contrato nº <strong>{{ contrato.numero_contrato }}</strong> do estagiário <strong>{{ contrato.estagiario.nome }}</strong>?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Sim, tenho certeza</button>
+        <a href="{% url 'contrato-detalhe' pk=contrato.pk %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

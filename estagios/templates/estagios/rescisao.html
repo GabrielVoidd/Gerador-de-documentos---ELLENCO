@@ -1,0 +1,288 @@
+{% extends 'seu_app/base.html' %}
+{% load static %}
+
+{% block title %}Termo de Rescisão de Estágio{% endblock %}
+
+{% block page_styles %}
+<style>
+    {% extends 'seu_app/base.html' %}
+{% load static %}
+
+{% block title %}Termo de Rescisão de Estágio{% endblock %}
+
+{% block page_styles %}
+<style>
+    @page {
+         margin: 1.5cm;
+         @bottom-right {
+             content: "Página " counter(page) " de " counter(pages);
+             font-size: 9pt;
+         }
+    }
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 10.5pt;
+        line-height: 1.3; /* Aumentado para melhor legibilidade */
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    td {
+        padding: 1px 3px;
+        vertical-align: top;
+    }
+
+    .header-logo {
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14pt;
+    }
+
+    .header-main-title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 11pt;
+    }
+
+    .header-subtitle {
+        text-align: center;
+        font-size: 9pt;
+        font-weight: bold;
+    }
+
+    /* --- ESTILO MODIFICADO --- */
+    .contract-box {
+        /* border: 1px solid black; -> REMOVIDO */
+        text-align: center;
+    }
+    .contract-box-title {
+        font-size: 8pt;
+        font-weight: bold;
+        /* border-bottom: 1px solid black; -> REMOVIDO */
+        padding: 1px;
+    }
+    .contract-box-content {
+        font-size: 10pt;
+        font-weight: bold;
+        padding: 2px;
+    }
+
+    .centered-text {
+        text-align: center;
+        font-size: 9pt;
+        margin: 10px 0;
+    }
+
+    .section-title {
+        font-weight: bold;
+        font-size: 9pt;
+        text-transform: uppercase;
+        margin-top: 10px;
+        margin-bottom: 2px;
+    }
+
+    .info-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-bottom: 1px solid black;
+        margin-bottom: 20px; /* ESPAÇAMENTO AUMENTADO */
+    }
+
+    .info-table td {
+        font-size: 9pt;
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 2px 0;
+        width: 50%;
+    }
+
+    .info-table strong {
+        font-weight: normal;
+        text-transform: none;
+    }
+
+    .lowercase {
+        text-transform: none !important;
+    }
+
+    .conditions-title {
+        text-align: left;
+        font-weight: bold;
+        font-size: 9pt;
+        /* border: 1px solid black; -> REMOVIDO */
+        /* border-bottom: none; -> REMOVIDO */
+        /* padding: 2px; -> REMOVIDO */
+        margin-top: 25px; /* ESPAÇAMENTO AUMENTADO */
+    }
+    .conditions-content {
+        text-align: left; /* Alinhamento padrão para o conteúdo */
+        font-size: 9pt;
+        /* border: 1px solid black; -> REMOVIDO */
+        /* padding: 3px; -> REMOVIDO */
+        margin-top: 5px;
+    }
+
+    /* Estilos específicos para conteúdo que deve ser centralizado ou negrito */
+    .conditions-content.centered {
+         text-align: left;
+    }
+    /*.conditions-content.bold {
+         font-weight: bold;
+    }*/
+
+    .clause {
+         font-size: 9pt;
+         text-align: justify;
+         margin-top: 12px; /* ESPAÇAMENTO AUMENTADO */
+    }
+
+    .signature-date {
+         text-align: center;
+         margin-top: 40px; /* ESPAÇAMENTO AUMENTADO */
+         margin-bottom: 30px;
+         font-size: 10pt;
+    }
+
+    .signature-block {
+         text-align: center;
+         font-size: 9pt;
+    }
+    .signature-line {
+         border-top: 1px solid black;
+         margin: 0 auto 2px auto;
+         width: 70%;
+    }
+    .signature-stamp {
+        font-size: 8pt;
+    }
+    @page {
+        margin: 1.5cm;
+        @bottom-right {
+            content: "Página " counter(page) " de " counter(pages);
+            font-size: 9pt;
+        }
+    }
+    .document-wrapper {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 10.5pt;
+        line-height: 1.3;
+        color: #000; /* Garante que o texto seja preto no documento */
+    }
+    .document-wrapper table { width: 100%; border-collapse: collapse; }
+    .document-wrapper td { padding: 1px 3px; vertical-align: top; }
+    .header-logo { font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 14pt; }
+    .header-main-title { text-align: center; font-weight: bold; font-size: 11pt; }
+    .contract-box { text-align: center; }
+    .contract-box-title { font-size: 8pt; font-weight: bold; padding: 1px; }
+    .contract-box-content { font-size: 10pt; font-weight: bold; padding: 2px; }
+    .section-title { font-weight: bold; font-size: 9pt; text-transform: uppercase; margin-top: 10px; margin-bottom: 2px; }
+    .info-table { width: 100%; border-collapse: collapse; border-bottom: 1px solid black; margin-bottom: 20px; }
+    .info-table td { font-size: 9pt; font-weight: bold; text-transform: uppercase; padding: 2px 0; width: 50%; }
+    .info-table strong { font-weight: normal; text-transform: none; }
+    .lowercase { text-transform: none !important; }
+    .conditions-title { text-align: left; font-weight: bold; font-size: 9pt; margin-top: 25px; }
+    .clause { font-size: 9pt; text-align: justify; margin-top: 12px; }
+    .signature-date { text-align: center; margin-top: 40px; margin-bottom: 30px; font-size: 10pt; }
+    .signature-block { text-align: center; font-size: 9pt; }
+    .signature-line { border-top: 1px solid black; margin: 0 auto 2px auto; width: 70%; }
+    .signature-stamp { font-size: 8pt; }
+
+    /* Estilo para esconder o layout principal ao imprimir */
+    @media print {
+        .main-header, .main-footer {
+            display: none;
+        }
+        .main-content {
+            padding: 0;
+        }
+        .document-wrapper {
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="document-wrapper">
+    <table style="margin-bottom: 10px;">
+        </table>
+
+    <div class="section-title">INSTITUIÇÃO DE ENSINO</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Razão Social:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.razao_social }}</td>
+        </tr>
+        </table>
+
+    </div>
+{% endblock %}
+    @page {
+        margin: 1.5cm;
+        @bottom-right {
+            content: "Página " counter(page) " de " counter(pages);
+            font-size: 9pt;
+        }
+    }
+    .document-wrapper {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 10.5pt;
+        line-height: 1.3;
+        color: #000; /* Garante que o texto seja preto no documento */
+    }
+    .document-wrapper table { width: 100%; border-collapse: collapse; }
+    .document-wrapper td { padding: 1px 3px; vertical-align: top; }
+    .header-logo { font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 14pt; }
+    .header-main-title { text-align: center; font-weight: bold; font-size: 11pt; }
+    .contract-box { text-align: center; }
+    .contract-box-title { font-size: 8pt; font-weight: bold; padding: 1px; }
+    .contract-box-content { font-size: 10pt; font-weight: bold; padding: 2px; }
+    .section-title { font-weight: bold; font-size: 9pt; text-transform: uppercase; margin-top: 10px; margin-bottom: 2px; }
+    .info-table { width: 100%; border-collapse: collapse; border-bottom: 1px solid black; margin-bottom: 20px; }
+    .info-table td { font-size: 9pt; font-weight: bold; text-transform: uppercase; padding: 2px 0; width: 50%; }
+    .info-table strong { font-weight: normal; text-transform: none; }
+    .lowercase { text-transform: none !important; }
+    .conditions-title { text-align: left; font-weight: bold; font-size: 9pt; margin-top: 25px; }
+    .clause { font-size: 9pt; text-align: justify; margin-top: 12px; }
+    .signature-date { text-align: center; margin-top: 40px; margin-bottom: 30px; font-size: 10pt; }
+    .signature-block { text-align: center; font-size: 9pt; }
+    .signature-line { border-top: 1px solid black; margin: 0 auto 2px auto; width: 70%; }
+    .signature-stamp { font-size: 8pt; }
+
+    /* Estilo para esconder o layout principal ao imprimir */
+    @media print {
+        .main-header, .main-footer {
+            display: none;
+        }
+        .main-content {
+            padding: 0;
+        }
+        .document-wrapper {
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="document-wrapper">
+    <table style="margin-bottom: 10px;">
+        </table>
+    
+    <div class="section-title">INSTITUIÇÃO DE ENSINO</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Razão Social:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.razao_social }}</td>
+        </tr>
+        </table>
+
+    </div>
+{% endblock %}

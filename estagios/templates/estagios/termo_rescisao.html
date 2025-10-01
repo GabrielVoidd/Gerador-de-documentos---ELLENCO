@@ -1,0 +1,344 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Termo de Conclusão / Rescisão do - TCE</title>
+    <style>
+        @page {
+            margin: 1.5cm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 9pt;
+            }
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10.5pt;
+            line-height: 1.3; /* Aumentado para melhor legibilidade */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 1px 3px;
+            vertical-align: top;
+        }
+
+        .header-logo {
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            font-size: 14pt;
+        }
+
+        .header-main-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11pt;
+        }
+
+        .header-subtitle {
+            text-align: center;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+
+        /* --- ESTILO MODIFICADO --- */
+        .contract-box {
+            /* border: 1px solid black; -> REMOVIDO */
+            text-align: center;
+        }
+        .contract-box-title {
+            font-size: 8pt;
+            font-weight: bold;
+            /* border-bottom: 1px solid black; -> REMOVIDO */
+            padding: 1px;
+        }
+        .contract-box-content {
+            font-size: 10pt;
+            font-weight: bold;
+            padding: 2px;
+        }
+
+        .centered-text {
+            text-align: center;
+            font-size: 9pt;
+            margin: 10px 0;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 9pt;
+            text-transform: uppercase;
+            margin-top: 10px;
+            margin-bottom: 2px;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-bottom: 1px solid black;
+            margin-bottom: 20px; /* ESPAÇAMENTO AUMENTADO */
+        }
+
+        .info-table td {
+            font-size: 9pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 2px 0;
+            width: 50%;
+        }
+
+        .info-table strong {
+            font-weight: normal;
+            text-transform: none;
+        }
+
+        .lowercase {
+            text-transform: none !important;
+        }
+
+        .conditions-title {
+            text-align: left;
+            font-weight: bold;
+            font-size: 9pt;
+            /* border: 1px solid black; -> REMOVIDO */
+            /* border-bottom: none; -> REMOVIDO */
+            /* padding: 2px; -> REMOVIDO */
+            margin-top: 25px; /* ESPAÇAMENTO AUMENTADO */
+        }
+        .conditions-content {
+            text-align: left; /* Alinhamento padrão para o conteúdo */
+            font-size: 9pt;
+            /* border: 1px solid black; -> REMOVIDO */
+            /* padding: 3px; -> REMOVIDO */
+            margin-top: 5px;
+        }
+
+        /* Estilos específicos para conteúdo que deve ser centralizado ou negrito */
+        .conditions-content.centered {
+             text-align: left;
+        }
+        /*.conditions-content.bold {
+            font-weight: bold;
+        }*/
+
+        .clause {
+            font-size: 9pt;
+            text-align: justify;
+            margin-top: 12px; /* ESPAÇAMENTO AUMENTADO */
+        }
+
+        .signature-date {
+            text-align: center;
+            margin-top: 40px; /* ESPAÇAMENTO AUMENTADO */
+            margin-bottom: 30px;
+            font-size: 10pt;
+        }
+
+        .signature-block {
+            text-align: center;
+            font-size: 9pt;
+        }
+        .signature-line {
+            border-top: 1px solid black;
+            margin: 0 auto 2px auto;
+            width: 70%;
+        }
+        .signature-stamp {
+            font-size: 8pt;
+        }
+        /* --- FIM DAS MODIFICAÇÕES DE ESTILO --- */
+    </style>
+</head>
+<body>
+
+    <table style="margin-bottom: 10px;">
+        <tr>
+            <td style="width: 25%;" class="header-logo">
+                <!--<img src="{% static 'images/LOGO.jpg' %}" alt="Logo da Empresa" style="max-width: 100%; height: auto;">-->
+                <img src="{{ logo_path }}" alt="Logo da Empresa" style="max-width: 100%; height: auto;">
+            </td>
+            <td style="width: 50%;">
+                <div class="header-main-title">Termo de Conclusão / Rescisão do - TCE</div>
+                <!--<div class="header-subtitle">PARA REALIZAÇÃO DE ESTÁGIO NÃO OBRIGATÓRIO</div>-->
+            </td>
+            <td style="width: 25%;">
+                <div class="contract-box">
+                    <div class="contract-box-title">Nº Contrato</div>
+                    <div class="contract-box-content">{{ rescisao.contrato.numero_contrato }}</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="clause">Instrumento jurídico de Termo de Compromisso de Estágio e Convênio de Concessão de Estágio, previstos na Lei 11.788 de
+        25/09/2008 que regulamenta e disciplina a contratação de Estagiários.
+    </div>
+    <div class="clause">As partes a seguir qualificadas:</div>
+
+    <div class="section-title">INSTITUIÇÃO DE ENSINO</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Razão Social:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.razao_social }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Endereço:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.endereco }}</td>
+        </tr>
+        <tr>
+            <td><strong>Bairro:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.bairro }}</td>
+            <td><strong>Estado:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.estado }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cnpj:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.cnpj }}</td>
+            <td><strong>Representante Legal:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.representante_legal }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">PARTE CONCEDENTE</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Razão Social:</strong> {{ rescisao.contrato.parte_concedente.razao_social }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Endereço:</strong> {{ rescisao.contrato.parte_concedente.endereco }}</td>
+        </tr>
+        <tr>
+            <td><strong>Bairro:</strong> {{ rescisao.contrato.parte_concedente.bairro }}</td>
+            <td><strong>Estado:</strong> {{ rescisao.contrato.parte_concedente.estado }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cnpj:</strong> {{ rescisao.contrato.parte_concedente.cnpj }}</td>
+            <td><strong>Representante Legal:</strong> {{ contrato.parte_concedente.representante_legal }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cidade:</strong> {{ rescisao.contrato.parte_concedente.cidade }}</td>
+            <td><strong>Cep:</strong> {{ rescisao.contrato.parte_concedente.cep }}</td>
+        </tr>
+        <tr>
+            <td><strong>Telefone:</strong> {{ rescisao.contrato.parte_concedente.telefone }}</td>
+            <td><strong>Email:</strong> <span class="lowercase">{{ rescisao.contrato.parte_concedente.email }}</span></td>
+        </tr>
+    </table>
+
+    <div class="section-title">ESTAGIÁRIO(A)</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Nome:</strong> {{ rescisao.contrato.estagiario.nome }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Endereço:</strong> {{ rescisao.contrato.estagiario.endereco }}</td>
+        </tr>
+        <tr>
+            <td><strong>Bairro:</strong> {{ rescisao.contrato.estagiario.bairro }}</td>
+            <td><strong>Estado:</strong> {{ rescisao.contrato.estagiario.estado }}</td>
+        </tr>
+        <tr>
+            <td><strong>CPF:</strong> {{ rescisao.contrato.estagiario.cpf }}</td>
+            <td><strong>Data nascimento:</strong> {{ rescisao.contrato.estagiario.data_nascimento|date:"d/m/Y" }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cidade:</strong> {{ rescisao.contrato.estagiario.cidade }}</td>
+            <td><strong>Cep:</strong> {{ rescisao.contrato.estagiario.cep }}</td>
+        </tr>
+        <tr>
+            <td><strong>Telefone:</strong> {{ rescisao.contrato.estagiario.telefone }}</td>
+            <td><strong>Email:</strong> <span class="lowercase">{{ rescisao.contrato.estagiario.email }}</span></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="font-size: 8pt;">
+                Regularmente matriculado(a) no {{ rescisao.contrato.estagiario.ano_periodo }} do curso de {{ rescisao.contrato.estagiario.curso }} do nível (NM) NÍVEL MÉDIO
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-title">AGENTE DE INTEGRAÇÃO</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Razão Social:</strong> {{ rescisao.contrato.agente_integrador.razao_social }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Endereço:</strong> {{ rescisao.contrato.agente_integrador.endereco }}</td>
+        </tr>
+        <tr>
+            <td><strong>Bairro:</strong> {{ rescisao.contrato.agente_integrador.bairro }}</td>
+            <td><strong>Estado:</strong> {{ rescisao.contrato.agente_integrador.estado }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cnpj:</strong> {{ rescisao.contrato.agente_integrador.cnpj }}</td>
+            <td><strong>Representante Legal:</strong> {{ rescisao.contrato.agente_integrador.representante_legal }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cidade:</strong> {{ rescisao.contrato.agente_integrador.cidade }}</td>
+            <td><strong>Cep:</strong> {{ rescisao.contrato.agente_integrador.cep }}</td>
+        </tr>
+        <tr>
+            <td><strong>Telefone:</strong> {{ rescisao.contrato.agente_integrador.telefone }}</td>
+            <td><strong>Email:</strong> <span class="lowercase">{{ rescisao.contrato.agente_integrador.email }}</span></td>
+        </tr>
+    </table>
+
+    <div class="clause" style="margin-top: 25px;">Comunicado de Conclusão / Rescisão do - TCE, termos e condições a seguir:</div>
+
+    <div class="conditions-title">1) Período Estagiado:</div>
+    <div class="clause">De: {{ rescisao.contrato.data_inicio|date:"d/m/Y" }} a {{ rescisao.data_rescisao|date:"d/m/Y" }}</div>
+    <div class="clause">Horário Estagiado: {{ rescisao.contrato.horario_estagio }}, {{ rescisao.contrato.jornada_estagio }}</div>
+
+    <div class="conditions-title">2) Motivo da Rescisão:</div>
+    <div class="clause">{{ rescisao.motivo }}</div>
+
+    <div class="conditions-title">3) Atividades do Estagiário</div>
+    <div class="clause">{{ rescisao.contrato.atividades }}</div>
+
+    <div class="signature-date">
+        GUARULHOS, {{ rescisao.data_rescisao|date:"d \\d\\e F \\d\\e Y" }}
+    </div>
+
+    <table>
+        <tr>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{{ rescisao.contrato.agente_integrador.razao_social }}</div>
+                    <div class="signature-stamp">(assinatura e carimbo)</div>
+                </div>
+            </td>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{{ rescisao.contrato.estagiario.instituicao_ensino.razao_social }}</div>
+                    <div class="signature-stamp">(assinatura e carimbo)</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{{ rescisao.contrato.estagiario.nome }}</div>
+                </div>
+            </td>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>Pais/Responsável</div>
+                </div>
+            </td>
+        </tr>
+         <!--<tr>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>Pais/Responsável</div>
+                </div>
+            </td>
+            <td style="width: 50%; padding: 45px 25px;"></td>
+        </tr>-->
+    </table>
+
+</body>
+</html>

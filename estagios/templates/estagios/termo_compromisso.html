@@ -1,0 +1,484 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>TCE - Termo de Compromisso de Estágio</title>
+    <style>
+        @page {
+            margin: 1.5cm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 9pt;
+            }
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10.5pt;
+            line-height: 1.3; /* Aumentado para melhor legibilidade */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 1px 3px;
+            vertical-align: top;
+        }
+
+        .header-logo {
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            font-size: 14pt;
+        }
+
+        .header-main-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11pt;
+        }
+
+        .header-subtitle {
+            text-align: center;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+
+        /* --- ESTILO MODIFICADO --- */
+        .contract-box {
+            /* border: 1px solid black; -> REMOVIDO */
+            text-align: center;
+        }
+        .contract-box-title {
+            font-size: 8pt;
+            font-weight: bold;
+            /* border-bottom: 1px solid black; -> REMOVIDO */
+            padding: 1px;
+        }
+        .contract-box-content {
+            font-size: 10pt;
+            font-weight: bold;
+            padding: 2px;
+        }
+
+        .centered-text {
+            text-align: center;
+            font-size: 9pt;
+            margin: 10px 0;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 9pt;
+            text-transform: uppercase;
+            margin-top: 10px;
+            margin-bottom: 2px;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-bottom: 1px solid black;
+            margin-bottom: 20px; /* ESPAÇAMENTO AUMENTADO */
+        }
+
+        .info-table td {
+            font-size: 9pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 2px 0;
+            width: 50%;
+        }
+
+        .info-table strong {
+            font-weight: normal;
+            text-transform: none;
+        }
+
+        .lowercase {
+            text-transform: none !important;
+        }
+
+        .conditions-title {
+            text-align: left;
+            font-weight: bold;
+            font-size: 9pt;
+            /* border: 1px solid black; -> REMOVIDO */
+            /* border-bottom: none; -> REMOVIDO */
+            /* padding: 2px; -> REMOVIDO */
+            margin-top: 25px; /* ESPAÇAMENTO AUMENTADO */
+        }
+        .conditions-content {
+            text-align: left; /* Alinhamento padrão para o conteúdo */
+            font-size: 9pt;
+            /* border: 1px solid black; -> REMOVIDO */
+            /* padding: 3px; -> REMOVIDO */
+            margin-top: 5px;
+        }
+
+        /* Estilos específicos para conteúdo que deve ser centralizado ou negrito */
+        .conditions-content.centered {
+             text-align: left;
+        }
+        /*.conditions-content.bold {
+            font-weight: bold;
+        }*/
+
+        .clause {
+            font-size: 9pt;
+            text-align: justify;
+            margin-top: 12px; /* ESPAÇAMENTO AUMENTADO */
+        }
+
+        .signature-date {
+            text-align: center;
+            margin-top: 40px; /* ESPAÇAMENTO AUMENTADO */
+            margin-bottom: 30px;
+            font-size: 10pt;
+        }
+
+        .signature-block {
+            text-align: center;
+            font-size: 9pt;
+        }
+        .signature-line {
+            border-top: 1px solid black;
+            margin: 0 auto 2px auto;
+            width: 70%;
+        }
+        .signature-stamp {
+            font-size: 8pt;
+        }
+        /* --- FIM DAS MODIFICAÇÕES DE ESTILO --- */
+    </style>
+</head>
+<body>
+
+    <table style="margin-bottom: 10px;">
+        <tr>
+            <td style="width: 25%;" class="header-logo">
+                <!--<img src="{% static 'images/LOGO.jpg' %}" alt="Logo da Empresa" style="max-width: 100%; height: auto;">-->
+                <img src="{{ logo_path }}" alt="Logo da Empresa" style="max-width: 100%; height: auto;">
+            </td>
+            <td style="width: 50%;">
+                <div class="header-main-title">TCE - Termo de COMPROMISSO de ESTÁGIO.</div>
+                <div class="header-subtitle">PARA REALIZAÇÃO DE ESTÁGIO NÃO OBRIGATÓRIO</div>
+            </td>
+            <td style="width: 25%;">
+                <div class="contract-box">
+                    <div class="contract-box-title">Nº Contrato</div>
+                    <div class="contract-box-content">{{ contrato.numero_contrato }}</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="centered-text">(Instrumentos jurídicos de que trata o inciso II do artigo 3º, da Lei 11.788, de 25/09/2008.)</div>
+    <div class="clause">Celebram entre si o presente instrumento jurídico de:</div>
+    <div class="clause">"TERMO DE COMPROMISSO DE ESTÁGIO, previsto no Artigo 8º da Legislação do Estágio. Lei 11.788 de 25/09/2008."</div>
+    <div class="clause">As partes a seguir qualificadas:</div>
+
+    <div class="section-title">INSTITUIÇÃO DE ENSINO</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Razão Social:</strong> {{ contrato.estagiario.instituicao_ensino.razao_social }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Endereço:</strong> {{ contrato.estagiario.instituicao_ensino.endereco }}</td>
+        </tr>
+        <tr>
+            <td><strong>Bairro:</strong> {{ contrato.estagiario.instituicao_ensino.bairro }}</td>
+            <td><strong>Estado:</strong> {{ contrato.estagiario.instituicao_ensino.estado }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cnpj:</strong> {{ contrato.estagiario.instituicao_ensino.cnpj }}</td>
+            <td><strong>Representante Legal:</strong> {{ contrato.estagiario.instituicao_ensino.representante_legal }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">PARTE CONCEDENTE</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Razão Social:</strong> {{ contrato.parte_concedente.razao_social }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Endereço:</strong> {{ contrato.parte_concedente.endereco }}</td>
+        </tr>
+        <tr>
+            <td><strong>Bairro:</strong> {{ contrato.parte_concedente.bairro }}</td>
+            <td><strong>Estado:</strong> {{ contrato.parte_concedente.estado }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cnpj:</strong> {{ contrato.parte_concedente.cnpj }}</td>
+            <td><strong>Representante Legal:</strong> {{ contrato.parte_concedente.representante_legal }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cidade:</strong> {{ contrato.parte_concedente.cidade }}</td>
+            <td><strong>Cep:</strong> {{ contrato.parte_concedente.cep }}</td>
+        </tr>
+        <tr>
+            <td><strong>Telefone:</strong> {{ contrato.parte_concedente.telefone }}</td>
+            <td><strong>Email:</strong> <span class="lowercase">{{ contrato.parte_concedente.email }}</span></td>
+        </tr>
+    </table>
+
+    <div class="section-title">ESTAGIÁRIO(A)</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Nome:</strong> {{ contrato.estagiario.nome }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Endereço:</strong> {{ contrato.estagiario.endereco }}</td>
+        </tr>
+        <tr>
+            <td><strong>Bairro:</strong> {{ contrato.estagiario.bairro }}</td>
+            <td><strong>Estado:</strong> {{ contrato.estagiario.estado }}</td>
+        </tr>
+        <tr>
+            <td><strong>CPF:</strong> {{ contrato.estagiario.cpf }}</td>
+            <td><strong>Data nascimento:</strong> {{ contrato.estagiario.data_nascimento|date:"d/m/Y" }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cidade:</strong> {{ contrato.estagiario.cidade }}</td>
+            <td><strong>Cep:</strong> {{ contrato.estagiario.cep }}</td>
+        </tr>
+        <tr>
+            <td><strong>Telefone:</strong> {{ contrato.estagiario.telefone }}</td>
+            <td><strong>Email:</strong> <span class="lowercase">{{ contrato.estagiario.email }}</span></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="font-size: 8pt;">
+                Regularmente matriculado(a) no {{ contrato.estagiario.ano_periodo }} do curso de {{ contrato.estagiario.curso }} do nível (NM) NÍVEL MÉDIO
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-title">AGENTE DE INTEGRAÇÃO</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Razão Social:</strong> {{ contrato.agente_integrador.razao_social }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Endereço:</strong> {{ contrato.agente_integrador.endereco }}</td>
+        </tr>
+        <tr>
+            <td><strong>Bairro:</strong> {{ contrato.agente_integrador.bairro }}</td>
+            <td><strong>Estado:</strong> {{ contrato.agente_integrador.estado }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cnpj:</strong> {{ contrato.agente_integrador.cnpj }}</td>
+            <td><strong>Representante Legal:</strong> {{ contrato.agente_integrador.representante_legal }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cidade:</strong> {{ contrato.agente_integrador.cidade }}</td>
+            <td><strong>Cep:</strong> {{ contrato.agente_integrador.cep }}</td>
+        </tr>
+        <tr>
+            <td><strong>Telefone:</strong> {{ contrato.agente_integrador.telefone }}</td>
+            <td><strong>Email:</strong> <span class="lowercase">{{ contrato.agente_integrador.email }}</span></td>
+        </tr>
+    </table>
+
+    <div class="clause" style="margin-top: 25px;">As partes convencionam as cláusulas e condições a seguir:</div>
+
+    <div class="conditions-title">PERÍODO DE VIGÊNCIA DESTE INSTRUMENTO</div>
+    <div class="conditions-content">
+        O estágio terá início em {{ contrato.data_inicio|date:"d/m/Y" }}, com a apresentação, ao CONCEDENTE, do termo de
+        compromisso devidamente assinado pela INSTITUIÇÃO DE ENSINO INTERVENIENTE, e findará, impreterivelmente, em
+        {{ contrato.data_termino_prevista|date:"d/m/Y" }} (com limite de dois anos contados da data de início). As datas
+        de início e término de vigência, poderão ser renovadas ou ajustadas assim como as atividades, horários, valores
+        de bolsas e/ou supervisores, através de aditivos ou rescindido automaticamente ao término de forma unilateral
+        por quaisquer das partesm a qualquer momento, sem ônus, multas ou aviso-prévio, mediante formalização do
+        respectivo Termo de Rescisão.
+    </div>
+
+    <div class="conditions-title">DA JORNADA E CARGA HORÁRIA DO ESTÁGIO</div>
+    <div class="conditions-content centered bold" style="text-transform: uppercase;">{{ contrato.horario_estagio }}, {{ contrato.jornada_estagio }}</div>
+
+    <div class="conditions-title">DA ATIVIDADE DO ESTAGIÁRIO(A)</div>
+    <div class="conditions-content">
+        <strong>Setor:</strong> {{ contrato.setor }}<br>
+        {{ contrato.atividades }}<br>
+        <strong>SUPERVISOR(A) DO ESTÁGIO:</strong> {{ contrato.supervisor_nome }}
+    </div>
+
+    <div class="conditions-title">DO VALOR DA BOLSA-ESTÁGIO + AUXÍLIO</div>
+    <div class="conditions-content">
+        No periodo do estágio o Estagiário receberá, diretamente da Parte Concedente, uma Bolsa-estágio mensal no valor de R$ {{ contrato.valor_bolsa|floatformat:2 }} + A CRITÉRIO, pagos até o 10º dia útil do mês subsequente ao vencido.
+    </div>
+
+    <div class="conditions-title">DO SEGURO</div>
+    <div class="conditions-content">
+        No período de vigência do presente TCE, o estagiário terá cobertura de Seguro de Acidentes Pessoais, contratado pela Parte Concedente na Apólice Individual ou Coletiva de Acidentes Pessoais nº {{ contrato.numero_apolice_seguro }}, garantido pela {{ contrato.seguradora_nome }}, nos termos do Inciso IV, do Art. 9º da Lei nº 11.788 de 25/09/2008.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 1ª</strong> - O presente TCE estabelece as condições básicas para a consecução do estágio NÃO OBRIGATÓRIO existente entre o(a) ESTAGIÁRIO(A) e a UNIDADE CONCEDENTE, caracterizando a não vinculação empregatícia, previsto nos Artigos 1º, 2º, 3º e 4º da Lei nº 11.788 de 25/09/2008.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 2ª</strong> - O estágio obrigatório quanto o não-obrigatório, não cria vínculo empregatício de qualquer natureza, observadas as disposições previstas no
+Artigo 3º da Legislação do Estágio.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 3ª</strong> - A Instituição de Ensino comunicará à parte concedente do estágio, através do Aluno, as datas de realização de avaliações escolares ou
+acadêmicas.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 4ª</strong> - Se houver verificações de aprendizagem periódicas ou finais, no período de estágio do Estudante, a carga horária do estágio, nestas datas,
+poderá ser reduzida à metade.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 5ª</strong> - O estagiário deverá apresentar em um prazo não superior a seis meses, o relatório das atividades do Estagiário, na conclusão ou na rescisão
+antecipada do Termo de Compromisso de Estágio.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 6ª</strong> - O horário do estágio não deverá, em hipótese alguma, prejudicar a frequência do Aluno às aulas.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 7ª</strong> - A assiduidade do Estagiário será demonstrada pela marcação de entrada e saída em cartão de ponto ou qualquer outra modalidade de
+controle adotada pela Parte Concedente.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 8ª</strong> - O estágio, como ato educativo escolar supervisionado, deverá ter acompanhamento efetivo pelo professor orientador da Instituição de Ensino
+e por supervisor da Parte Concedente.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 9ª</strong> - Ficam estabelecidas ainda entre as partes:
+    </div>
+
+    <div class="clause">
+        O valor da bolsa-estágio descrito no ítem 4 deste instrumento poderá variar em decorrência do não cumprimento das obrigações acordadas no presente
+Termo de Compromisso de Estágio;
+    </div>
+
+    <div class="clause">
+        Cabe a UNIDADE CONCEDENTE o fornecimento de auxílio transporte quando tratar-se de Estágio Não-Obrigatório, sendo facultado o fornecimento de
+auxílio refeição e planos de saúde, além de inclusão do ESTAGIÁRIO como segurado facultativo do regime geral da Previdência Social, conforme disposto
+nos parágrafos 1º e 2º, do artigo 12, da Lei nº 11.788/2008.
+    </div>
+
+    <div class="clause">
+        É assegurado ao estagiário, sempre que o estágio tenha duração igual ou superior a 1 (um) ano, período de recesso de 30 (trinta) dias, a ser gozado
+preferencialmente durante suas férias escolares. Os dias de recesso previstos neste artigo serão gozados ou indenizados de maneira proporcional, nos
+casos de o estágio ter duração inferior a 1 (um) ano. O período de recesso poderá ser ainda gozado ou indenizado ao final do contrato.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 10ª</strong> - Caberá ao Estagiário informar à Parte Concedente alterações ocorridas na sua atividade escolar, como interrupção de frequência, mudança
+de curso ou transferência de Instituição de Ensino.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 11ª</strong> - É de responsabilidade do Estagiário preservar o sigilo e a confidencialidade das informações a que tiver acesso no decorrer do seu estágio
+junto à Parte Concedente.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 12ª</strong> - O não cumprimento de quaisquer das cláusulas previstas neste instrumento jurídico, abandono ou interrupção do curso, trancamento de
+matrícula, constatado que o estágio não é compativel com o combinado no TCE ou conclusão do curso, conduta não condizente ou comprovada
+insuficiência no desempenho do estágio, serão motivos de rescisão automática.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 13ª</strong> - Aplica-se ao Estagiário a Legislação relacionada à saúde e segurança no trabalho, sendo sua implementação de responsabilidade da Parte
+concedente do Estágio.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 14ª</strong> - O presente instrumento poderá ser renovado na forma da Lei e denunciado, a qualquer tempo, mediante comunicação escrita, pela
+Instituição de Ensino, pela Parte Concedente ou pelo Estagiário, não excedendo o limite de 2 anos exceto para os casos de estagiários com deficiência.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 15ª</strong> - A observância dos requisitos previstos no TCE e, bem assim, daqueles enumerados na Lei nº 11.788/2008, especificamente no que toca às
+obrigações da UNIDADE CONCEDENTE, não configurarão sob hipótese alguma relação de emprego na forma do Artigo 3º da CLT.
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 16ª</strong> - Dos requisitos para segurança da informação e do disposto pela Lei no 13.709, de 14 de agosto de 2018, referente a coleta, retenção,
+processamento, compartilhamento e eliminação das informações geradas através deste TCE: O Tratamento dos dados obtidos através do livre cadastro de
+forma voluntária do candidato no site de vagas, no banco de currículos, por meio de ficha preenchida e encaminhada por e-mail ou pessoalmente, conforme
+preconizado pelos arts. 7o e 11 da LGPD, são de uso exclusivo para cumprir finalidades específicas de administração dos contratos segundo a Lei
+11788/08. Todas as informações neste TCE são de total acesso, conhecimento das partes interessadas para recolhimento de assinatura, reclamações,
+cancelamentos e andamento do processo.
+    </div>
+
+    <div class="conditions-title">DO AGENTE DE INTEGRAÇÃO</div>
+
+    <div class="clause">
+        Atuar como auxiliar no processo de aperfeiçoamento do estágio identificando as oportunidades, ajustando suas condições de realização, fazendo o
+acompanhamento administrativo através de verificação in-loco e/ou através de relatórios, efetivar o Seguro Contra Acidentes Pessoais e cadastrar os
+estudantes (§1º do art. 5º da Lei nº 11.788/08), selecionando os locais de estágio e organizando o cadastro dos concedentes das oportunidades de estágio
+(art. 6º da Lei nº 11.788/08).
+    </div>
+
+    <div class="clause">
+        É vedada a cobrança de qualquer taxa dos estudantes a título de remuneração pelos serviços dos agentes de integração. (§2º do art. 5º da Lei nº
+11.788/2008).
+    </div>
+
+    <div class="clause">
+        Parágrafo único: Se durante a vigência deste TCE, o Agente de Integração, em sua condição de legitimidade, atribuições e responsabilidades que são do
+conhecimento das partes contratantes, identificar violação dos compromissos assumidos por quaisquer das partes, cessarão suas responsabilidades legais,
+técnicas e administrativas, devendo o mesmo cientificar, por escrito, todas as partes envolvidas.
+    </div>
+
+    <div class="signature-date">
+        GUARULHOS, {{ contrato.data_inicio|date:"d \\d\\e F \\d\\e Y" }}
+    </div>
+
+    <table>
+        <tr>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{{ contrato.agente_integrador.razao_social }}</div>
+                    <div class="signature-stamp">(assinatura e carimbo)</div>
+                </div>
+            </td>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{{ contrato.estagiario.instituicao_ensino.razao_social }}</div>
+                    <div class="signature-stamp">(assinatura e carimbo)</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{{ contrato.estagiario.nome }}</div>
+                </div>
+            </td>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>Pais/Responsável</div>
+                </div>
+            </td>
+        </tr>
+         <tr>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{{ contrato.agente_integrador.razao_social }}</div>
+                </div>
+            </td>
+            <td style="width: 50%; padding: 45px 25px;"></td>
+        </tr>
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+{% extends 'estagios/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar Contrato{% else %}Adicionar Contrato{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% if form.instance.pk %}Editar Contrato{% else %}Adicionar Novo Contrato{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Salvar</button>
+        <a href="{% url 'contrato-lista' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,299 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Ficha de Cadastro - Recrutamento</title>
+    <style>
+        @page {
+            margin: 1.5cm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 9pt;
+            }
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10.5pt;
+            line-height: 1.3; /* Aumentado para melhor legibilidade */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 1px 3px;
+            vertical-align: top;
+        }
+
+        .header-logo {
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            font-size: 14pt;
+        }
+
+        .header-main-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11pt;
+        }
+
+        .header-subtitle {
+            text-align: center;
+            font-size: 9pt;
+            font-weight: bold;
+            padding: 20px;
+            font-size: 18pt;
+            margin-left: 7%;
+        }
+
+        /* --- ESTILO MODIFICADO --- */
+        .contract-box {
+            /* border: 1px solid black; -> REMOVIDO */
+            text-align: center;
+        }
+        .contract-box-title {
+            font-size: 8pt;
+            font-weight: bold;
+            /* border-bottom: 1px solid black; -> REMOVIDO */
+            padding: 1px;
+        }
+        .contract-box-content {
+            font-size: 10pt;
+            font-weight: bold;
+            padding: 2px;
+        }
+
+        .centered-text {
+            text-align: center;
+            font-size: 9pt;
+            margin: 10px 0;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 9pt;
+            text-transform: uppercase;
+            margin-top: 10px;
+            margin-bottom: 2px;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-bottom: 1px solid black;
+            margin-bottom: 20px; /* ESPAÇAMENTO AUMENTADO */
+        }
+
+        .info-table td {
+            font-size: 9pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 2px 0;
+            width: 50%;
+        }
+
+        .info-table strong {
+            font-weight: normal;
+            text-transform: none;
+        }
+
+        .lowercase {
+            text-transform: none !important;
+        }
+
+        .conditions-title {
+            text-align: left;
+            font-weight: bold;
+            font-size: 9pt;
+            /* border: 1px solid black; -> REMOVIDO */
+            /* border-bottom: none; -> REMOVIDO */
+            /* padding: 2px; -> REMOVIDO */
+            margin-top: 25px; /* ESPAÇAMENTO AUMENTADO */
+        }
+        .conditions-content {
+            text-align: left; /* Alinhamento padrão para o conteúdo */
+            font-size: 9pt;
+            /* border: 1px solid black; -> REMOVIDO */
+            /* padding: 3px; -> REMOVIDO */
+            margin-top: 5px;
+        }
+
+        /* Estilos específicos para conteúdo que deve ser centralizado ou negrito */
+        .conditions-content.centered {
+             text-align: left;
+        }
+        /*.conditions-content.bold {
+            font-weight: bold;
+        }*/
+
+        .clause {
+            font-size: 9pt;
+            text-align: justify;
+            margin-top: 12px; /* ESPAÇAMENTO AUMENTADO */
+        }
+
+        .signature-date {
+            text-align: center;
+            margin-top: 40px; /* ESPAÇAMENTO AUMENTADO */
+            margin-bottom: 30px;
+            font-size: 10pt;
+        }
+
+        .signature-block {
+            text-align: center;
+            font-size: 9pt;
+        }
+        .signature-line {
+            border-top: 1px solid black;
+            margin: 0 auto 2px auto;
+            width: 70%;
+        }
+        .signature-stamp {
+            font-size: 8pt;
+        }
+        /* --- FIM DAS MODIFICAÇÕES DE ESTILO --- */
+    </style>
+</head>
+<body>
+
+    <table style="margin-bottom: 10px;">
+        <tr>
+            <td style="width: 25%;" class="header-logo">
+                <img src="{{ logo_path }}" alt="Logo da Empresa" style="max-width: 100%; height: auto;">
+            </td>
+            <td style="width: 50%;">
+                <!--<div class="header-main-title">TCE - Termo de COMPROMISSO de ESTÁGIO.</div>-->
+                <div class="header-subtitle">Ficha de Cadastro - Recrutamento</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-title">Dados Pessoais</div>
+<table class="info-table">
+    <tr>
+        <td><strong>Nome:</strong> {{ candidato.nome }}</td>
+        <td><strong>Sexo:</strong> {{ candidato.sexo }}</td>
+    </tr>
+    <tr>
+        <td><strong>RG:</strong> {{ candidato.rg }}</td>
+        <td><strong>CPF:</strong> {{ candidato.cpf }}</td>
+    </tr>
+    <tr>
+        <td><strong>Data de Nascimento:</strong> {{ candidato.data_nascimento }}</td>
+        <td><strong>Estado Civil:</strong> {{ candidato.get_estado_civil_display }}</td>
+    </tr>
+    <tr>
+        <td><strong>Tem filhos:</strong> {{ candidato.tem_filhos|yesno:'Sim,Não' }}</td>
+        <td><strong>Filhos detalhes:</strong> {{ candidato.filho_detalhes_formatado }}</td>
+    </tr>
+    <tr>
+        <td><strong>Celular:</strong> {{ candidato.celular }}</td>
+        <td><strong>Celular 2:</strong> {{ candidato.celular2_formatado }}</td>
+    </tr>
+    <tr>
+        <td><strong>Email:</strong> <span class="lowercase">{{ candidato.email }}</span></td>
+        <td><strong>Rede Social:</strong> {{ candidato.rede_social }}</td>
+    </tr>
+    <tr>
+        <td><strong>CEP:</strong> {{ candidato.cep }}</td>
+        <td colspan="3"><strong>Endereço:</strong> {{ candidato.endereco }}, <strong>N°:</strong> {{ candidato.numero }}, <strong>Bairro:</strong> {{ candidato.bairro }}</td>
+    </tr>
+    <tr>
+        <td><strong>Complemento:</strong> {{ candidato.complemento }}</td>
+        <td><strong>Cidade:</strong> {{ candidato.cidade }}</td>
+    </tr>
+    <tr>
+        <td><strong>Estado:</strong> {{ candidato.estado }}</td>
+    </tr>
+</table>
+
+    <div class="section-title">Informações Adicionais</div>
+    <table class="info-table">
+        <tr>
+            <td><strong>Fumante:</strong> {{ candidato.fumante|yesno:'Sim,Não' }}</td>
+            <td><strong>Habilitação:</strong> {{ candidato.get_habilitacao_display }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Religião:</strong> {{ candidato.religiao_formatada }}</td>
+            <td><strong>Como conheceu a agência:</strong> {{ candidato.conheceu_agencia }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">Formação Acadêmica</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Escolaridade:</strong> {{ candidato.get_escolaridade_display }}</td>
+            <td colspan="2"><strong>Curso:</strong> {{ candidato.curso }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Período:</strong> {{ candidato.periodo }}</td>
+            <td colspan="2"><strong>Série / Semestre:</strong> {{ candidato.serie_semestre }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Data de Término:</strong> {{ candidato.data_termino }}</td>
+            <td colspan="2"><strong>Instituição de Ensino:</strong> {{ candidato.instituicao_ensino }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Vale Transporte:</strong> {{ candidato.get_vale_transporte_display }}</td>
+            <td colspan="2"><strong>Curso Extracurricular:</strong> {{ candidato.curso_extracurricular }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">Informações Profissionais</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Já trabalhou:</strong> {{ candidato.get_trabalho_display }}</td>
+            <td colspan="2"><strong>Disponibilidade para trabalhar no final de semana:</strong>
+                {{ candidato.disponibilidade_final_semana|yesno:'Sim,Não' }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Microsoft 365 (Pacote Office):</strong> {{ candidato.get_microsoft_365_display }}</td>
+            <td colspan="2"><strong>Experiência Profissional:</strong> {{ candidato.experiencia_profissional }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Área de Interesse:</strong> {{ candidato.area_interesse }}</td>
+            <td colspan="2"><strong>Vaga Pretendida:</strong> {{ candidato.vaga_pretendida }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Pretensão Salarial:</strong> {{ candidato.pretensao_salarial }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">Informações Médicas</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Medicamento Constante:</strong> {{ candidato.medicamento_constante }}</td>
+            <td colspan="2"><strong>Alergia:</strong> {{ candidato.alergia }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Problema de Saúde:</strong> {{ candidato.problema_saude }}</td>
+            <td colspan="2"><strong>PCD:</strong> {{ candidato.get_pcd_display }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>PCD detalhes:</strong> {{ candidato.pcd_detalhes_formatado }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">Informações dos Responsáveis</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Nome do pai:</strong> {{ candidato.nome_pai }}</td>
+            <td colspan="2"><strong>Telefone do pai:</strong> {{ candidato.telefone_pai }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Email do pai:</strong> {{ candidato.email_pai }}</td>
+            <td colspan="2"><strong>Nome da mãe:</strong> {{ candidato.nome_mae }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Telefone da mãe:</strong> {{ candidato.telefone_mae }}</td>
+            <td colspan="2"><strong>Email da mãe:</strong> {{ candidato.email_mae }}</td>
+        </tr>
+    </table>
+
+</body>
+</html>
