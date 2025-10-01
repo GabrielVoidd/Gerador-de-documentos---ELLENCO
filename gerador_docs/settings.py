@@ -73,15 +73,8 @@ WSGI_APPLICATION = 'gerador_docs.wsgi.application'
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-# --- INÍCIO DO DEBUG ---
-print("--- INICIANDO DEBUG DE CONEXÃO ---")
-print(f"Valor lido da DATABASE_URL: '{DATABASE_URL}'")
-if DATABASE_URL:
-    print("Resultado: A variável foi encontrada. Tentando configurar o banco de produção.")
-else:
-    print("Resultado: A variável NÃO foi encontrada. Tentando configurar o banco local.")
-print("--- FIM DO DEBUG DE CONEXÃO ---")
-# --- FIM DO DEBUG ---
+if DATABASE_URL and DATABASE_URL.startswith('postgresql://'):
+    DATABASE_URL = DATABASE_URL.replace('postgresql://', 'postgres://', 1)
 
 if DATABASE_URL:
     DATABASES = {
