@@ -4,7 +4,7 @@ import os
 def create_superuser(apps, schema_editor):
     User = apps.get_model('auth', 'User')
 
-    admin_username = os.environ.get('ADMIN_USERNAME', 'souza')
+    admin_username = os.environ.get('ADMIN_USERNAME', 'admin_souza')
     admin_email = os.environ.get('ADMIN_EMAIL', 'sollencomktdigital@gmail.com')
     admin_password = os.environ.get('ADMIN_PASSWORD')
 
