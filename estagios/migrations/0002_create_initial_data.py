@@ -13,7 +13,7 @@ def create_superuser(apps, schema_editor):
         print(f'Superuser "{admin_username}" criado')
 
 
-class Migrations(migrations.Migration):
+class Migration(migrations.Migration):
     dependencies = [
         ('estagios', '0001_initial'),
     ]
