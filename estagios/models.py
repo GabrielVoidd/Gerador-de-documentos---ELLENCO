@@ -216,6 +216,9 @@ class Candidato(models.Model):
         verbose_name = 'Candidato'
         verbose_name_plural = 'Candidatos'
 
+    def __str__(self):
+        return self.nome
+
 
 class Estagiario(models.Model):
     # primary_key=True assegura que existirá somente um registro de Estagiário para Candidato
@@ -227,7 +230,9 @@ class Estagiario(models.Model):
         verbose_name_plural = 'Estagiários'
 
     def __str__(self):
-        return self.nome
+        if self.candidato:
+            return self.candidato.nome
+        return 'Sem candidato(a)'
 
 
 class AgenteIntegrador(models.Model):
