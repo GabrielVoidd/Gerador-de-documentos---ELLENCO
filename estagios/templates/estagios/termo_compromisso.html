@@ -228,30 +228,30 @@
     <div class="section-title">ESTAGIÁRIO(A)</div>
     <table class="info-table">
         <tr>
-            <td colspan="2"><strong>Nome:</strong> {{ contrato.estagiario.nome }}</td>
+            <td colspan="2"><strong>Nome:</strong> {{ contrato.estagiario.candidato.nome }}</td>
         </tr>
         <tr>
-            <td colspan="2"><strong>Endereço:</strong> {{ contrato.estagiario.endereco }}</td>
+            <td colspan="2"><strong>Endereço:</strong> {{ contrato.estagiario.candidato.endereco }}</td>
         </tr>
         <tr>
-            <td><strong>Bairro:</strong> {{ contrato.estagiario.bairro }}</td>
-            <td><strong>Estado:</strong> {{ contrato.estagiario.estado }}</td>
+            <td><strong>Bairro:</strong> {{ contrato.estagiario.candidato.bairro }}</td>
+            <td><strong>Estado:</strong> {{ contrato.estagiario.candidato.estado }}</td>
         </tr>
         <tr>
             <td><strong>CPF:</strong> {{ contrato.estagiario.cpf }}</td>
-            <td><strong>Data nascimento:</strong> {{ contrato.estagiario.data_nascimento|date:"d/m/Y" }}</td>
+            <td><strong>Data nascimento:</strong> {{ contrato.estagiario.candidato.data_nascimento|date:"d/m/Y" }}</td>
         </tr>
         <tr>
-            <td><strong>Cidade:</strong> {{ contrato.estagiario.cidade }}</td>
-            <td><strong>Cep:</strong> {{ contrato.estagiario.cep }}</td>
+            <td><strong>Cidade:</strong> {{ contrato.estagiario.candidato.cidade }}</td>
+            <td><strong>Cep:</strong> {{ contrato.estagiario.candidato.cep }}</td>
         </tr>
         <tr>
-            <td><strong>Telefone:</strong> {{ contrato.estagiario.telefone }}</td>
-            <td><strong>Email:</strong> <span class="lowercase">{{ contrato.estagiario.email }}</span></td>
+            <td><strong>Telefone:</strong> {{ contrato.estagiario.candidato.celular }}</td>
+            <td><strong>Email:</strong> <span class="lowercase">{{ contrato.estagiario.candidato.email }}</span></td>
         </tr>
         <tr>
             <td colspan="2" style="font-size: 8pt;">
-                Regularmente matriculado(a) no {{ contrato.estagiario.ano_periodo }} do curso de {{ contrato.estagiario.curso }} do nível (NM) NÍVEL MÉDIO
+                Regularmente matriculado(a) no {{ contrato.estagiario.candidato.ano_periodo }} do curso de {{ contrato.estagiario.candidato.curso }}
             </td>
         </tr>
     </table>
