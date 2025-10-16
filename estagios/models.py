@@ -2,9 +2,6 @@ from django.db import models
 from django.utils import timezone
 from datetime import date
 from rest_framework.exceptions import ValidationError
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 class InstituicaoEnsino(models.Model):
@@ -285,7 +282,7 @@ class Contrato(models.Model):
                 super().save(update_fields=['numero_contrato'])
 
         except Exception as e:
-            logger.exception("Erro ao salvar contrato")
+            print(e)
             raise
 
     class Meta:
