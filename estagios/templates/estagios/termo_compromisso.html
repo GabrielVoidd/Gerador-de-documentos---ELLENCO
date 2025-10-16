@@ -238,7 +238,7 @@
             <td><strong>Estado:</strong> {{ contrato.estagiario.candidato.estado }}</td>
         </tr>
         <tr>
-            <td><strong>CPF:</strong> {{ contrato.estagiario.cpf }}</td>
+            <td><strong>CPF:</strong> {{ contrato.estagiario.candidato.cpf }}</td>
             <td><strong>Data nascimento:</strong> {{ contrato.estagiario.candidato.data_nascimento|date:"d/m/Y" }}</td>
         </tr>
         <tr>
@@ -459,7 +459,7 @@ técnicas e administrativas, devendo o mesmo cientificar, por escrito, todas as 
             <td style="width: 50%; padding: 45px 25px;">
                 <div class="signature-block">
                     <div class="signature-line"></div>
-                    <div>{{ contrato.estagiario.nome }}</div>
+                    <div>{{ contrato.estagiario.candidato.nome }}</div>
                 </div>
             </td>
             <td style="width: 50%; padding: 45px 25px;">
