@@ -64,7 +64,7 @@ class ContratoViewSet(viewsets.ModelViewSet):
 
         # Cria a resposta HTTP
         response = HttpResponse(pdf_file, content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="TCE_{contrato.estagiario.nome}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="TCE_{contrato.estagiario.candidato.nome}.pdf"'
 
         return response
 
