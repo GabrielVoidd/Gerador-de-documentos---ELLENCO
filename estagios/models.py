@@ -272,26 +272,29 @@ class Contrato(models.Model):
     valor_bolsa = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        # A lógica só funciona na criação de um novo contrato
-        is_new = self._state.adding
+        try:
+            if self.numero_contrato:
+                super().save(*args, **kwargs)
+                return
 
-        super().save(*args, **kwargs)
+            if self._state.adding:
+                super().save(*args, **kwargs)
 
-        # Se o número do contrato ainda não foi definido
-        if is_new and not self.numero_contrato:
-            ano_atual = self.data_inicio.year if self.data_inicio else timezone.now().year
+                ano_atual = self.data_inicio.year if self.data_inicio else timezone.now().year
+                numero_formatado = f'CT-{ano_atual}-{self.id:04d}'
+                self.numero_contrato = numero_formatado
 
-            # Formata o número: CT=[ANO]-[ID com 4 dígitos, preenchido com zeros (0001 por diante)]
-            numero_formatado = f'CT-{ano_atual}-{self.id:04d}'
-            self.numero_contrato = numero_formatado
+                super().save(update_fields=['numero_contrato'])
 
-            # Salva novamente o objeto, mas atualizando somente o campo do número do contrato
-            # kwargs['force_insert'] = False # Garante o salvamento
-            super().save(update_fields=['numero_contrato'])
+            else:
+                ano_atual = self.data_inicio.year if self.data_inicio else timezone.now().year
+                numero_formatado = f'CT-{ano_atual}-{self.id:04d}'
+                self.numero_contrato = numero_formatado
+                super().save(*args, **kwargs)
 
-        # Se for uma atualização de um objeto já existe, salva normalmente
-        # elif not is_new:
-            # super().save(*args, **kwargs)
+        except Exception as e:
+            print(e)
+            raise
 
     class Meta:
         verbose_name = 'Contrato'
