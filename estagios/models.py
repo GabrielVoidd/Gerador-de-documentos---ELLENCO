@@ -290,7 +290,7 @@ class Contrato(models.Model):
         verbose_name_plural = 'Contratos'
 
     def __str__(self):
-        return f'Contrato {self.numero_contrato} - {self.estagiario.nome}'
+        return f'Contrato {self.numero_contrato} - {self.estagiario.candidato.nome}'
 
 
 class Rescisao(models.Model):
