@@ -275,13 +275,10 @@ class Contrato(models.Model):
         # A lógica só funciona na criação de um novo contrato
         is_new = self._state.adding
 
-        # Salva o objeto para que ele ganhe um ID no banco de dados
-        # Apenas se for um novo objeto, senão ele já tem um ID
-        if is_new:
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
         # Se o número do contrato ainda não foi definido
-        if not self.numero_contrato:
+        if is_new and not self.numero_contrato:
             ano_atual = self.data_inicio.year if self.data_inicio else timezone.now().year
 
             # Formata o número: CT=[ANO]-[ID com 4 dígitos, preenchido com zeros (0001 por diante)]
@@ -289,12 +286,12 @@ class Contrato(models.Model):
             self.numero_contrato = numero_formatado
 
             # Salva novamente o objeto, mas atualizando somente o campo do número do contrato
-            kwargs['force_insert'] = False # Garante o salvamento
-            super().save(update_fields=['numero_contrato'], *args, **kwargs)
+            # kwargs['force_insert'] = False # Garante o salvamento
+            super().save(update_fields=['numero_contrato'])
 
         # Se for uma atualização de um objeto já existe, salva normalmente
-        elif not is_new:
-            super().save(*args, **kwargs)
+        # elif not is_new:
+            # super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Contrato'
