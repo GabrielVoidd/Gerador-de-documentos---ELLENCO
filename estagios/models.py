@@ -2,6 +2,9 @@ from django.db import models
 from django.utils import timezone
 from datetime import date
 from rest_framework.exceptions import ValidationError
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class InstituicaoEnsino(models.Model):
@@ -273,27 +276,16 @@ class Contrato(models.Model):
 
     def save(self, *args, **kwargs):
         try:
-            if self.numero_contrato:
-                super().save(*args, **kwargs)
-                return
+            novo = self.pk is None
+            super().save(*args, **kwargs)
 
-            if self._state.adding:
-                super().save(*args, **kwargs)
-
+            if novo:
                 ano_atual = self.data_inicio.year if self.data_inicio else timezone.now().year
-                numero_formatado = f'CT-{ano_atual}-{self.id:04d}'
-                self.numero_contrato = numero_formatado
-
+                self.numero_contrato = f'CT-{ano_atual}-{self.id:04d}'
                 super().save(update_fields=['numero_contrato'])
 
-            else:
-                ano_atual = self.data_inicio.year if self.data_inicio else timezone.now().year
-                numero_formatado = f'CT-{ano_atual}-{self.id:04d}'
-                self.numero_contrato = numero_formatado
-                super().save(*args, **kwargs)
-
         except Exception as e:
-            print(e)
+            logger.exception("Erro ao salvar contrato")
             raise
 
     class Meta:
