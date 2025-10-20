@@ -31,3 +31,7 @@ urlpatterns = [
 # Em produção, o seu servidor web deve ser configurado para servir os arquivos da pasta MEDIA_ROOT.
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+admin.site.site_header = 'Painel de Controle de Candidatos Ellenco Estágios'
+
+admin.site.index_title = 'Bem vindo ao painel de cadastro'
