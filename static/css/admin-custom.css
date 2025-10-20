@@ -1,0 +1,31 @@
+/* Muda a cor de fundo do cabeçalho principal */
+#header {
+    background-color: #002184;
+    color: #fff;
+}
+
+/* Muda a cor dos links no cabeçalho */
+#header a:link, #header a:visited {
+    color: #f1f1f1; /* Um branco levemente acinzentado */
+}
+
+/* Muda a cor do cabeçalho ao passar o mouse */
+#header a:hover {
+    color: #fff;
+    background-color: #555;
+}
+
+/* Muda a cor de fundo do cabeçalho secundário (onde fica o "Bem-vindo...") */
+.breadcrumbs {
+    background-color: #002184;
+}
+
+/* Muda a cor dos botões principais */
+.button.default, input[type=submit].default {
+    background-color: #FF9600;
+    color: #fff;
+}
+
+.button.default:hover, input[type=submit].default:hover {
+    background-color: #e0621a;
+}

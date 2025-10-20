@@ -1,0 +1,99 @@
+/* Importação de uma fonte limpa e profissional */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* Variáveis de Cor para fácil customização */
+:root {
+    --primary-color: #004a99; /* Azul corporativo */
+    --secondary-color: #f4f4f4; /* Fundo cinza claro */
+    --text-color: #333;
+    --header-bg: #ffffff;
+    --footer-bg: #2c3e50; /* Rodapé escuro */
+    --footer-text: #ecf0f1;
+    --border-color: #ddd;
+    --shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Cabeçalho e Navegação */
+.main-header {
+    background-color: var(--header-bg);
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+.main-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin: 0;
+}
+
+.main-header nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.main-header nav ul li {
+    display: inline-block;
+    margin-left: 25px;
+}
+
+.main-header nav a {
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.main-header nav a:hover {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+/* Conteúdo Principal */
+.main-content {
+    padding: 40px 0;
+    flex-grow: 1;
+}
+
+/* Estilo para a "folha" do documento */
+.document-wrapper {
+    background-color: #fff;
+    padding: 40px 50px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    margin: 0 auto;
+    max-width: 850px; /* Largura similar a A4 */
+}
+
+/* Rodapé */
+.main-footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+    text-align: center;
+    padding: 1.5rem 0;
+    margin-top: 40px;
+}
