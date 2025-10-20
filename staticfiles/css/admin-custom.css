@@ -29,3 +29,8 @@
 .button.default:hover, input[type=submit].default:hover {
     background-color: #e0621a;
 }
+
+.module caption {
+    background-color: #002184;
+    color: #002184;
+}
