@@ -127,6 +127,9 @@ class Candidato(models.Model):
     fumante = models.BooleanField(help_text='É fumante?', default=False)
     religiao = models.CharField(
         max_length=100, null=True, blank=True, help_text='Possui alguma religião? Se sim, qual?')
+    anexar_reservista = models.FileField(
+        verbose_name='Anexar Reservista',
+        upload_to='documentos_candidatos/reservistas/%Y%/%m/%d/', null=True, blank=True)
     conheceu_agencia = models.CharField(max_length=100, help_text='Como conheceu a agência?')
 
     # --- FORMAÇÃO ACADÊMICA ---
@@ -142,6 +145,9 @@ class Candidato(models.Model):
 
     # --- INFORMAÇÕES PROFISSIONAIS ---
     trabalho = models.CharField(max_length=2, choices=Trabalhos.choices)
+    anexar_carteira_trabalho = models.FileField(
+        verbose_name='Anexar Carteira de Trabalho',
+        upload_to='documentos_candidatos/carteiras_trabalho/%Y%/%m/%d/', null=True, blank=True)
     disponibilidade_final_semana = models.BooleanField(help_text='Pode trabalhar de final de semana?', default=False)
     microsoft_365 = models.CharField(
         max_length=2, choices=Microsoft_365.choices, help_text='Nível de conhecimento do pacote office')
@@ -218,6 +224,21 @@ class Candidato(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class CartaEncaminhamento(models.Model):
+    candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='cartas')
+
+    arquivo = models.FileField(upload_to='cartas_encaminhamento/')
+
+    data_emissao = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.arquivo.name
+
+    class Meta:
+        verbose_name = "Carta de Encaminhamento"
+        verbose_name_plural = "Cartas de Encaminhamento"
 
 
 class Estagiario(models.Model):
