@@ -35,7 +35,7 @@
     color: #002184;
 }
 
-.breadcrumbs-bg {
-    background-color: #002184;
-    color: #002184;
+:root {
+    --breadcrumbs-bg: #002184;
+    --breadcrumbs-link-fg: #f5f5f5;
 }
