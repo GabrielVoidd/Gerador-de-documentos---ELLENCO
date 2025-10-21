@@ -78,8 +78,7 @@ class CandidatoAdmin(admin.ModelAdmin):
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = ('nome', 'bairro', 'cpf', 'rg')
 
-    inlines = [CartaEncaminhamentoInline]
-    inlines = [Arquivos]
+    inlines = [CartaEncaminhamentoInline, ArquivosInline]
 
     def gerar_termo_link(self, obj):
         # Cria a URL para o endpoint da API que gera o PDF
