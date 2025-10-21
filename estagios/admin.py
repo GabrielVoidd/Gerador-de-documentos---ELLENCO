@@ -84,7 +84,7 @@ class CandidatoAdmin(admin.ModelAdmin):
     gerar_termo_link.allow_tags = True
 
     def get_readonly_fields(self, request, obj = None):
-        """"Define o campo observacoes como somente leitura se o usuário não perterncer ao grupo 'Recrutamento'"""
+        """"Define o campo observacoes como somente leitura se o usuário não perterncer ao grupo Recrutamento"""
         readonly_fields = super().get_readonly_fields(request, obj)
 
         if request.user.is_superuser:
@@ -95,3 +95,9 @@ class CandidatoAdmin(admin.ModelAdmin):
             return readonly_fields + ('observacoes',)
 
         return readonly_fields
+
+    def get_inlines(self, request, obj=None):
+        if request.user.is_superuser:
+            return self.inlines
+
+        return []
