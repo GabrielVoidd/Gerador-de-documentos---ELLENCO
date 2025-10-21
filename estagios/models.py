@@ -241,6 +241,21 @@ class CartaEncaminhamento(models.Model):
         verbose_name_plural = "Cartas de Encaminhamento"
 
 
+class Arquivos(models.Model):
+    candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='arquivos')
+
+    arquivo = models.FileField(upload_to='arquivos/')
+
+    data_emissao = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.arquivo.name
+
+    class Meta:
+        verbose_name = 'Arquivo'
+        verbose_name_plural = 'Arquivos'
+
+
 class Estagiario(models.Model):
     # primary_key=True assegura que existirá somente um registro de Estagiário para Candidato
     candidato = models.OneToOneField(Candidato, on_delete=models.CASCADE, null=True)
