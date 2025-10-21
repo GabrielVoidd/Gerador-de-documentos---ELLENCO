@@ -180,6 +180,8 @@ class Candidato(models.Model):
     # --- INFORMAÇÕES PARA O(A) RECRUTADOR (A) ---
     observacoes = models.TextField(null=True, blank=True)
 
+    data_cadastro = models.DateField(auto_now_add=True, null=True, blank=True)
+
     def clean(self):
         super().clean()
 
@@ -229,7 +231,7 @@ class Candidato(models.Model):
 class CartaEncaminhamento(models.Model):
     candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='cartas')
 
-    arquivo = models.FileField(upload_to='cartas_encaminhamento/')
+    arquivo = models.FileField(upload_to='cartas_encaminhamento/', null=True, blank=True)
 
     data_emissao = models.DateField(auto_now_add=True)
 
@@ -244,7 +246,7 @@ class CartaEncaminhamento(models.Model):
 class Arquivos(models.Model):
     candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='arquivos')
 
-    arquivo = models.FileField(upload_to='arquivos/')
+    arquivo = models.FileField(upload_to='arquivos/', null=True, blank=True)
 
     data_emissao = models.DateField(auto_now_add=True)
 
@@ -254,6 +256,20 @@ class Arquivos(models.Model):
     class Meta:
         verbose_name = 'Arquivo'
         verbose_name_plural = 'Arquivos'
+
+
+class Empresa(models.Model):
+    candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='empresas')
+    nome = models.CharField(max_length=120, null=True, blank=True)
+    arquivos = models.FileField(upload_to='empresas/', null=True, blank=True)
+    observacoes = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.nome
+
+    class Meta:
+        verbose_name = 'Empresa'
+        verbose_name_plural = 'Empresas'
 
 
 class Estagiario(models.Model):

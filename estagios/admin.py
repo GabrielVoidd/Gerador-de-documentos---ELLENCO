@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
-    CartaEncaminhamento, Arquivos
+    CartaEncaminhamento, Arquivos, Empresa
 
 @admin.register(Contrato)
 class ContratoAdmin(admin.ModelAdmin):
@@ -72,13 +72,18 @@ class ArquivosInline(admin.TabularInline):
     extra = 1
 
 
+class EmpresaInline(admin.TabularInline):
+    model = Empresa
+    extra = 1
+
+
 @admin.register(Candidato)
 class CandidatoAdmin(admin.ModelAdmin):
     list_display = ('nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = ('nome', 'bairro', 'cpf', 'rg')
 
-    inlines = [CartaEncaminhamentoInline, ArquivosInline]
+    inlines = [CartaEncaminhamentoInline, ArquivosInline, EmpresaInline]
 
     def gerar_termo_link(self, obj):
         # Cria a URL para o endpoint da API que gera o PDF
