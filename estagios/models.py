@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from datetime import date
 from rest_framework.exceptions import ValidationError
+from unidecode import unidecode
 
 
 class InstituicaoEnsino(models.Model):
@@ -219,6 +220,12 @@ class Candidato(models.Model):
         if not self.pcd_detalhes:
             return 'Nenhuma observação'
         return self.pcd_detalhes
+
+    def save(self, *args, **kwargs):
+        if self.nome:
+            self.nome = unidecode(self.nome)
+
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Candidato'
