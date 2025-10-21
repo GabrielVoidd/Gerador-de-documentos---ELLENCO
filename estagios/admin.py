@@ -67,6 +67,11 @@ class CartaEncaminhamentoInline(admin.TabularInline):
     extra = 1
 
 
+class ArquivosInline(admin.TabularInline):
+    model = Arquivos
+    extra = 1
+
+
 @admin.register(Candidato)
 class CandidatoAdmin(admin.ModelAdmin):
     list_display = ('nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link')
