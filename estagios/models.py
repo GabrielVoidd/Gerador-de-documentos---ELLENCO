@@ -230,10 +230,8 @@ class Candidato(models.Model):
 
 class CartaEncaminhamento(models.Model):
     candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='cartas')
-
     arquivo = models.FileField(upload_to='cartas_encaminhamento/', null=True, blank=True)
-
-    data_emissao = models.DateField(auto_now_add=True)
+    data_emissao = models.DateField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.arquivo.name
@@ -245,10 +243,8 @@ class CartaEncaminhamento(models.Model):
 
 class Arquivos(models.Model):
     candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='arquivos')
-
     arquivo = models.FileField(upload_to='arquivos/', null=True, blank=True)
-
-    data_emissao = models.DateField(auto_now_add=True)
+    data_emissao = models.DateField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.arquivo.name
@@ -261,7 +257,6 @@ class Arquivos(models.Model):
 class Empresa(models.Model):
     candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='empresas')
     nome = models.CharField(max_length=120, null=True, blank=True)
-    arquivos = models.FileField(upload_to='empresas/', null=True, blank=True)
     observacoes = models.TextField(null=True, blank=True)
 
     def __str__(self):
@@ -270,6 +265,15 @@ class Empresa(models.Model):
     class Meta:
         verbose_name = 'Empresa'
         verbose_name_plural = 'Empresas'
+
+
+class DetalhesEmpresa(models.Model):
+    empresa = models.ForeignKey(Empresa, on_delete=models.PROTECT, related_name='detalhes')
+    arquivos = models.FileField(upload_to='empresas/', null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Detalhes Empresa'
+        verbose_name_plural = 'Detalhes Empresas'
 
 
 class Estagiario(models.Model):
