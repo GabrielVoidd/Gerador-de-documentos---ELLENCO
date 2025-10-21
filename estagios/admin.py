@@ -89,7 +89,7 @@ class EmpresaInline(NestedTabularInline):
 
 @admin.register(Candidato)
 class CandidatoAdmin(NestedModelAdmin):
-    list_display = ('nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link')
+    list_display = ('nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = ('nome', 'bairro', 'cpf', 'rg')
 
