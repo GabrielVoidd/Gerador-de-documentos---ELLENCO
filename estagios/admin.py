@@ -75,7 +75,7 @@ class ArquivosInline(admin.TabularInline):
 
 class DetalhesEmpresaInline(NestedTabularInline):
     model = DetalhesEmpresa
-    fields = ('arquivos')
+    fields = ('arquivos',)
     extra = 1
 
 
