@@ -89,7 +89,7 @@ class EmpresaInline(NestedTabularInline):
 
 @admin.register(Candidato)
 class CandidatoAdmin(NestedModelAdmin):
-    list_display = ('nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro')
+    list_display = ('nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = ('nome', 'bairro', 'cpf', 'rg')
 
@@ -104,7 +104,7 @@ class CandidatoAdmin(NestedModelAdmin):
     gerar_termo_link.allow_tags = True
 
     def get_readonly_fields(self, request, obj = None):
-        """"Define o campo observacoes como somente leitura se o usuário não perterncer ao grupo Recrutamento"""
+        """"Define os campos observacoes e restrito como somente leitura se o usuário não perterncer ao grupo Recrutamento"""
         readonly_fields = super().get_readonly_fields(request, obj)
 
         if request.user.is_superuser:
@@ -112,12 +112,12 @@ class CandidatoAdmin(NestedModelAdmin):
 
         if not request.user.groups.filter(name='Recrutamento').exists():
             # se ele não estiver no grupo, o campo observacoes será somente leitura
-            return readonly_fields + ('observacoes',)
+            return readonly_fields + ('observacoes', 'restrito')
 
         return readonly_fields
 
     def get_inlines(self, request, obj=None):
-        if request.user.is_superuser:
+        if request.user.is_superuser and request.user.groups.filter(name='Recrutamento').exists():
             return self.inlines
 
         return []
