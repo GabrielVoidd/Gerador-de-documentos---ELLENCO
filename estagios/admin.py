@@ -93,6 +93,10 @@ class CandidatoAdmin(NestedModelAdmin):
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = ('nome', 'bairro', 'cpf', 'rg')
 
+    class Media:
+        css = {'all': ('admin/css/custom_admin.css',)}
+        js = ('admin/js/custom_admin.js',)
+
     inlines = [CartaEncaminhamentoInline, ArquivosInline, EmpresaInline]
 
     def gerar_termo_link(self, obj):

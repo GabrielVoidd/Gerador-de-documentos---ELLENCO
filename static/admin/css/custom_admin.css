@@ -1,0 +1,14 @@
+/* #result_list para garantir que o estilo só se aplique na tabela de resultados do admin */
+
+#result_list tbody tr.linha-restrita {
+    background: #f8d7da;
+
+    /* Pode deixar a fonte mais escura ou em negrito */
+    color: #721c24;
+    font-weight: 500;
+}
+
+/* "hover" */
+#result_list tbody tr.linha-restrita:hover {
+    background: #f1c1c7;
+}
