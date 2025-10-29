@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
-    CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa
+    CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 
 @admin.register(Contrato)
@@ -49,11 +49,19 @@ class InstituicaoEnsinoAdmin(admin.ModelAdmin):
     list_filter = ('razao_social', 'cidade')
 
 
+class DetalhesParteConcedenteInline(admin.TabularInline):
+    model = DetalhesParteConcedente
+    fields = (
+        'dia_pagamento_estagiario', 'dia_cobranca_agencia', 'dia_fechamento', 'mensalidade_contrato', 'taxa_cliente')
+
+
 @admin.register(ParteConcedente)
 class ParteConcedenteAdmin(admin.ModelAdmin):
     list_display = ('razao_social', 'cnpj', 'telefone', 'email')
     search_fields = ('razao_social', 'cnpj', 'cidade')
     list_filter = ('razao_social', 'cidade')
+
+    inlines = [DetalhesParteConcedenteInline]
 
 
 @admin.register(AgenteIntegrador)
@@ -89,7 +97,8 @@ class EmpresaInline(NestedTabularInline):
 
 @admin.register(Candidato)
 class CandidatoAdmin(NestedModelAdmin):
-    list_display = ('nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
+    list_display = (
+        'nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = ('nome', 'bairro', 'cpf', 'rg')
 

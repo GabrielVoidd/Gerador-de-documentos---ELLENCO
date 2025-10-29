@@ -45,6 +45,15 @@ class ParteConcedente(models.Model):
         return self.razao_social
 
 
+class DetalhesParteConcedente(models.Model):
+    parte_concedente = models.ForeignKey(ParteConcedente, on_delete=models.PROTECT, related_name='detalhes')
+    dia_pagamento_estagiario = models.IntegerField(null=True, blank=True)
+    dia_cobranca_agencia = models.IntegerField(null=True, blank=True)
+    dia_fechamento = models.IntegerField(null=True, blank=True)
+    mensalidade_contrato = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    taxa_cliente = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+
+
 class Candidato(models.Model):
     class EstadosCivis(models.TextChoices):
         SOLTEIRO = 'S', 'Solteiro(a)'
