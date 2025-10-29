@@ -140,7 +140,7 @@ class Candidato(models.Model):
     serie_semestre = models.CharField(max_length=50, help_text='2° semestre / 3°ano')
     data_termino = models.DateField(help_text='Quando o curso / escola acaba?', null=True, blank=True)
     instituicao_ensino = models.ForeignKey(InstituicaoEnsino, on_delete=models.PROTECT)
-    nome_da_instituicao = models.CharField(max_length=150, null=True, blank=True)
+    nome_da_instituicao = models.CharField(max_length=150, null=True, blank=True, help_text='Caso não esteja na lista')
     vale_transporte = models.CharField(max_length=2, choices=ValeTransporte.choices, default='E')
     curso_extracurricular = models.CharField(max_length=200, help_text='Sim, de informática das 08h as 10h / Não')
     anexar_declaracao = models.FileField(null=True, blank=True, upload_to='documentos_candidatos/declaracao/%Y%/%m/%d/')
