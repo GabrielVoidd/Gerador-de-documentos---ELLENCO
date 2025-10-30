@@ -64,6 +64,12 @@ class ParteConcedenteAdmin(admin.ModelAdmin):
 
     inlines = [DetalhesParteConcedenteInline]
 
+    def get_inlines(self, request, obj=None):
+        if request.user.is_superuser and request.user.groups.filter(name='Comercial').exists():
+            return self.inlines
+
+        return []
+
 
 @admin.register(AgenteIntegrador)
 class AgenteIntegadorAdmin(admin.ModelAdmin):
