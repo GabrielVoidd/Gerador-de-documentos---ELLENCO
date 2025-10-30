@@ -53,6 +53,7 @@ class DetalhesParteConcedenteInline(admin.TabularInline):
     model = DetalhesParteConcedente
     fields = (
         'dia_pagamento_estagiario', 'dia_cobranca_agencia', 'dia_fechamento', 'mensalidade_contrato', 'taxa_cliente')
+    extra = 1
 
 
 @admin.register(ParteConcedente)
