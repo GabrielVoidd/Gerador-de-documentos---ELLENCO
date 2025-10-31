@@ -231,7 +231,7 @@
             <td colspan="2"><strong>Curso:</strong> {{ candidato.curso }}</td>
         </tr>
         <tr>
-            <td colspan="2"><strong>Período:</strong> {{ candidato.periodo }}</td>
+            <td colspan="2"><strong>Período:</strong> {{ candidato.get_periodo_display }}</td>
             <td colspan="2"><strong>Série / Semestre:</strong> {{ candidato.serie_semestre }}</td>
         </tr>
         <tr>
@@ -292,6 +292,13 @@
         <tr>
             <td colspan="2"><strong>Telefone da mãe:</strong> {{ candidato.telefone_responsavel_legal2 }}</td>
             <td colspan="2"><strong>Email da mãe:</strong> {{ candidato.email_responsavel_legal2 }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">Observações</div>
+    <table class="info-table">
+        <tr>
+            <td colspan="2"><strong>Observações:</strong> {{ candidato.observacoes }}</td>
         </tr>
     </table>
 

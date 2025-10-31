@@ -65,7 +65,7 @@ class ParteConcedenteAdmin(admin.ModelAdmin):
     inlines = [DetalhesParteConcedenteInline]
 
     def get_inlines(self, request, obj=None):
-        if request.user.is_superuser and request.user.groups.filter(name='Comercial').exists():
+        if request.user.is_superuser or request.user.groups.filter(name='Comercial').exists():
             return self.inlines
 
         return []
@@ -137,7 +137,7 @@ class CandidatoAdmin(NestedModelAdmin):
         return readonly_fields
 
     def get_inlines(self, request, obj=None):
-        if request.user.is_superuser and request.user.groups.filter(name='Recrutamento').exists():
+        if request.user.is_superuser or request.user.groups.filter(name='Recrutamento').exists():
             return self.inlines
 
         return []
