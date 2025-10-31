@@ -1,14 +1,20 @@
-/* #result_list para garantir que o estilo só se aplique na tabela de resultados do admin */
-
 #result_list tbody tr.linha-restrita {
-    background: #f8d7da;
-
-    /* Pode deixar a fonte mais escura ou em negrito */
-    color: #721c24;
+    background-color: #f8d7da !important;
+    color: #721c24 !important;
     font-weight: 500;
+    border-left: 4px solid #dc3545;
 }
 
-/* "hover" */
+#result_list tbody tr.linha-restrita td {
+    background-color: inherit !important;
+    color: inherit !important;
+    border-color: #f5c6cb !important;
+}
+
 #result_list tbody tr.linha-restrita:hover {
-    background: #f1c1c7;
+    background-color: #f1b0b7 !important;
+}
+
+#result_list tbody tr.linha-restrita:hover td {
+    background-color: inherit !important;
 }
