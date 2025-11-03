@@ -377,3 +377,59 @@ class Rescisao(models.Model):
 
     def __str__(self):
         return f'Rescisão do Contrato {self.contrato.numero_contrato}'
+
+
+class TipoEvento(models.Model):
+    class TipoTransacao(models.TextChoices):
+        CREDITO = 'CREDITO', 'Crédito'
+        DEBITO = 'DEBITO', 'Débito'
+
+    descricao = models.CharField(max_length=100, unique=True)
+    tipo = models.CharField(max_length=10, choices=TipoTransacao.choices)
+
+    def __str__(self):
+        return f'{self.descricao} ({self.tipo})'
+
+
+class Recibo(models.Model):
+    # --- RASTREABILIDADE ---
+    contrato = models.ForeignKey(Contrato, on_delete=models.SET_NULL, null=True, blank=True)
+
+    # --- DADOS DO SNAPSHOT (COPIADOS DO CONTRATO) ---
+    estagiario_nome = models.CharField(max_length=100)
+    parte_concedente_nome = models.CharField(max_length=100)
+    valor_bolsa = models.DecimalField(max_digits=10, decimal_places=2)
+    data_inicio = models.DateField()
+    data_fim = models.DateField()
+
+    # --- DADOS DO RECIBO EM SI ---
+    data_referencia = models.DateField()
+    dias_referencia = models.IntegerField(default=30)
+    dias_trabalhados = models.IntegerField(default=22)
+    dias_falta = models.IntegerField(default=0)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+
+    # --- CÁLCULOS DOS TOTAIS ---
+    @property
+    def total_creditos(self):
+        return self.lancamentos.filter(tipo_evento__tipo='CREDITO').aggregate(total=models.Sum('valor'))['total'] or 0.00
+
+    @property
+    def total_debitos(self):
+        return self.lancamentos.filter(tipo_evento__tipo='DEBITO').aggregate(total=models.Sum('valor'))['total'] or 0.00
+
+    @property
+    def valor_liquido(self):
+        return self.total_creditos - self.total_debitos
+
+    def __str__(self):
+        return f'Recibo de {self.estagiario_nome} - {self.data}'
+
+
+class Lancamento(models.Model):
+    recibo = models.ForeignKey(Recibo, on_delete=models.CASCADE, related_name='lancamentos')
+    tipo_evento = models.ForeignKey(TipoEvento, on_delete=models.PROTECT)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.tipo_evento.descricao} - R${self.valor}'
