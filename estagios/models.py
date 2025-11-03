@@ -408,6 +408,7 @@ class Recibo(models.Model):
     dias_trabalhados = models.IntegerField(default=22)
     dias_falta = models.IntegerField(default=0)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
+    beneficio_horario = models.TextField(blank=True)
 
     # --- CÁLCULOS DOS TOTAIS ---
     @property
