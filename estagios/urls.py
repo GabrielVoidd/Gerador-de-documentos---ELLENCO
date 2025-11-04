@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     InstituicaoEnsinoViewSet, ParteConcedenteViewSet, EstagiarioViewSet, ContratoViewSet, RescisaoViewSet,
-    AgenteIntegracaoViewSet, CandidatoViewSet
+    AgenteIntegracaoViewSet, CandidatoViewSet, TipoEventoViewSet, LancamentoViewSet, ReciboViewSet
 )
 
 router = DefaultRouter()
@@ -13,6 +13,9 @@ router.register('contratos', ContratoViewSet)
 router.register('rescisoes', RescisaoViewSet)
 router.register('agentes-integradores', AgenteIntegracaoViewSet)
 router.register(r'candidatos', CandidatoViewSet)
+router.register(r'tipos-eventos', TipoEventoViewSet, basename='tipoevento')
+router.register(r'Lancamentos', LancamentoViewSet, basename='lancamento')
+router.register(r'recibos', ReciboViewSet, basename='recibo')
 
 urlpatterns = [
     path('', include(router.urls)),

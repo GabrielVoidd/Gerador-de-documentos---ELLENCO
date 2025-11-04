@@ -12,10 +12,12 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.shortcuts import render
-from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato
+from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
+    TipoEvento, Lancamento, Recibo
 from .serializers import(
 InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
-ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer
+ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
+TipoEventoSerializer, LancamentoSerializer, ReciboSerializer
 )
 
 class InstituicaoEnsinoViewSet(viewsets.ModelViewSet):
@@ -200,3 +202,65 @@ class ContratoDeleteView(SuccessMessageMixin, DeleteView):
     template_name = 'estagios/contrato_confirm_delete.html'
     success_url = reverse_lazy('contrato_lista')
     success_message = 'Contrato deletado com sucesso.'
+
+
+class TipoEventoViewSet(viewsets.ModelViewSet):
+    queryset = TipoEvento.objects.all()
+    serializer_class = TipoEventoSerializer
+
+
+class LancamentoViewSet(viewsets.ModelViewSet):
+    queryset = Lancamento.objects.all()
+    serializer_class = LancamentoSerializer
+
+
+class ReciboViewSet(viewsets.ModelViewSet):
+    queryset = Recibo.objects.all()
+    serializer_class = ReciboSerializer
+
+    def create(self, request, *args, **kwargs):
+        contrato_id = request.data.get('contrato_id')
+        try:
+            contrato = Contrato.objects.get(id=contrato_id)
+        except Contrato.DoesNotExist:
+            return Response({'error': 'Contrato não encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        texto_beneficio = '(BENEFÍCIO): A CRITÉRIO'
+        texto_horario = contrato.jornada_estagio
+        texto_combinado = f'{texto_beneficio} {texto_horario}'
+
+        try:
+            novo_recibo = Recibo.objects.create(
+                contrato = contrato,
+
+                # Snapshots
+                estagiario_nome = contrato.estagiario.candidato.nome,
+                parte_concedente_nome = contrato.parte_concedente.razao_social,
+                valor_bolsa = contrato.valor_bolsa,
+                data_inicio = contrato.data_inicio,
+                data_fim = contrato.data_termino_prevista,
+
+                # String combinada
+                beneficio_horario = texto_combinado,
+
+                # Dados específicos do período
+                dias_trabalhados = request.data.get('dias_trabalhados', 30),
+                dias_falta = request.data.get('dias_falta', 0)
+            )
+        except Exception as e:
+            return Response({'error': f'Erro ao criar o recibo: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)'})
+
+        try:
+            tipo_bolsa = TipoEvento.objects.get(descricao='Bolsa Auxílio')
+
+            Lancamento.objects.create(
+                recibo=novo_recibo, tipo_evento=tipo_bolsa, valor=novo_recibo.valor_bolsa,
+            )
+        except TipoEvento.DoesNotExist:
+            return Response(
+                {'error': 'TipoEvento "Bolsa Auxílio" não encontrado, configure primeiro'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': f'Erro ao criar lançamento inicial: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(novo_recibo)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
