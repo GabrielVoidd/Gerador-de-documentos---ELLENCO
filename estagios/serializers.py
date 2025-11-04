@@ -84,3 +84,39 @@ class LancamentoSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'recibo_id', 'tipo_evento_id', 'tipo_evento', 'valor'
         ]
+
+
+class ReciboSerializer(serializers.ModelSerializer):
+    # many=True porque é uma lista
+    # read_only=True porque os lançamentos são criados/deletados separadamente, não como parte da criação do Recibo
+    lancamentos = LancamentoSerializer(many=True, read_only=True)
+
+    # Expor os campos do @property, o cálculo fica a cargo do modelo
+    total_creditos = serializers.ReadOnlyField()
+    total_debitos = serializers.ReadOnlyField()
+    valor_liquido = serializers.ReadOnlyField()
+
+    # Não vai aparecer no GET, pois os campos do snapshot já existem
+    contrato = serializers.PrimaryKeyRelatedField(
+        queryset=Contrato.objects.all(), write_only=True
+    )
+
+    class Meta:
+        model = Recibo
+        fields = [
+            'id', 'contrato',
+            # Campos do snapshot, read_only por conta da ViewSet
+            'estagiario_nome', 'valor_bolsa', 'data_inicio', 'data_fim', 'beneficio_horario',
+            # Dddos do período
+            'dias_trabalhados', 'dias_falta',
+            # Propriedades calculadas, apenas leitura
+            'total_creditos', 'total_debitos', 'valor_liquido',
+            # Lista aninhada
+            'lancamenos'
+            ]
+
+        # Os campos do snapshot são read_only, o front não enviará esses dados
+        read_only_fields = [
+            'estagiario_nome', 'valor_bolsa', 'data_inicio', 'data_fim', 'beneficio_horario', 'total_creditos',
+            'total_debitos', 'valor_liquido', 'lancamentos'
+        ]
