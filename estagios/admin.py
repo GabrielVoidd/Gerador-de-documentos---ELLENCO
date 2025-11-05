@@ -155,6 +155,12 @@ class LancamentoAdmin(admin.ModelAdmin):
 
 @admin.register(Recibo)
 class ReciboAdmin(admin.ModelAdmin):
-    list_display = ('estagiario_nome', 'recibo__contrato__parte_concedente')
-    list_filter = ('estagiario_nome', 'recibo__contrato__parte_concedente')
-    search_fields = ('estagiario_nome', 'recibo__contrato__parte_concedente')
+    list_display = ('estagiario_nome', 'contrato__parte_concedente')
+    list_filter = ('estagiario_nome', 'contrato__parte_concedente')
+    search_fields = ('estagiario_nome', 'contrato__parte_concedente__razao_social')
+
+    @admin.display(description='Parte Concedente', ordering='contrato__parte_concedente__razao_social')
+    def get_parte_concedente(self, obj):
+        if obj.contrato and obj.contrato.parte_concedente:
+            return obj.contrato.parte_concedente.razao_social
+        return 'N/A'
