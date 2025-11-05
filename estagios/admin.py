@@ -143,17 +143,17 @@ class CandidatoAdmin(NestedModelAdmin):
         return []
 
 
-@admin.register
+@admin.register(TipoEvento)
 class TipoEventoAdmin(admin.ModelAdmin):
     list_display = ('descricao', 'tipo')
 
 
-@admin.register
+@admin.register(Lancamento)
 class TipoEventoInline(admin.ModelAdmin):
     list_display = ('recibo', 'tipo_evento', 'valor')
 
 
-@admin.register
+@admin.register(Recibo)
 class ReciboAdmin(admin.ModelAdmin):
     list_display = ('estagiario_nome', 'parte_concedente')
     list_filter = ('estagiario_nome', 'parte_concedente')
