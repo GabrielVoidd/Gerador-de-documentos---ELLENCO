@@ -149,12 +149,12 @@ class TipoEventoAdmin(admin.ModelAdmin):
 
 
 @admin.register(Lancamento)
-class TipoEventoInline(admin.ModelAdmin):
+class LancamentoAdmin(admin.ModelAdmin):
     list_display = ('recibo', 'tipo_evento', 'valor')
 
 
 @admin.register(Recibo)
 class ReciboAdmin(admin.ModelAdmin):
-    list_display = ('estagiario_nome', 'parte_concedente')
-    list_filter = ('estagiario_nome', 'parte_concedente')
-    search_fields = ('estagiario_nome', 'parte_concedente')
+    list_display = ('estagiario_nome', 'recibo__parte_concedente')
+    list_filter = ('estagiario_nome', 'recibo__parte_concedente')
+    search_fields = ('estagiario_nome', 'recibo__parte_concedente')
