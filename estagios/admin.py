@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
-    CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente
+    CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 
 @admin.register(Contrato)
@@ -141,3 +141,17 @@ class CandidatoAdmin(NestedModelAdmin):
             return self.inlines
 
         return []
+
+
+class TipoEventoAdmin(admin.ModelAdmin):
+    list_display = ('descricao', 'tipo')
+
+
+class TipoEventoInline(admin.ModelAdmin):
+    list_display = ('recibo', 'tipo_evento', 'valor')
+
+
+class ReciboAdmin(admin.ModelAdmin):
+    list_display = ('estagiario_nome', 'parte_concedente')
+    list_filter = ('estagiario_nome', 'parte_concedente')
+    search_fields = ('estagiario_nome', 'parte_concedente')
