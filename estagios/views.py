@@ -248,7 +248,7 @@ class ReciboViewSet(viewsets.ModelViewSet):
                 dias_falta = request.data.get('dias_falta', 0)
             )
         except Exception as e:
-            return Response({'error': f'Erro ao criar o recibo: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)'})
+            return Response({'error': f'Erro ao criar o recibo: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             tipo_bolsa = TipoEvento.objects.get(descricao='Bolsa Auxílio')
