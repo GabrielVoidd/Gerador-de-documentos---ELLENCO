@@ -155,6 +155,6 @@ class LancamentoAdmin(admin.ModelAdmin):
 
 @admin.register(Recibo)
 class ReciboAdmin(admin.ModelAdmin):
-    list_display = ('estagiario_nome', 'recibo__parte_concedente')
-    list_filter = ('estagiario_nome', 'recibo__parte_concedente')
-    search_fields = ('estagiario_nome', 'recibo__parte_concedente')
+    list_display = ('estagiario_nome', 'recibo__contrato__parte_concedente')
+    list_filter = ('estagiario_nome', 'recibo__contrato__parte_concedente')
+    search_fields = ('estagiario_nome', 'recibo__contrato__parte_concedente')
