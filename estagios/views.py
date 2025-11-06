@@ -272,7 +272,7 @@ def get_contrato_data(request, contrato_id):
         contrato = Contrato.objects.get(pk=contrato_id)
 
         data = {
-            'estagiario_nome': contrato.estagiario.nome,
+            'estagiario_nome': contrato.estagiario.candidato.nome,
             'parte_concedente_nome': contrato.parte_concedente.razao_social,
             'valor_bolsa': contrato.valor_bolsa,
             'data_inicio': contrato.data_inicio,

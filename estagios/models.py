@@ -424,7 +424,7 @@ class Recibo(models.Model):
         return self.total_creditos - self.total_debitos
 
     def __str__(self):
-        return f'Recibo de {self.estagiario_nome} - {self.data}'
+        return f'Recibo de {self.estagiario_nome} - {self.data_referencia}'
 
 
 class Lancamento(models.Model):
