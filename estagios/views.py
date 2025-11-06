@@ -1,4 +1,5 @@
 from PIL.ImageFilter import DETAIL
+from django.http import JsonResponse
 from django.conf import settings
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.urls import reverse_lazy
@@ -264,3 +265,22 @@ class ReciboViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(novo_recibo)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def get_contrato_data(request, contrato_id):
+    try:
+        contrato = Contrato.objects.get(pk=contrato_id)
+
+        data = {
+            'estagiario_nome': contrato.estagiario.nome,
+            'parte_concedente_nome': contrato.parte_concedente.razao_social,
+            'valor_bolsa': contrato.valor_bolsa,
+            'data_inicio': contrato.data_inicio,
+            'data_fim': contrato.data_termino_prevista
+        }
+
+        return JsonResponse(data)
+    except Contrato.DoesNotExist:
+        return JsonResponse({'error': 'Contrato não encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

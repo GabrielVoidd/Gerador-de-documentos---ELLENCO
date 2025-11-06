@@ -164,3 +164,6 @@ class ReciboAdmin(admin.ModelAdmin):
         if obj.contrato and obj.contrato.parte_concedente:
             return obj.contrato.parte_concedente.razao_social
         return 'N/A'
+
+    class Media:
+        js = ('js/preencher_recibo.js',)
