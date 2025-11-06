@@ -19,5 +19,5 @@ router.register(r'recibos', ReciboViewSet, basename='recibo')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('api/get-contrato-data/<int:contrato_id>/', get_contrato_data, name='get_contrato_data'),
+    path('get-contrato-data/<int:contrato_id>/', get_contrato_data, name='get_contrato_data'),
 ]
