@@ -340,7 +340,7 @@ class Contrato(models.Model):
     atividades = models.TextField()
     setor = models.CharField(max_length=100)
     supervisor_nome = models.CharField(max_length=100)
-    numero_apolice_seguro = models.CharField(max_length=50)
+    numero_apolice_seguro = models.CharField(max_length=50, default='363787')
     jornada_estagio = models.CharField(max_length=150, null=True, blank=True,
                                        help_text='de segunda a domingo com uma folga na semana e 15 minutos de pausa')
     valor_bolsa = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
