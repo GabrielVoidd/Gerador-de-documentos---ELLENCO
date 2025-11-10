@@ -54,13 +54,14 @@ class ContratoViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='gerar-termo-compromisso', url_name='gerar-termo-compromisso')
     def gerar_termo_compromisso(self, request, pk=None):
+        usuario_que_gerou = request.user
         contrato = self.get_object()
 
         logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
         logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
 
         # Renderiza o template HTML com o contexto do contrato
-        html_string = render_to_string('estagios/termo_compromisso.html', {'contrato': contrato, 'logo_path': logo_path})
+        html_string = render_to_string('estagios/termo_compromisso.html', {'contrato': contrato, 'logo_path': logo_path, 'usuario_logado': usuario_que_gerou})
 
         # Gera o PDF
         pdf_file = HTML(string=html_string).write_pdf()
