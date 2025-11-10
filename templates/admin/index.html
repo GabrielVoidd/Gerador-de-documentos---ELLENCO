@@ -2,12 +2,6 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static log %}
 
-{% block content %}
-    <div id="content-main">
-        {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
-    </div>
-{% endblock %}
-
 {% block sidebar %}
     {% if user.username != 'CANDIDATO' %}
         <div id="content-related">
