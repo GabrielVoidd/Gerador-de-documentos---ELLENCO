@@ -3,6 +3,7 @@ from django.utils import timezone
 from datetime import date
 from rest_framework.exceptions import ValidationError
 from unidecode import unidecode
+from decimal import Decimal
 
 
 class InstituicaoEnsino(models.Model):
@@ -403,9 +404,9 @@ class Recibo(models.Model):
     data_fim = models.DateField()
 
     # --- DADOS DO RECIBO EM SI ---
-    data_referencia = models.DateField()
+    data_referencia = models.DateField(help_text='Deve ser o 1º dia do mês de referência')
     dias_referencia = models.IntegerField(default=30)
-    dias_trabalhados = models.IntegerField(default=22)
+    dias_trabalhados = models.IntegerField()
     dias_falta = models.IntegerField(default=0)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
     beneficio_horario = models.TextField(blank=True)
@@ -422,6 +423,9 @@ class Recibo(models.Model):
     @property
     def valor_liquido(self):
         return self.total_creditos - self.total_debitos
+
+
+
 
     def __str__(self):
         return f'Recibo de {self.estagiario_nome} - {self.data_referencia}'
