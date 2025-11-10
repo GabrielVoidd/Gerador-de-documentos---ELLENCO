@@ -159,6 +159,8 @@ class ReciboAdmin(admin.ModelAdmin):
     list_display = ('estagiario_nome', 'contrato__parte_concedente')
     list_filter = ('estagiario_nome', 'contrato__parte_concedente')
     search_fields = ('estagiario_nome', 'contrato__parte_concedente__razao_social')
+    readonly_fields = ('valor', 'dias_trabalhados', 'estagiario_nome', 'parte_concedente_nome', 'valor_bolsa',
+        'data_inicio', 'data_fim')
 
     @admin.display(description='Parte Concedente', ordering='contrato__parte_concedente__razao_social')
     def get_parte_concedente(self, obj):
