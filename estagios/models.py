@@ -424,8 +424,46 @@ class Recibo(models.Model):
     def valor_liquido(self):
         return self.total_creditos - self.total_debitos
 
+    def save(self, *args, **kwargs):
+        # Convertendo para decimal
+        base_dias = Decimal(self.dias_referencia)
+        valor_bolsa_integral = Decimal(self.valor_bolsa)
 
+        # Calcula o valor por dia
+        valor_por_dia = valor_bolsa_integral / base_dias
 
+        # Assumimos que o mês é cheio
+        dias_a_pagar = base_dias
+
+        # --- LÓGICA DO PRIMEIRO MÊS (PROPORCIONAL) ---
+        # Verifica se o recibo é do mês/ano de início do contrato
+        if (self.data_referencia.month == self.data_inicio.month and self.data_referencia.year == self.data_inicio.year):
+            # Se começou depois do dia 1
+            if self.data_inicio.day > 1:
+                # Calcula dias não trabalhados (se começou dia 2, não trabalhou 1 dia)
+                dias_nao_trabalhados = self.data_inicio.day - 1
+                dias_a_pagar = base_dias - Decimal(dias_nao_trabalhados)
+
+        # --- LÓGICA DO ÚLTIMO MÊS (PROPORCIONAL) ---
+        # Verifica se o recibo é do mês/ano de término do contrato
+        if (self.data_referencia.month == self.data_fim.month and self.data_referencia.year == self.data_fim.year):
+            # Paga apenas os dias até a data fim (base 30)
+            # Se o mês comercial é 30 e ele saiu dia 31, paga 30
+            dias_a_pagar = Decimal(min(self.data_fim.day, base_dias))
+
+        # --- APLICA FALTAS E CALCULA OS VALORES FINAIS ---
+        # Subtrai as faltas inseridas manualmente
+        dias_a_pagar -= Decimal(self.dias_falta)
+
+        # Garante que não há pagamento para dias negativos
+        dias_a_pagar = max(dias_a_pagar, 0)
+
+        # Salva os valores calculados nos campos do modelo
+        self.dias_trabalhados = dias_a_pagar
+        self.valor = (valor_por_dia + dias_a_pagar).quantize(Decimal('0.01'))
+
+        # Chama o metodo 'save' original para salvar no banco
+        super(Recibo, self).save(*args, **kwargs)
 
     def __str__(self):
         return f'Recibo de {self.estagiario_nome} - {self.data_referencia}'
