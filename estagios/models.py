@@ -425,6 +425,15 @@ class Recibo(models.Model):
         return self.total_creditos - self.total_debitos
 
     def save(self, *args, **kwargs):
+        # --- POPULANDO O SHAPSHOT ---
+        # Se os campos estiverem vazios (ao criar), copia do contrato
+        if self.contrato and not self.valor_bolsa:
+            self.estagiario_nome = self.contrato.estagiario.candidato.nome
+            self.parte_concedente_nome = self.contrato.parte_concedente.razao_social
+            self.valor_bolsa = self.contrato.valor_bolsa
+            self.data_inicio = self.contrato.data_inicio
+            self.data_fim = self.contrato.data_termino_prevista
+
         # Convertendo para decimal
         base_dias = Decimal(self.dias_referencia)
         valor_bolsa_integral = Decimal(self.valor_bolsa)
