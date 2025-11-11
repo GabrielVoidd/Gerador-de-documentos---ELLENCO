@@ -120,3 +120,12 @@ class ReciboSerializer(serializers.ModelSerializer):
             'estagiario_nome', 'valor_bolsa', 'data_inicio', 'data_fim', 'beneficio_horario', 'total_creditos',
             'total_debitos', 'valor_liquido', 'lancamentos'
         ]
+
+    def get_mes_referencia(self, obj):
+        return obj.data_referencia.strftime('%m/%Y')
+
+    def validate_data_referencial(self, value):
+        ''''Valida se a data de referência é o primeiro dia do mês'''''
+        if value.day != 1:
+            raise serializers.ValidationError('A data de referência deve ser o primeiro dia do mês')
+        return value

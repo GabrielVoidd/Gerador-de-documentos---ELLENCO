@@ -1,4 +1,6 @@
 from PIL.ImageFilter import DETAIL
+from datetime import date
+from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 from django.conf import settings
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
@@ -231,9 +233,32 @@ class ReciboViewSet(viewsets.ModelViewSet):
         texto_horario = contrato.jornada_estagio
         texto_combinado = f'{texto_beneficio} {texto_horario}'
 
+        hoje = date.today()
+        primeiro_dia_mes_atual = hoje.replace(day=1)
+        data_referencia = primeiro_dia_mes_atual - relativedelta(months=1)
+
+        # Verifica se há um recibo para um contrato no mesmo período
+        if Recibo.objects.filter(contrato=contrato, data_referencia=data_referencia).exists():
+            return Response(
+                {'error': f'Já existe um recibo para este contrato na referência {data_referencia.strftime('%m/%Y')}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Cálculo dos dias trabalhados caso não sejam especificados
+        dias_falta = request.data.get('dias_falta', 0)
+        dias_trabalhados = request.data.get('dias_trabalhados')
+
+        if dias_trabalhados is None:
+            dias_referencia = 30
+            dias_trabalhados = dias_referencia - dias_falta
+        else:
+            dias_trabalhados = int(dias_trabalhados)
+
         try:
             novo_recibo = Recibo.objects.create(
                 contrato = contrato,
+
+                # TESTE - Data de referência (primeiro dia do mês anterior)
 
                 # Snapshots
                 estagiario_nome = contrato.estagiario.candidato.nome,
