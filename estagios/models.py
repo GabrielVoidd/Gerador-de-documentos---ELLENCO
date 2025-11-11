@@ -426,6 +426,12 @@ class Recibo(models.Model):
     def valor_liquido(self):
         return self.total_creditos - self.total_debitos
 
+    def calcular_valor_final(self):
+        if self.dias_referencia > 0 and self.valor_bolsa:
+            valor_diario = self.valor_bolsa / self.dias_referencia
+            return valor_diario * self.dias_trabalhados
+        return self.valor_bolsa
+
     def save(self, *args, **kwargs):
         # --- POPULANDO O SHAPSHOT ---
         # Se os campos estiverem vazios (ao criar), copia do contrato
@@ -445,6 +451,9 @@ class Recibo(models.Model):
         # Cálculo automático caso os dias trabalhados não forem especificados
         if not self.dias_trabalhados and self.dias_referencia is not None:
             self.dias_trabalhados = self.dias_referencia - self.dias_falta
+
+        if not self.valor:
+            self.valor = self.calcular_valor_final()
 
         # Chama o metodo 'save' original para salvar no banco
         super(Recibo, self).save(*args, **kwargs)

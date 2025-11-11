@@ -169,9 +169,6 @@ class ReciboAdmin(admin.ModelAdmin):
         return 'N/A'
 
     def save_model(self, request, obj, form, change):
-        if not obj.valor and obj.valor_bolsa:
-            obj.valor = obj.valor_bolsa
-
         super().save_model(self, request, obj, form, change)
 
     class Media:
