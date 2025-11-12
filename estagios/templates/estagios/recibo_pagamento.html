@@ -1,330 +1,75 @@
-{% load static %}
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recibo de Pagamento de Bolsa-Auxílio</title>
+    <title>Recibo de Pagamento - Bolsa Auxílio</title>
     <style>
-        /* --- Configurações Gerais --- */
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 10pt;
-            background-color: #f4f4f4;
-            color: #000;
-        }
-
-        /* --- Layout Principal --- */
-        .recibo-container {
-            width: 21cm; /* Largura A4 */
-            min-height: 10cm;
-            margin: 20px auto;
-            background-color: #fff;
-            border: 1px solid #888;
-            padding: 0.75cm;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            box-sizing: border-box;
-        }
-
-        .recibo-main {
-            flex-grow: 1; /* Ocupa todo o espaço, exceto o sidebar */
-        }
-
-        .recibo-sidebar {
-            width: 5cm; /* Largura da "tira" de assinatura */
-            flex-shrink: 0;
-            border-left: 2px dashed #aaa;
-            padding-left: 10px;
-            box-sizing: border-box;
-        }
-
-        /* --- Cabeçalho --- */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 2px solid #000;
-            padding-bottom: 5px;
-        }
-
-        .header h1 {
-            font-size: 14pt;
-            font-weight: bold;
-            margin: 0;
-        }
-
-        .header .referencia {
-            border: 1px solid #000;
-            padding: 5px 8px;
-            font-weight: bold;
-            font-size: 11pt;
-            text-align: center;
-        }
-
-        /* --- Bloco de Informações (Concedente, Agente, Estagiário) --- */
-        .info-block {
-            margin: 10px 0;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 3px;
-            font-size: 9pt;
-        }
-
-        .info-row .label {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .info-row .text {
-            flex-grow: 1;
-            margin-left: 5px;
-        }
-
-        .info-row .side-info {
-            flex-basis: 150px; /* Largura fixa para CPF/CNPJ/Datas */
-            text-align: left;
-            margin-left: 10px;
-        }
-
-        /* --- Tabela de Pagamento --- */
-        .pagamento-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        .pagamento-table th,
-        .pagamento-table td {
-            border: 1px solid #000;
-            padding: 4px 6px;
-        }
-
-        .pagamento-table th {
-            background-color: #eee;
-            font-size: 9pt;
-            text-align: left;
-        }
-
-        /* --- Corpo da Tabela --- */
-        .pagamento-table tbody td {
-            height: 2.5em; /* Dando altura para as linhas */
-            vertical-align: top;
-            font-size: 9pt;
-        }
-
-        .col-codigo { width: 8%; text-align: center; }
-        .col-descricao { width: 52%; }
-        .col-vencimentos, .col-descontos {
-            width: 20%;
-            text-align: right;
-            vertical-align: top;
-        }
-
-        /* Células vazias */
-        .pagamento-table td.empty-cell {
-            color: #fff; /* Esconde conteúdo se houver, mas mantém a borda */
-        }
-
-        /* --- Rodapé da Tabela (Logo e Totais) --- */
-        .pagamento-table tfoot td {
-            border: none;
-            padding-top: 10px;
-        }
-
-        .logo-cell {
-            vertical-align: bottom;
-            text-align: left;
-        }
-
-        /* Placeholder do Logo - Troque por sua <img> */
-        .logo-placeholder {
-            width: 180px;
-            height: 60px;
-            border: 2px solid #f07c00; /* Laranja Ellenco */
-            color: #004a91; /* Azul Ellenco */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14pt;
-            font-weight: bold;
-            box-sizing: border-box;
-        }
-
-        .summary-cell {
-            vertical-align: top;
-            padding-left: 10px;
-        }
-
-        .summary-block {
-            border: 1px solid #000;
-        }
-        .summary-block div {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 8px;
-            font-size: 10pt;
-        }
-        .summary-block div:not(:last-child) {
-            border-bottom: 1px solid #000;
-        }
-        .summary-block .label {
-            font-weight: bold;
-        }
-        .summary-block .valor-liquido {
-            font-weight: bold;
-            background-color: #eee;
-        }
-
-        /* --- Rodapé (Valor Base e Banco) --- */
-        .footer-block {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            border: 1px solid #000;
-            padding: 5px;
-            font-size: 9pt;
-        }
-        .valor-base {
-            padding: 5px;
-        }
-        .valor-base .label {
-            display: block; /* "Valor Base..." fica em cima */
-        }
-        .valor-base .value {
-            font-size: 12pt;
-            font-weight: bold;
-        }
-        .banco-info {
-            flex-grow: 1;
-            display: flex;
-            justify-content: space-between;
-            padding: 5px;
-            margin-left: 10px;
-            border-left: 1px solid #ccc;
-        }
-        .banco-info span {
-            margin-right: 15px;
-        }
-
-        /* --- Sidebar de Assinatura --- */
-        .signature-block {
-            margin-top: 4cm; /* Empurra para baixo */
-        }
-        .signature-block .line {
-            border-bottom: 1px solid #000;
-            height: 2em;
-            margin-bottom: 1cm;
-        }
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        h1 { text-align: center; text-transform: uppercase; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #000; padding: 6px; font-size: 13px; }
+        .no-border td { border: none; }
+        .right { text-align: right; }
     </style>
 </head>
 <body>
 
-    <div class="recibo-container">
-        <main class="recibo-main">
+    <h1>Recibo de Pagamento - Bolsa Auxílio</h1>
 
-            <header class="header">
-                <h1>Recibo de Pagamento Bolsa-Auxílio</h1>
-                <div class="referencia">
-                    Referência 2025/10
-                </div>
-            </header>
+    <table class="no-border">
+        <tr><td><strong>Referência:</strong> {{ recibo.data_referencia|date:"m/Y" }}</td></tr>
+    </table>
 
-            <section class="info-block">
-                <div class="info-row">
-                    <div class="text"><span class="label">Unidade Concedente:</span>{{ recibo.contrato.parte_concedente.razao_social }}</div>
-                    <div class="side-info"><span class="label">C.N.P.J.</span>{{ recibo.contrato.parte_concedente.cnpj }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="text"><span class="label">Agente de Integração:</span>{{ recibo.contrato.agente_integrador.cnpj }} -
-                        {{ recibo.contrato.agente_integrador.razao_social }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="text"><span class="label">Estagiário(a):</span>{{ recibo.contrato.estagiario.candidato.nome }}</div>
-                    <div class="side-info"><span class="label">C.P.F.</span>{{ recibo.contrato.estagiario.candidato.cpf }}</div>
-                    <div class="side-info"><span class="label">Data Início:</span>{{ recibo.contrato.data_inicio }}</div>
-                    <div class="side-info"><span class="label">Data Fim:</span>{{ recibo.contrato.data_termino_prevista }}</div>
-                </div>
-            </section>
+    <table>
+        <tr><td><strong>Parte Concedente:</strong> {{ recibo.contrato.parte_concedente.razao_social }}</td></tr>
+        <tr><td><strong>CNPJ:</strong> {{ recibo.contrato.parte_concedente.cnpj }}</td></tr>
+        <tr><td><strong>Agente de Integração:</strong> {{ recibo.contrato.agente_integrador.razao_social }}</td></tr>
+        <tr><td><strong>Estagiário:</strong> {{ recibo.estagiario_nome }}</td></tr>
+        <tr><td><strong>CPF:</strong> {{ recibo.contrato.estagiario.candidato.cpf }}</td></tr>
+        <tr>
+            <td><strong>Período:</strong> {{ recibo.data_inicio|date:"d/m/Y" }} a {{ recibo.data_fim|date:"d/m/Y" }}</td>
+        </tr>
+    </table>
 
-            <table class="pagamento-table">
-                <thead>
-                    <tr>
-                        <th class="col-codigo">Código</th>
-                        <th class="col-descricao">Descrição</th>
-                        <th class="col-vencimentos">Vencimentos</th>
-                        <th class="col-descontos">Descontos</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="col-codigo">1</td>
-                        <td class="col-descricao">{{ recibo.lancamento.tipo_evento.descricao }}</td>
-                        <td class="col-vencimentos">{{ recibo.lancamento.tipo_evento.valor }}</td>
-                        <td class="col-descontos empty-cell"> </td>
-                    </tr>
-                    <tr>
-                        <td class="col-codigo">26</td>
-                        <td class="col-descricao">Debito Bolsa Auxílio Antecipado</td>
-                        <td class="col-vencimentos empty-cell"> </td>
-                        <td class="col-descontos">400,00</td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="2" class="logo-cell">
-                            <div class="logo-placeholder">
-                                ELLENCO ESTÁGIOS
-                            </div>
-                        </td>
-                        <td colspan="2" class="summary-cell">
-                            <div class="summary-block">
-                                <div>
-                                    <span class="label">Total de Vencimentos</span>
-                                    <span>773,33</span>
-                                </div>
-                                <div>
-                                    <span class="label">Total de Descontos</span>
-                                    <span>400,00</span>
-                                </div>
-                                <div class="valor-liquido">
-                                    <span class="label">Valor Líquido</span>
-                                    <span>373,33</span>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
+    <h3>Lançamentos</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Descrição</th>
+                <th>Tipo</th>
+                <th class="right">Valor (R$)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lancamento in recibo.lancamentos.all %}
+            <tr>
+                <td>{{ lancamento.tipo_evento.descricao }}</td>
+                <td>{{ lancamento.tipo_evento.get_tipo_display }}</td>
+                <td class="right">{{ lancamento.valor|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">Nenhum lançamento registrado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-            <footer class="footer-block">
-                <div class="valor-base">
-                    <span class="label">Valor Base Bolsa-Auxílio</span>
-                    <span class="value">800,00</span>
-                </div>
-                <div class="banco-info">
-                    <span>Banco / Agência:</span>
-                    <span>Conta / Tipo:</span>
-                    <span>Pix:</span>
-                </div>
-            </footer>
+    <table class="no-border">
+        <tr><td><strong>Total de Créditos:</strong></td><td class="right">{{ recibo.total_creditos|floatformat:2 }}</td></tr>
+        <tr><td><strong>Total de Débitos:</strong></td><td class="right">{{ recibo.total_debitos|floatformat:2 }}</td></tr>
+        <tr><td><strong>Valor Base:</strong></td><td class="right">{{ recibo.valor_bolsa|floatformat:2 }}</td></tr>
+        <tr><td><strong>Valor Líquido:</strong></td><td class="right"><strong>{{ recibo.calcular_valor_final|floatformat:2 }}</strong></td></tr>
+    </table>
 
-        </main>
-
-        <aside class="recibo-sidebar">
-            <div class="signature-block">
-                <label>Assinatura:</label>
-                <div class="line"></div>
-
-                <label>Data:</label>
-                <div class="line"></div>
-            </div>
-        </aside>
-    </div>
+    <br><br>
+    <table class="no-border">
+        <tr>
+            <td><strong>Data:</strong> ____/____/______</td>
+            <td style="text-align:center;">
+                ___________________________________________<br>
+                <small>Assinatura do Estagiário</small>
+            </td>
+        </tr>
+    </table>
 
 </body>
 </html>

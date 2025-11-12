@@ -416,21 +416,21 @@ class Recibo(models.Model):
     # --- CÁLCULOS DOS TOTAIS ---
     @property
     def total_creditos(self):
-        return self.lancamentos.filter(tipo_evento__tipo='CREDITO').aggregate(total=models.Sum('valor'))['total'] or 0.00
+        return self.lancamentos.filter(tipo_evento__tipo='CREDITO').aggregate(total=models.Sum('valor'))['total'] or Decimal(0.00)
 
     @property
     def total_debitos(self):
-        return self.lancamentos.filter(tipo_evento__tipo='DEBITO').aggregate(total=models.Sum('valor'))['total'] or 0.00
+        return self.lancamentos.filter(tipo_evento__tipo='DEBITO').aggregate(total=models.Sum('valor'))['total'] or Decimal(0.00)
 
     @property
     def valor_liquido(self):
-        base = self.valor_bolsa * (self.dias_trabalhados / self.dias_referencia)
-        return base + self.total_creditos - self.total_debitos
+        base = self.valor_bolsa * (Decimal(self.dias_trabalhados / self.dias_referencia))
+        return base + (self.total_creditos - self.total_debitos)
 
     def calcular_valor_final(self):
         if self.dias_referencia > 0 and self.valor_bolsa:
             valor_diario = self.valor_bolsa / self.dias_referencia
-            return round(valor_diario * self.dias_trabalhados, 2)
+            return round(valor_diario * ((self.dias_referencia - self.dias_falta) + (self.total_creditos - self.total_debitos)), 2)
         return self.valor_bolsa or 0.00
 
     def save(self, *args, **kwargs):
