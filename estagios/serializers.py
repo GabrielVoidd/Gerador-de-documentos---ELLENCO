@@ -96,7 +96,13 @@ class ReciboSerializer(serializers.ModelSerializer):
     total_debitos = serializers.ReadOnlyField()
     valor_liquido = serializers.ReadOnlyField()
 
-    # Não vai aparecer no GET, pois os campos do snapshot já existem
+    # Campo para exibir mês/ano formatado
+    mes_referencia = serializers.SerializerMethodField()
+
+    # Campos de relacionamento (somente leitura)
+    estagiario_nome = serializers.SerializerMethodField()
+    parte_concedente_nome = serializers.SerializerMethodField()
+
     contrato = serializers.PrimaryKeyRelatedField(
         queryset=Contrato.objects.all(), write_only=True
     )
@@ -105,27 +111,51 @@ class ReciboSerializer(serializers.ModelSerializer):
         model = Recibo
         fields = [
             'id', 'contrato',
-            # Campos do snapshot, read_only por conta da ViewSet
-            'estagiario_nome', 'valor_bolsa', 'data_inicio', 'data_fim', 'beneficio_horario',
-            # Dddos do período
-            'dias_trabalhados', 'dias_falta',
-            # Propriedades calculadas, apenas leitura
-            'total_creditos', 'total_debitos', 'valor_liquido',
-            # Lista aninhada
-            'lancamenos'
-            ]
 
-        # Os campos do snapshot são read_only, o front não enviará esses dados
-        read_only_fields = [
-            'estagiario_nome', 'valor_bolsa', 'data_inicio', 'data_fim', 'beneficio_horario', 'total_creditos',
-            'total_debitos', 'valor_liquido', 'lancamentos'
+            # Campos do snapshot (ou dinâmicos)
+            'estagiario_nome', 'parte_concedente_nome', 'valor_bolsa', 'data_inicio', 'data_fim',
+
+            # Dados do recibo
+            'data_referencia', 'dias_referencia', 'dias_trabalhados', 'dias_falta', 'valor', 'beneficio_horario',
+
+            # Campos calculados
+            'total_creditos', 'total_debitos', 'total_liquidos', 'mes_referencia',
+
+            # Lista aninhada
+            'lancamentos',
         ]
 
-    def get_mes_referencia(self, obj):
-        return obj.data_referencia.strftime('%m/%Y')
+        read_only_fields = [
+            'estagiario_nome', 'parte_concedente_nome', 'valor_bolsa', 'data_inicio', 'data_fim', 'beneficio_horario',
+            'valor', 'total_creditos', 'total_debitos', 'total_liquidos', 'lancamentos', 'mes_referencia'
+        ]
 
-    def validate_data_referencial(self, value):
-        ''''Valida se a data de referência é o primeiro dia do mês'''''
-        if value.day != 1:
-            raise serializers.ValidationError('A data de referência deve ser o primeiro dia do mês')
-        return value
+        # --- MÉTODOS AUXILIARES DE EXIBIÇÃO ---
+
+        def get_mes_referencia(self, obj):
+            '''Retorna o mês/ano da referência formatada (MM/YYYY)'''
+            return obj.data_referencia.strftime('%m/%Y') if obj.data_referencia else None
+
+        def get_estagiario_nome(self, obj):
+            '''Exibe o nome do estagiário - prioriza o snapshot, mas busca do contrato se disponível'''
+            if obj.estagiario_nome:
+                return obj.estagiario_nome
+            if obj.contrato and hasattr(obj.contrato, 'estagiario'):
+                return obj.contrato.estagiario.candidato.nome
+            return None
+
+        def get_parte_concedente_nome(self, obj):
+            '''Exibe o nome da parte concedente - prioriza o snapshot, mas busca do contrato se disponível'''
+            if obj.parte_concedente_nome:
+                return obj.parte_concedente_nome
+            if obj.contrato and hasattr(obj.contrato, 'parte_concedente'):
+                return obj.contrato.parte_concedente.razao_social
+            return None
+
+        # Validações
+
+        def validate_data_referencia(self, value):
+            '''Valida se a data de referência é o 1º dia do mês'''
+            if value.day != 1:
+                raise serializers.ValidationError('A data de referência deve ser o primeiro dia do mês')
+            return value

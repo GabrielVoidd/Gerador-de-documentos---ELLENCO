@@ -429,8 +429,8 @@ class Recibo(models.Model):
     def calcular_valor_final(self):
         if self.dias_referencia > 0 and self.valor_bolsa:
             valor_diario = self.valor_bolsa / self.dias_referencia
-            return valor_diario * self.dias_trabalhados
-        return self.valor_bolsa
+            return round(valor_diario * self.dias_trabalhados, 2)
+        return self.valor_bolsa or 0.00
 
     def save(self, *args, **kwargs):
         # --- POPULANDO O SHAPSHOT ---
@@ -445,21 +445,22 @@ class Recibo(models.Model):
         # Caso não seja especificada uma data de referência, será usado o primeiro dia do mês anterior
         if not self.data_referencia:
             hoje = date.today()
-            primeiro_dia_mes_atual = hoje.replace(day=1)
-            self.data_referencia = primeiro_dia_mes_atual - relativedelta(months=1)
+            primeiro_dia_mes_anterior = (hoje.replace(day=1) - relativedelta(months=1))
+            self.data_referencia = primeiro_dia_mes_anterior
 
         # Cálculo automático caso os dias trabalhados não forem especificados
-        if not self.dias_trabalhados and self.dias_referencia is not None:
+        if not self.dias_trabalhados and self.dias_referencia:
             self.dias_trabalhados = self.dias_referencia - self.dias_falta
 
         if not self.valor:
             self.valor = self.calcular_valor_final()
 
         # Chama o metodo 'save' original para salvar no banco
-        super(Recibo, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'Recibo de {self.estagiario_nome} - {self.data_referencia}'
+        mes_ano = self.data_referencia.strftime('%m/%Y') if self.data_referencia else 'sem data'
+        return f'Recibo de {self.estagiario_nome} - {mes_ano}'
 
 
 class Lancamento(models.Model):

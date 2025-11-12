@@ -1,4 +1,3 @@
-from PIL.ImageFilter import DETAIL
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
@@ -224,68 +223,54 @@ class ReciboViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         contrato_id = request.data.get('contrato_id')
+        if not contrato_id:
+            return Response({'error': 'O campo "contrato_id" é obrigatório'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             contrato = Contrato.objects.get(id=contrato_id)
         except Contrato.DoesNotExist:
             return Response({'error': 'Contrato não encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
+        # Texto informativo sobre benefício e horário
         texto_beneficio = '(BENEFÍCIO): A CRITÉRIO'
         texto_horario = contrato.jornada_estagio
         texto_combinado = f'{texto_beneficio} {texto_horario}'
 
+        # Determina a data de referência (1° dia do mês anterior)
         hoje = date.today()
-        primeiro_dia_mes_atual = hoje.replace(day=1)
-        data_referencia = primeiro_dia_mes_atual - relativedelta(months=1)
+        data_referencia = hoje.replace(day=1) - relativedelta(months=1)
 
-        # Verifica se há um recibo para um contrato no mesmo período
+        # Evita recibos duplicados no mesmo mês para o mesmo contrato
         if Recibo.objects.filter(contrato=contrato, data_referencia=data_referencia).exists():
+            mes_ref = data_referencia.strftime('%m/%Y')
             return Response(
-                {'error': f'Já existe um recibo para este contrato na referência {data_referencia.strftime('%m/%Y')}'},
+                {'error': f'Já existe um recibo para este contrato na referência {mes_ref}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Cálculo dos dias trabalhados caso não sejam especificados
-        dias_falta = request.data.get('dias_falta', 0)
-        dias_trabalhados = request.data.get('dias_trabalhados')
-
-        if dias_trabalhados is None:
-            dias_referencia = 30
-            dias_trabalhados = dias_referencia - dias_falta
-        else:
-            dias_trabalhados = int(dias_trabalhados)
-
+        # --- CRIAÇÃO DO RECIBO ---
         try:
-            novo_recibo = Recibo.objects.create(
-                contrato = contrato,
-
-                # TESTE - Data de referência (primeiro dia do mês anterior)
-
-                # Snapshots
-                estagiario_nome = contrato.estagiario.candidato.nome,
-                parte_concedente_nome = contrato.parte_concedente.razao_social,
-                valor_bolsa = contrato.valor_bolsa,
-                data_inicio = contrato.data_inicio,
-                data_fim = contrato.data_termino_prevista,
-
-                # String combinada
-                beneficio_horario = texto_combinado,
-
-                # Dados específicos do período
-                dias_trabalhados = request.data.get('dias_trabalhados', 30),
-                dias_falta = request.data.get('dias_falta', 0)
+            novo_recibo = Recibo(
+                contrato=contrato, beneficio_horario=texto_combinado,
+                data_referencia=data_referencia, dias_falta=int(request.data.get('dias_falta', 0)),
             )
+
+            novo_recibo.save()
+
         except Exception as e:
             return Response({'error': f'Erro ao criar o recibo: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # --- BOLSA AUXÍLIO ---
         try:
             tipo_bolsa = TipoEvento.objects.get(descricao='Bolsa Auxílio')
-
             Lancamento.objects.create(
-                recibo=novo_recibo, tipo_evento=tipo_bolsa, valor=novo_recibo.valor_bolsa,
+                recibo=novo_recibo, tipo_evento=tipo_bolsa, valor=novo_recibo.valor,
             )
         except TipoEvento.DoesNotExist:
             return Response(
-                {'error': 'TipoEvento "Bolsa Auxílio" não encontrado, configure primeiro'}, status=status.HTTP_404_NOT_FOUND)
+                {'error': 'TipoEvento "Bolsa Auxílio" não encontrado. Configure-o antes de criar recibos'},
+                status=status.HTTP_404_NOT_FOUND
+            )
         except Exception as e:
             return Response({'error': f'Erro ao criar lançamento inicial: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
 
