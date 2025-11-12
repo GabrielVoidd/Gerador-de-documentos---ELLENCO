@@ -293,7 +293,7 @@ class ReciboViewSet(viewsets.ModelViewSet):
 
         # Cria a resposta HTTP
         response = HttpResponse(pdf_file, content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="Recibo_Bolsa_Auxilio_{recibo.contrato.candidato.estagiario.nome}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="Recibo_Bolsa_Auxilio_{recibo.contrato.estagiario.candidato.nome}.pdf"'
 
         return response
 
