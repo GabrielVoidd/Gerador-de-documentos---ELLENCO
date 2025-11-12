@@ -162,11 +162,13 @@ class ReciboAdmin(admin.ModelAdmin):
     readonly_fields = ('valor', 'dias_trabalhados', 'estagiario_nome', 'parte_concedente_nome', 'valor_bolsa',
         'data_inicio', 'data_fim')
 
-    @admin.display(description='Parte Concedente', ordering='contrato__parte_concedente__razao_social')
-    def get_parte_concedente(self, obj):
-        if obj.contrato and obj.contrato.parte_concedente:
-            return obj.contrato.parte_concedente.razao_social
-        return 'N/A'
-
     class Media:
         js = ('js/preencher_recibo.js',)
+
+    def gerar_termo_link(self, obj):
+        # Cria a URL para o endpoint da API que gera o PDF
+        url = reverse('gerar-recibo-pagamento', kwargs={'pk': obj.pk})
+        return format_html('<a class="button" href="{}" target="_blank">Gerar PDF</a>', url)
+
+    gerar_termo_link.short_description = 'Recibo de pagamento bolsa auxílio'
+    gerar_termo_link.allow_tags = True

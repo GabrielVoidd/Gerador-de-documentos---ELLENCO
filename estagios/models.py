@@ -424,7 +424,8 @@ class Recibo(models.Model):
 
     @property
     def valor_liquido(self):
-        return self.total_creditos - self.total_debitos
+        base = self.valor_bolsa * (self.dias_trabalhados / self.dias_referencia)
+        return base + self.total_creditos - self.total_debitos
 
     def calcular_valor_final(self):
         if self.dias_referencia > 0 and self.valor_bolsa:

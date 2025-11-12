@@ -277,6 +277,26 @@ class ReciboViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(novo_recibo)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @action(detail=True, methods=['get'], url_path='gerar-recibo-pagamento', url_name='gerar-recibo-pagamento')
+    def gerar_recibo_pagamento(self, request, pk=None):
+        recibo = self.get_object()
+
+        logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
+        logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
+
+        # Renderiza o template HTML com o contexto do cadastro
+        html_string = render_to_string('estagios/recibo_pagamento.html',
+                                       {'recibo': recibo, 'logo_path': logo_path})
+
+        # Gera o PDF
+        pdf_file = HTML(string=html_string).write_pdf()
+
+        # Cria a resposta HTTP
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="Recibo_Bolsa_Auxilio_{recibo.contrato.candidato.estagiario.nome}.pdf"'
+
+        return response
+
 
 def get_contrato_data(request, contrato_id):
     try:
