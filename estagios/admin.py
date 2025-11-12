@@ -79,12 +79,12 @@ class AgenteIntegadorAdmin(admin.ModelAdmin):
     list_filter = ('razao_social', 'cidade')
 
 
-class CartaEncaminhamentoInline(admin.TabularInline):
+class CartaEncaminhamentoInline(NestedTabularInline):
     model = CartaEncaminhamento
     extra = 1
 
 
-class ArquivosInline(admin.TabularInline):
+class ArquivosInline(NestedTabularInline):
     model = Arquivos
     extra = 1
 
