@@ -168,8 +168,5 @@ class ReciboAdmin(admin.ModelAdmin):
             return obj.contrato.parte_concedente.razao_social
         return 'N/A'
 
-    def save_model(self, request, obj, form, change):
-        super().save_model(self, request, obj, form, change)
-
     class Media:
         js = ('js/preencher_recibo.js',)
