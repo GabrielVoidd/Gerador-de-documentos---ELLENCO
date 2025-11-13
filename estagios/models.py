@@ -6,6 +6,7 @@ from unidecode import unidecode
 from decimal import Decimal
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal, ROUND_HALF_UP
 
 
 class InstituicaoEnsino(models.Model):
@@ -424,14 +425,13 @@ class Recibo(models.Model):
 
     @property
     def valor_liquido(self):
-        base = self.valor_bolsa * (Decimal(self.dias_trabalhados / self.dias_referencia))
-        return base + (self.total_creditos - self.total_debitos)
+        if not self.valor_bolsa or not self.dias_referencia:
+            return Decimal('0.00')
 
-    def calcular_valor_final(self):
-        if self.dias_referencia > 0 and self.valor_bolsa:
-            valor_diario = self.valor_bolsa / self.dias_referencia
-            return round(valor_diario * ((self.dias_referencia - self.dias_falta) + (self.total_creditos - self.total_debitos)), 2)
-        return self.valor_bolsa or 0.00
+        proporcao = Decimal(self.dias_trabalhados) / Decimal(self.dias_referencia)
+        base = (self.valor_bolsa * proporcao).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        total = base + self.total_creditos - self.total_debitos
+        return total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     def save(self, *args, **kwargs):
         # --- POPULANDO O SHAPSHOT ---
@@ -455,6 +455,9 @@ class Recibo(models.Model):
 
         if not self.valor:
             self.valor = self.calcular_valor_final()
+
+        # Atualiza dias_trabalhados antes de salvar
+        self.dias_trabalhados = max(0, self.dias_referencia - self.dias_falta)
 
         # Chama o metodo 'save' original para salvar no banco
         super().save(*args, **kwargs)
