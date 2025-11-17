@@ -10,7 +10,7 @@ from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 @admin.register(Contrato)
 class ContratoAdmin(admin.ModelAdmin):
     list_display = ('numero_contrato', 'estagiario', 'parte_concedente', 'data_inicio', 'gerar_termo_link')
-    search_fields = ('numero_contrato', 'candidato__nome', 'parte_concedente__razao_social')
+    search_fields = ('numero_contrato', 'estagiario__candidato__nome', 'parte_concedente__razao_social')
     list_filter = ('parte_concedente', 'data_inicio')
 
     def gerar_termo_link(self, obj):
