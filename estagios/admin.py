@@ -109,6 +109,33 @@ class CandidatoAdmin(NestedModelAdmin):
         'nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = ('nome', 'bairro', 'cpf', 'rg')
+    actions = ['exportar_para_excel']
+
+    def exportar_para_excel(self, request, queryset):
+        '''Exporta os dados do candidato junto com a Parte Concedente e Instituição de Ensino. Inclui somente os
+        registros selecionados no admin'''
+        queryset = queryset.select_related(
+            'contrato__parte_concedente', 'contrato__instituicao_ensino'
+        )
+
+        data = []
+        for candidato in queryset:
+            contrato = getattr(candidato, 'contrato', None)
+            parte_concedente = getattr(candidato, 'parte_concedente', None)
+            instituicao = getattr(candidato, 'instituicao_ensino', None)
+
+            data.append({
+                # --- CANDIDATO ---
+                'Nome Candidato': candidato.nome,
+                'CPF Candidato': candidato.cpf,
+                'Telefone Candidato': candidato.telefone if hasattr(candidato, 'telefone') else '',
+                'Email Candidato': candidato.email,
+
+                # --- PARTE CONCEDENTE ---
+                'Razão Social (Parte Concedente)': parte_concedente.razao_social if parte_concedente else '',
+                'CNPJ (Parte Concedente)': parte_concedente.cnpj if parte_concedente else '',
+            })
+
 
     class Media:
         css = {'all': ('admin/css/custom_admin.css',)}

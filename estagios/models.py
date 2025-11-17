@@ -33,6 +33,7 @@ class ParteConcedente(models.Model):
     razao_social = models.CharField(max_length=250)
     endereco = models.CharField(max_length=250)
     bairro = models.CharField(max_length=100)
+    local_trabalho = models.CharField(max_length=100, null=True, blank=True)
     estado = models.CharField(max_length=2)
     cnpj = models.CharField(max_length=18, unique=True)
     representante_legal = models.CharField(max_length=100)
