@@ -3,7 +3,6 @@ from django.utils import timezone
 from datetime import date
 from rest_framework.exceptions import ValidationError
 from unidecode import unidecode
-from decimal import Decimal
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal, ROUND_HALF_UP
@@ -510,6 +509,95 @@ class Recibo(models.Model):
     def __str__(self):
         mes_ano = self.data_referencia.strftime('%m/%Y') if self.data_referencia else 'sem data'
         return f'Recibo de {self.estagiario_nome} - {mes_ano}'
+
+
+class ReciboRescisao(models.Model):
+    # --- RASTREABILIDADE ---
+    contrato = models.ForeignKey(Contrato, on_delete=models.PROTECT, null=True, blank=True)
+
+    # --- DADOS DO SNAPSHOT ---
+    estagiario_nome = models.CharField(max_length=100)
+    parte_concedente_nome = models.CharField(max_length=100)
+    valor_bolsa = models.DecimalField(max_digits=10, decimal_places=2)
+    data_inicio = models.DateField()
+    data_fim = models.DateField()
+
+    # --- MOTIVO DA RESCISÃO ---
+    motivo_rescisao = models.ForeignKey(MotivoRescisao, on_delete=models.PROTECT, null=True, blank=True)
+
+    # --- DATAS IMPORTANTES ---
+    data_rescisao = models.DateField()
+    data_pagamento = models.DateField()
+
+    # --- PERÍODO DE CÁLCULO ---
+    saldo_salario = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    recesso_remunerado = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    aviso_previo = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    # --- DESCONTOS ---
+    adiantamentos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    outros_descontos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    # --- TOTAIS ---
+    total_creditos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_debitos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    valor_liquido = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    # --- CÁLCULOS AUTOMÁTICOS ---
+    @property
+    def calcular_saldo_salario(self):
+        """Calcula o saldo de bolsa até a data de rescisão"""
+        if not self.data_rescisao or not self.valor_bolsa:
+            return Decimal('0.00')
+
+        # Calcula os dias trabalhados no mês da rescisão
+        dias_no_mes = 30
+        dias_trabalhados = min(self.data_rescisao.day, dias_no_mes)
+        return (self.valor_bolsa / dias_no_mes) * dias_trabalhados
+
+    @property
+    def calcular_recesso_proporcional(self):
+        """Calcula recesso remunerado proporcional"""
+        if not self.data_inicio or not self.data_rescisao or not self.valor_bolsa:
+            return Decimal('0.00')
+
+        # Calcula meses trabalhados (considerando 30 dias por mês)
+        dias_trabalhados = (self.data_rescisao - self.data_inicio).days
+        meses_trabalhados = dias_trabalhados / 30.0
+
+        # Recesso: 30 dias para cada 12 meses trabalhados
+        dias_recesso = (meses_trabalhados / 12) * 30
+        return (self.valor_bolsa / 30) * dias_recesso
+
+    def calcular_totais(self):
+        """Calcula todos os totais automaticamente"""
+        self.saldo_salario = self.calcular_saldo_salario
+        self.recesso_remunerado = self.calcular_recesso_proporcional
+
+        # Aviso prévio só em casos específicos
+
+        self.total_creditos = (
+            self.saldo_salario + self.recesso_remunerado + self.aviso_previo
+        )
+
+        self.total_debitos = self.adiantamentos + self.outros_descontos
+        self.valor_liquido = self.total_creditos - self.total_debitos
+
+    def save(self, *args, **kwargs):
+        # Snapshot do contrato
+        if self.contrato and not self.estagiario_nome:
+            self.estagiario_nome = self.contrato.estagiario.candidato.nome
+            self.parte_concedente_nome = self.contrato.parte_concedente.razao_social
+            self.valor_bolsa = self.contrato.valor_bolsa
+            self.data_inicio = self.contrato.data_inicio
+
+        # Calcula os totais antes de salvar
+        self.calcular_totais()
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'Rescisão Estágio - {self.estagiario_nome} - {self.data_rescisao.strftime("%d/%m/%Y")}'
 
 
 class Lancamento(models.Model):
