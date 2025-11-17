@@ -32,6 +32,7 @@ class RescisaoAdmin(admin.ModelAdmin):
     list_display = ('contrato__numero_contrato', 'contrato__estagiario', 'contrato__parte_concedente', 'data_rescisao', 'gerar_termo_link')
     search_fields = ('contrato__numero_contrato', 'contrato__estagiario__candidato__nome', 'contrato__parte_concedente__razao_social')
     list_filter = ('contrato__parte_concedente', 'data_rescisao')
+    autocomplete_fields = ['contrato']
 
     def gerar_termo_link(self, obj):
         # Cria a URL para o endpoint da API que gera o PDF
