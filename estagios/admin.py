@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
-    CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo
+    CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
+    MotivoRescisao
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 
 
@@ -19,6 +20,11 @@ class ContratoAdmin(admin.ModelAdmin):
 
     gerar_termo_link.short_description = 'Termo de Compromisso'
     gerar_termo_link.allow_tags = True
+
+
+@admin.register(MotivoRescisao)
+class MotivoRescisaoAdmin(admin.ModelAdmin):
+    list_display = ('motivo')
 
 
 @admin.register(Rescisao)
