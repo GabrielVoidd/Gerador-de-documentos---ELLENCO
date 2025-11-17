@@ -371,10 +371,21 @@ class Contrato(models.Model):
         return f'Contrato {self.numero_contrato} - {self.estagiario.candidato.nome}'
 
 
+class MotivoRescisao(models.Model):
+    motivo = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.motivo
+
+    class Meta:
+        verbose_name = 'Motivo da rescisão'
+        verbose_name_plural = 'Motivos da rescisão'
+
+
 class Rescisao(models.Model):
     contrato = models.OneToOneField(Contrato, on_delete=models.PROTECT)
     data_rescisao = models.DateField()
-    motivo = models.TextField()
+    motivo = models.ForeignKey(MotivoRescisao, on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = 'Rescisão'
