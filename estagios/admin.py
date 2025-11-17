@@ -120,6 +120,7 @@ class CandidatoAdmin(NestedModelAdmin):
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = ('nome', 'bairro', 'cpf', 'rg')
     actions = ['exportar_para_excel']
+    list_per_page = 20
 
     def exportar_para_excel(self, request, queryset):
         '''Exporta os dados do candidato junto com a Parte Concedente e Instituição de Ensino. Inclui somente os
