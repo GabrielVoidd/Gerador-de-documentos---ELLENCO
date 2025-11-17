@@ -113,7 +113,7 @@ class Candidato(models.Model):
     # --- DADOS PESSOAIS ---
     nome = models.CharField(max_length=100)
     sexo = models.CharField(max_length=50)
-    rg = models.CharField(max_length=9, unique=True)
+    rg = models.CharField(max_length=9, unique=True, blank=True)
     anexar_rg = models.FileField(
         verbose_name='Anexar RG',
         upload_to='documentos_candidatos/rg/%Y%/%m/%d/', null=True, blank=True)
@@ -155,6 +155,9 @@ class Candidato(models.Model):
     data_termino = models.DateField(help_text='Quando o curso / escola acaba?', null=True, blank=True)
     instituicao_ensino = models.ForeignKey(InstituicaoEnsino, on_delete=models.PROTECT)
     nome_da_instituicao = models.CharField(max_length=150, null=True, blank=True, help_text='Caso não esteja na lista')
+    app_escolar = models.CharField(max_length=50, blank=True,
+                                   help_text='Não / Nome do aplicativo da escola/faculdade caso tenha',
+                                   verbose_name='Aplicativo da escola/faculdade')
     vale_transporte = models.CharField(max_length=2, choices=ValeTransporte.choices, default='E')
     curso_extracurricular = models.CharField(max_length=200, help_text='Sim, de informática das 08h as 10h / Não')
     anexar_declaracao = models.FileField(null=True, blank=True, upload_to='documentos_candidatos/declaracao/%Y%/%m/%d/')
