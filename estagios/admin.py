@@ -24,7 +24,7 @@ class ContratoAdmin(admin.ModelAdmin):
 
 @admin.register(MotivoRescisao)
 class MotivoRescisaoAdmin(admin.ModelAdmin):
-    list_display = ('motivo')
+    list_display = ('motivo',)
 
 
 @admin.register(Rescisao)
