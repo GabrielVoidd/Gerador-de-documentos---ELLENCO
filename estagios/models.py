@@ -236,6 +236,36 @@ class Candidato(models.Model):
             return 'Nenhuma observação'
         return self.pcd_detalhes
 
+    def nome_responsavel_formatado(self):
+        if not self.nome_responsavel_legal:
+            return '-'
+        return self.nome_responsavel_legal
+
+    def nome_responsavel2_formatado(self):
+        if not self.nome_responsavel_legal2:
+            return '-'
+        return self.nome_responsavel_legal2
+
+    def telefone_responsavel_formatado(self):
+        if not self.telefone_responsavel_legal:
+            return '-'
+        return self.telefone_responsavel_legal
+
+    def telefone_responsavel2_formatado(self):
+        if not self.telefone_responsavel_legal2:
+            return '-'
+        return self.telefone_responsavel_legal2
+
+    def email_responsavel_formatado(self):
+        if not self.email_responsavel_legal:
+            return '-'
+        return self.email_responsavel_legal
+
+    def email_responsavel2_formatado(self):
+        if not self.email_responsavel_legal2:
+            return '-'
+        return self.email_responsavel_legal2
+
     def save(self, *args, **kwargs):
         if self.nome:
             self.nome = unidecode(self.nome)
