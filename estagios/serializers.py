@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
-TipoEvento, Lancamento, Recibo
+TipoEvento, Lancamento, Recibo, ReciboRescisao
 
 
 class InstituicaoEnsinoSerializer(serializers.ModelSerializer):
@@ -159,3 +159,52 @@ class ReciboSerializer(serializers.ModelSerializer):
             if value.day != 1:
                 raise serializers.ValidationError('A data de referência deve ser o primeiro dia do mês')
             return value
+
+
+class ReciboRescisaoSerializer(serializers.ModelSerializer):
+    estagiario_nome = serializers.CharField(read_only=True, help_text='Nome do estagiário (preenchido automaticamente)')
+
+    class Meta:
+        model = ReciboRescisao
+        fields = '__all__'
+        read_only_fields = [
+            'estagiario_nome',
+            'parte_concedente_nome',
+            'valor_bolsa',
+            'data_inicio',
+            'total_creditos',
+            'total_debitos',
+            'valor_liquido',
+        ]
+
+    def validate(self, attrs):
+        """Validações customizadas"""
+        data_rescisao = attrs('data_rescisao')
+        data_pagamento = attrs('data_pagamento')
+
+        if data_rescisao and data_pagamento:
+            if data_pagamento < data_rescisao:
+                raise serializers.ValidationError({
+                    'data_pagamento': 'A data de pagamento não pode ser anterior à data de rescisão'
+                })
+
+        # Valida valores negativos
+        decimal_fields = ['saldo_salario', 'recesso_remunerado', 'aviso_previo', 'adiantamento', 'outros_descontos']
+        for field in decimal_fields:
+            if field in attrs and attrs[field] < 0:
+                raise serializers.ValidationError({
+                    field: f'O valor de {field} não pode ser negativo'
+                })
+
+        return attrs
+
+    def create(self, validated_data):
+        # Garante que o contrato está presente para copiar os dados
+        contrato = validated_data('contrato')
+        if contrato:
+            instance = ReciboRescisao.objects.create(**validated_data)
+            return instance
+        else:
+            raise serializers.ValidationError({
+                'contrato': 'É necessário informar um contrato válido'
+            })
