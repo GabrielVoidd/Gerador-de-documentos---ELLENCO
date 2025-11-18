@@ -5,6 +5,9 @@ from django.conf import settings
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+
 from .forms import ContratoForm
 import os
 from rest_framework import viewsets, status, filters
@@ -15,11 +18,11 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.shortcuts import render
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
-    TipoEvento, Lancamento, Recibo
+    TipoEvento, Lancamento, Recibo, ReciboRescisao
 from .serializers import(
 InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
 ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
-TipoEventoSerializer, LancamentoSerializer, ReciboSerializer
+TipoEventoSerializer, LancamentoSerializer, ReciboSerializer, ReciboRescisaoSerializer
 )
 
 class InstituicaoEnsinoViewSet(viewsets.ModelViewSet):
@@ -315,3 +318,73 @@ def get_contrato_data(request, contrato_id):
         return JsonResponse({'error': 'Contrato não encontrado'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+class ReciboRescisaoViewSet(viewsets.ModelViewSet):
+    queryset = ReciboRescisao.objects.all().order_by('-data_rescisao')
+    serializer_class = ReciboRescisaoSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    # Filtros
+    filterset_fields = ['contrato', 'motivo_rescisao', 'data_rescisao']
+
+    # Campos de busca
+    search_fields = ['estagiario_nome', 'parte_concedente_nome']
+
+    # Campos para ordenação
+    ordering_fields = ['data_rescisao', 'data_pagamento', 'estagiario_nome', 'valor_liquido']
+
+    # Ordenação padrão
+    ordering = ['-data_rescisao']
+
+    def perform_create(self, serializer):
+        """Sobreescrita para garantir que os cálculos sejam executados"""
+        instance = serializer.save() # Os cálculos são feitos no save() do model
+
+    def perform_update(self, serializer):
+        """"Sobreescrita para garantir que os cálculos sejam executados no update"""
+        instance = serializer.save()
+
+    @action(detail=True, methods=['post'])
+    def simular_calculos(self, request, pk=None):
+        """Endpoint para simular cálculos sem salvar"""
+        instance = self.get_object()
+
+        # Recria os cálculos
+        instance.calcular_totais()
+
+        data = {
+            'saldo_salario': instance.saldo_salario, 'recesso_remunerado': instance.recesso_remunerado,
+            'total_creditos': instance.total_creditos, 'total_debitos': instance.total_debitos,
+            'valor_liquido': instance.valor_liquido,
+        }
+
+        return Response(data)
+
+    @action(detail=True, methods=['get'])
+    def por_estagiario(self, request):
+        """Endpoint para filtrar recibos por estagiário"""
+        estagiario_nome = request.query_params.get('estagiario', None)
+
+        if estagiario_nome:
+            recibos = ReciboRescisao.objects.filter(estagiario_nome__icontains=estagiario_nome)
+            serializer = self.get_serializer(recibos, many=True)
+            return Response(serializer.data)
+
+        return Response([])
+
+    @action(detail=True, methods=['get'])
+    def por_periodo(self, request):
+        """Endpoint para filtrar recibos por período"""
+        data_inicio = request.query_params.get('data_inicio', None)
+        data_fim = request.query_params.get('data_fim', None)
+
+        if data_inicio and data_fim:
+            recibos = ReciboRescisao.objects.filter(
+                data_rescisao__gte=data_inicio, data_rescisao__lte=data_fim
+            )
+            serializer = self.get_serializer(recibos, many=True)
+            return Response(serializer.data)
+
+        return Response({'error': 'Parâmetros data_inicio e data_fim são obrigatórios'},
+                        status=status.HTTP_400_BAD_REQUEST)
