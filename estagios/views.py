@@ -7,7 +7,6 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-
 from .forms import ContratoForm
 import os
 from rest_framework import viewsets, status, filters
@@ -338,13 +337,16 @@ class ReciboRescisaoViewSet(viewsets.ModelViewSet):
     # Ordenação padrão
     ordering = ['-data_rescisao']
 
-    def perform_create(self, serializer):
-        """Sobreescrita para garantir que os cálculos sejam executados"""
-        instance = serializer.save() # Os cálculos são feitos no save() do model
+    @action(detail=True, methods=['post'])
+    def adicionar_lancamento(self, request, pk=None):
+        recibo = self.get_object()
+        serializer = LancamentoSerializer(data=request.data)
 
-    def perform_update(self, serializer):
-        """"Sobreescrita para garantir que os cálculos sejam executados no update"""
-        instance = serializer.save()
+        if serializer.is_valid():
+            serializer.save(recibo_rescisao=recibo)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'])
     def simular_calculos(self, request, pk=None):
