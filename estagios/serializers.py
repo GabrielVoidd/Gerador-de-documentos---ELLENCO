@@ -155,13 +155,17 @@ class ReciboSerializer(serializers.ModelSerializer):
         # Validações
 
         def validate_data_referencia(self, value):
-            '''Valida se a data de referência é o 1º dia do mês'''
+            """Valida se a data de referência é o 1.º dia do mês"""
             if value.day != 1:
                 raise serializers.ValidationError('A data de referência deve ser o primeiro dia do mês')
             return value
 
 
 class ReciboRescisaoSerializer(serializers.ModelSerializer):
+    lancamentos = LancamentoSerializer(many=True, read_only=True)
+    contrato = serializers.PrimaryKeyRelatedField(
+        queryset=Contrato.objects.all(), write_only=True
+    )
     estagiario_nome = serializers.CharField(read_only=True, help_text='Nome do estagiário (preenchido automaticamente)')
 
     class Meta:
@@ -197,6 +201,14 @@ class ReciboRescisaoSerializer(serializers.ModelSerializer):
                 })
 
         return attrs
+
+    # def get_sugestao_saldo_salario(self, obj):
+    #     valores = obj.calcular_valores_automaticos()
+    #     return valores['saldo_salario']
+    #
+    # def get_sugestao_recesso(self, obj):
+    #     valores = obj.calcular_valores_automaticos()
+    #     return valores['recesso']
 
     def create(self, validated_data):
         # Garante que o contrato está presente para copiar os dados

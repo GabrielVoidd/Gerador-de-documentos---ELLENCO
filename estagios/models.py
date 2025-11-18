@@ -587,12 +587,3 @@ class Lancamento(models.Model):
 
     def __str__(self):
         return f'{self.tipo_evento.descricao} - R${self.valor}'
-
-
-class LancamentoRescisao(models.Model):
-    recibo_rescisao = models.ForeignKey(ReciboRescisao, on_delete=models.CASCADE, related_name='lancamentos')
-    tipo_evento = models.ForeignKey(TipoEvento, on_delete=models.PROTECT)
-    valor = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f'{self.tipo_evento.descricao} - R${self.valor}'
