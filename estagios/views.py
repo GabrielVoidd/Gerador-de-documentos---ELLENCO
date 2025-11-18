@@ -324,6 +324,7 @@ class ReciboRescisaoViewSet(viewsets.ModelViewSet):
     queryset = ReciboRescisao.objects.all().order_by('-data_rescisao')
     serializer_class = ReciboRescisaoSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    context_object_name = 'recibo_rescisao'
 
     # Filtros
     filterset_fields = ['contrato', 'motivo_rescisao', 'data_rescisao']

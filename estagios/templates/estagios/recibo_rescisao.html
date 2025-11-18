@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Recibo de Rescisão</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        h1 { text-align: center; text-transform: uppercase; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #000; padding: 6px; font-size: 13px; }
+        .no-border td { border: none; }
+        .right { text-align: right; }
+    </style>
+</head>
+<body>
+
+    <h1>Recibo de Rescisão</h1>
+
+    <table class="no-border">
+        <tr><td><strong>Referência:</strong> {{ recibo_rescisao.data_rescisao|date:"m/Y" }}</td></tr>
+    </table>
+
+    <table>
+        <tr><td><strong>Parte Concedente:</strong> {{ recibo_rescisao.contrato.parte_concedente.razao_social }}</td></tr>
+        <tr><td><strong>CNPJ:</strong> {{ recibo_rescisao.contrato.parte_concedente.cnpj }}</td></tr>
+        <tr><td><strong>Agente de Integração:</strong> {{ recibo_rescisao.contrato.agente_integrador.razao_social }}</td></tr>
+        <tr><td><strong>Estagiário:</strong> {{ recibo_rescisao.estagiario_nome }}</td></tr>
+        <tr><td><strong>CPF:</strong> {{ recibo_rescisao.contrato.estagiario.candidato.cpf }}</td></tr>
+        <tr>
+            <td><strong>Período:</strong> {{ recibo_rescisao.data_inicio|date:"d/m/Y" }} a {{ recibo.data_fim|date:"d/m/Y" }}</td>
+        </tr>
+    </table>
+
+    <h3>Lançamentos</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Descrição</th>
+                <th>Tipo</th>
+                <th class="right">Valor (R$)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lancamento in recibo.lancamentos.all %}
+            <tr>
+                <td>{{ lancamento.tipo_evento.descricao }}</td>
+                <td>{{ lancamento.tipo_evento.get_tipo_display }}</td>
+                <td class="right">{{ lancamento.valor|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">Nenhum lançamento registrado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="no-border">
+        <tr><td><strong>Total de Créditos:</strong></td><td class="right">{{ recibo.total_creditos|floatformat:2 }}</td></tr>
+        <tr><td><strong>Total de Débitos:</strong></td><td class="right">{{ recibo.total_debitos|floatformat:2 }}</td></tr>
+        <tr><td><strong>Valor Base:</strong></td><td class="right">{{ recibo.valor_bolsa|floatformat:2 }}</td></tr>
+        <tr><td><strong>Valor Líquido:</strong></td><td class="right"><strong>{{ recibo.valor_liquido|floatformat:2 }}</strong></td></tr>
+    </table>
+
+    <br><br>
+    <table class="no-border">
+        <tr>
+            <td><strong>Data:</strong> ____/____/______</td>
+            <td style="text-align:center;">
+                ___________________________________________<br>
+                <small>Assinatura do Estagiário</small>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

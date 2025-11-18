@@ -529,59 +529,42 @@ class ReciboRescisao(models.Model):
     data_rescisao = models.DateField()
     data_pagamento = models.DateField()
 
-    # --- PERÍODO DE CÁLCULO ---
-    saldo_salario = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    recesso_remunerado = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    aviso_previo = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    # --- CÁLCULOS BASE ---
+    dias_trabalhados_mes = models.IntegerField(default=0, help_text='Dias trabalhados no mês da rescisão')
+    dias_recesso_devidos = models.IntegerField(default=0, help_text='Dias de recesso devidos')
 
-    # --- DESCONTOS ---
-    adiantamentos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    outros_descontos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-    # --- TOTAIS ---
-    total_creditos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    total_debitos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    valor_liquido = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-    # --- CÁLCULOS AUTOMÁTICOS ---
+    # --- CÁLCULOS DOS TOTAIS ---
     @property
-    def calcular_saldo_salario(self):
-        """Calcula o saldo de bolsa até a data de rescisão"""
-        if not self.data_rescisao or not self.valor_bolsa:
-            return Decimal('0.00')
-
-        # Calcula os dias trabalhados no mês da rescisão
-        dias_no_mes = 30
-        dias_trabalhados = min(self.data_rescisao.day, dias_no_mes)
-        return (self.valor_bolsa / dias_no_mes) * dias_trabalhados
+    def total_creditos(self):
+        return self.lancamentos.filter(tipo_evento__tipo='CREDITO').aggregate(
+            total=models.Sum('valor')['total'] or Decimal(0.00))
 
     @property
-    def calcular_recesso_proporcional(self):
-        """Calcula recesso remunerado proporcional"""
-        if not self.data_inicio or not self.data_rescisao or not self.valor_bolsa:
-            return Decimal('0.00')
+    def total_debitos(self):
+        return self.lancamentos.filter(tipo_evento__tipo='DEBITO').aggregate(
+            total=models.Sum('valor')['total'] or Decimal(0.00))
 
-        # Calcula meses trabalhados (considerando 30 dias por mês)
-        dias_trabalhados = (self.data_rescisao - self.data_inicio).days
-        meses_trabalhados = dias_trabalhados / 30.0
+    @property
+    def valor_liquido(self):
+        return self.total_creditos - self.total_debitos
 
-        # Recesso: 30 dias para cada 12 meses trabalhados
-        dias_recesso = (meses_trabalhados / 12) * 30
-        return (self.valor_bolsa / 30) * dias_recesso
+    def calcular_valores_automaticos(self):
+        """Calcula valores base automaticamente para sugerir lançamentos"""
+        # Saldo de salário (bolsa)
+        if self.dias_trabalhados_mes and self.valor_bolsa:
+            saldo_salario = (self.valor_bolsa / 30) * self.dias_trabalhados_mes
+        else:
+            saldo_salario = Decimal('0.00')
 
-    def calcular_totais(self):
-        """Calcula todos os totais automaticamente"""
-        self.saldo_salario = self.calcular_saldo_salario
-        self.recesso_remunerado = self.calcular_recesso_proporcional
+        # Recesso proporcional
+        if self.dias_recesso_devidos and self.valor_bolsa:
+            recesso = (self.valor_bolsa / 30) * self.dias_recesso_devidos
+        else:
+            recesso = Decimal('0.00')
 
-        # Aviso prévio só em casos específicos
-
-        self.total_creditos = (
-            self.saldo_salario + self.recesso_remunerado + self.aviso_previo
-        )
-
-        self.total_debitos = self.adiantamentos + self.outros_descontos
-        self.valor_liquido = self.total_creditos - self.total_debitos
+        return {
+            'saldo_salario': saldo_salario.quantize(Decimal('0.01')), 'recesso': recesso.quantize(Decimal('0.01'))
+        }
 
     def save(self, *args, **kwargs):
         # Snapshot do contrato
@@ -591,9 +574,6 @@ class ReciboRescisao(models.Model):
             self.valor_bolsa = self.contrato.valor_bolsa
             self.data_inicio = self.contrato.data_inicio
 
-        # Calcula os totais antes de salvar
-        self.calcular_totais()
-
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -602,6 +582,15 @@ class ReciboRescisao(models.Model):
 
 class Lancamento(models.Model):
     recibo = models.ForeignKey(Recibo, on_delete=models.CASCADE, related_name='lancamentos')
+    tipo_evento = models.ForeignKey(TipoEvento, on_delete=models.PROTECT)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.tipo_evento.descricao} - R${self.valor}'
+
+
+class LancamentoRescisao(models.Model):
+    recibo_rescisao = models.ForeignKey(ReciboRescisao, on_delete=models.CASCADE, related_name='lancamentos')
     tipo_evento = models.ForeignKey(TipoEvento, on_delete=models.PROTECT)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
 
