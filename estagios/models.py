@@ -380,7 +380,7 @@ class Contrato(models.Model):
     jornada_estagio = models.CharField(max_length=150, null=True, blank=True,
                                        help_text='de segunda a domingo com uma folga na semana e 15 minutos de pausa')
     valor_bolsa = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
-    data_criacao = models.DateField()
+    data_criacao = models.DateField(auto_now_add=True, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         try:
