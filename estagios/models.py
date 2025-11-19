@@ -577,6 +577,10 @@ class ReciboRescisao(models.Model):
 
         super().save(*args, **kwargs)
 
+    class Meta:
+        verbose_name = 'Recibo de Rescisão'
+        verbose_name_plural = 'Recibos de Rescisão'
+
     def __str__(self):
         return f'Rescisão Estágio - {self.estagiario_nome} - {self.data_rescisao.strftime("%d/%m/%Y")}'
 

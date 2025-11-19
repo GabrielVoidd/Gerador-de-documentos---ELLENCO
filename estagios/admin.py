@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
-    MotivoRescisao
+    MotivoRescisao, ReciboRescisao
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 
 
@@ -210,3 +210,14 @@ class ReciboAdmin(admin.ModelAdmin):
 
     gerar_termo_link.short_description = 'Recibo de pagamento bolsa auxílio'
     gerar_termo_link.allow_tags = True
+
+
+@admin.register(ReciboRescisao)
+class ReciboRescisaoAdmin(admin.ModelAdmin):
+    list_display = ('parte_concedente_nome', 'estagiario_nome')
+    search_fields = ('parte_concedente_nome', 'estagiario_nome')
+    list_filter = ('parte_concedente_nome', 'estagiario_nome')
+    list_per_page = 20
+
+    class Media:
+        js = ('js/preencher_recibo.js',)
