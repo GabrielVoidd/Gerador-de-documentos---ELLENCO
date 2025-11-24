@@ -17,11 +17,11 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.shortcuts import render
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
-    TipoEvento, Lancamento, Recibo, ReciboRescisao
+    TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao
 from .serializers import(
 InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
 ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
-TipoEventoSerializer, LancamentoSerializer, ReciboSerializer, ReciboRescisaoSerializer
+TipoEventoSerializer, LancamentoSerializer, ReciboSerializer, ReciboRescisaoSerializer, LancamentoRescisaoSerializer
 )
 
 class InstituicaoEnsinoViewSet(viewsets.ModelViewSet):
@@ -219,6 +219,11 @@ class LancamentoViewSet(viewsets.ModelViewSet):
     serializer_class = LancamentoSerializer
 
 
+class LancamentoRescisaoViewSet(viewsets.ModelViewSet):
+    queryset = LancamentoRescisao.objects.all()
+    serializer_class = LancamentoRescisaoSerializer
+
+
 class ReciboViewSet(viewsets.ModelViewSet):
     queryset = Recibo.objects.all()
     serializer_class = ReciboSerializer
@@ -340,7 +345,7 @@ class ReciboRescisaoViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def adicionar_lancamento(self, request, pk=None):
         recibo = self.get_object()
-        serializer = LancamentoSerializer(data=request.data)
+        serializer = LancamentoRescisaoSerializer(data=request.data)
 
         if serializer.is_valid():
             serializer.save(recibo_rescisao=recibo)
@@ -391,3 +396,24 @@ class ReciboRescisaoViewSet(viewsets.ModelViewSet):
 
         return Response({'error': 'Parâmetros data_inicio e data_fim são obrigatórios'},
                         status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'], url_path='gerar-recibo-rescisao', url_name='gerar-recibo-rescisao')
+    def gerar_recibo_rescisao(self, request, pk=None):
+        recibo_rescisao = self.get_object()
+
+        logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
+        logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
+
+        # Renderiza o template HTML com o contexto do cadastro
+        html_string = render_to_string('estagios/recibo_rescisao.html',
+                                       {'recibo_rescisao': recibo_rescisao, 'logo_path': logo_path})
+
+        # Gera o PDF
+        pdf_file = HTML(string=html_string).write_pdf()
+
+        # Cria a resposta HTTP
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response[
+            'Content-Disposition'] = f'attachment; filename="Recibo_Bolsa_Auxilio_{recibo_rescisao.contrato.estagiario.candidato.nome}.pdf"'
+
+        return response

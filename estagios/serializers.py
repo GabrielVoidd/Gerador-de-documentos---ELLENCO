@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
-TipoEvento, Lancamento, Recibo, ReciboRescisao
+TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao
 
 
 class InstituicaoEnsinoSerializer(serializers.ModelSerializer):
@@ -83,6 +83,24 @@ class LancamentoSerializer(serializers.ModelSerializer):
         model = Lancamento
         fields = [
             'id', 'recibo_id', 'tipo_evento_id', 'tipo_evento', 'valor'
+        ]
+
+
+class LancamentoRescisaoSerializer(serializers.ModelSerializer):
+    tipo_evento = TipoEventoSerializer(read_only=True)
+    # Campo usado para escrita
+    tipo_evento_id = serializers.PrimaryKeyRelatedField(
+        queryset=TipoEvento.objects.all(),source='tipo_evento', write_only=True
+    )
+
+    recibo_rescisao_id = serializers.PrimaryKeyRelatedField(
+        queryset=ReciboRescisao.objects.all(), source='recibo_rescisao', write_only=True
+    )
+
+    class Meta:
+        model = LancamentoRescisao
+        fields = [
+            'id', 'recibo_rescisao_id', 'tipo_evento_id', 'tipo_evento', 'valor'
         ]
 
 

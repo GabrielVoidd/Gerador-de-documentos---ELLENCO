@@ -534,61 +534,168 @@ class ReciboRescisao(models.Model):
     dias_trabalhados_mes = models.IntegerField(default=0, help_text='Dias trabalhados no mês da rescisão')
     dias_recesso_devidos = models.IntegerField(default=0, help_text='Dias de recesso devidos')
 
-    # --- CÁLCULOS DOS TOTAIS ---
+    class Meta:
+        verbose_name = 'Recibo de Rescisão'
+        verbose_name_plural = 'Recibos de Rescisão'
+
+    def __str__(self):
+        data_str = self.data_rescisao.strftime("%d/%m/%Y") if self.data_rescisao else "Data N/A"
+        return f'Rescisão Estágio - {self.estagiario_nome} - {data_str}'
+
+    # --- MÉTODOS DE CÁLCULO DE DIAS ---
+
+    def calcular_dias_trabalhados_mes(self):
+        """Calcula dias trabalhados no mês da rescisão"""
+        if not self.data_rescisao:
+            return 0
+
+        # Se a rescisão for no último dia do mês, considera-se mês cheio (30 dias ou dias reais)
+        # Lógica simplificada: dia da rescisão
+        ultimo_dia_mes = (self.data_rescisao.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
+
+        if self.data_rescisao == ultimo_dia_mes:
+            return 30  # Padronização comercial comum, mas ajuste conforme sua regra (ex: 31)
+        else:
+            return self.data_rescisao.day
+
+    def calcular_dias_recesso_proporcional(self):
+        """Calcula os dias de recesso proporcionais baseados no tempo de contrato"""
+        if not self.data_inicio or not self.data_rescisao:
+            return 0
+
+        delta = relativedelta(self.data_rescisao, self.data_inicio)
+        meses_trabalhados = delta.years * 12 + delta.months
+
+        if delta.days > 14:  # Regra comum: fração superior a 14 dias conta como mês
+            meses_trabalhados += 1
+        elif delta.days > 0:
+            meses_trabalhados += delta.days / 30.0
+
+        # 30 dias de recesso a cada 12 meses
+        dias_recesso = (meses_trabalhados / 12) * 30
+        return round(dias_recesso)
+
+    # --- MÉTODOS DE VALORES E SINCRONIZAÇÃO (O "ROBÔ") ---
+
+    def calcular_valores_automaticos(self):
+        """Calcula valores monetários (apenas memória)"""
+        valor_bolsa = self.valor_bolsa or Decimal('0.00')
+
+        # Usa valor do campo se existir, senão calcula
+        dias_trab = self.dias_trabalhados_mes if self.dias_trabalhados_mes else self.calcular_dias_trabalhados_mes()
+        dias_rec = self.dias_recesso_devidos if self.dias_recesso_devidos else self.calcular_dias_recesso_proporcional()
+
+        saldo_salario = Decimal('0.00')
+        valor_recesso = Decimal('0.00')
+
+        if valor_bolsa > 0:
+            valor_dia = valor_bolsa / Decimal('30')
+            saldo_salario = (valor_dia * Decimal(dias_trab)).quantize(Decimal('0.01'))
+            valor_recesso = (valor_dia * Decimal(dias_rec)).quantize(Decimal('0.01'))
+
+        return {
+            'saldo_salario': saldo_salario,
+            'recesso': valor_recesso,
+            'dias_trabalhados': dias_trab,
+            'dias_recesso': dias_rec
+        }
+
+    def sincronizar_lancamentos_automaticos(self):
+        """O Robô: Cria/Atualiza os registros na tabela de lançamentos"""
+        valores = self.calcular_valores_automaticos()
+
+        # Garante que os Tipos de Evento existem
+        tipo_saldo, _ = TipoEvento.objects.get_or_create(
+            descricao='Saldo de Bolsa',
+            defaults={'tipo': TipoEvento.TipoTransacao.CREDITO}
+        )
+        tipo_recesso, _ = TipoEvento.objects.get_or_create(
+            descricao='Recesso Indenizado',
+            defaults={'tipo': TipoEvento.TipoTransacao.CREDITO}
+        )
+
+        # Atualiza ou Cria os Lançamentos Filhos
+        self.lancamentos_rescisao.update_or_create(
+            tipo_evento=tipo_saldo,
+            defaults={'valor': valores['saldo_salario']}
+        )
+        self.lancamentos_rescisao.update_or_create(
+            tipo_evento=tipo_recesso,
+            defaults={'valor': valores['recesso']}
+        )
+
+    # --- PROPERTIES E TOTAIS ---
+
     @property
     def total_creditos(self):
-        return self.lancamentos.filter(tipo_evento__tipo='CREDITO').aggregate(
-            total=models.Sum('valor')['total'] or Decimal(0.00))
+        # Como o "Robô" já colocou o Saldo e o Recesso no banco,
+        # este aggregate JÁ INCLUI TUDO (Base + Extras).
+        return self.lancamentos_rescisao.filter(
+            tipo_evento__tipo=TipoEvento.TipoTransacao.CREDITO
+        ).aggregate(total=models.Sum('valor'))['total'] or Decimal('0.00')
 
     @property
     def total_debitos(self):
-        return self.lancamentos.filter(tipo_evento__tipo='DEBITO').aggregate(
-            total=models.Sum('valor')['total'] or Decimal(0.00))
+        return self.lancamentos_rescisao.filter(
+            tipo_evento__tipo=TipoEvento.TipoTransacao.DEBITO
+        ).aggregate(total=models.Sum('valor'))['total'] or Decimal('0.00')
 
     @property
-    def valor_liquido(self):
-        return self.total_creditos - self.total_debitos
+    def saldo_liquido(self):
+        # ATENÇÃO: Simplificado para evitar duplicação
+        # Total Créditos (já tem salário e recesso) - Total Débitos
+        return (self.total_creditos - self.total_debitos).quantize(Decimal('0.01'))
 
-    def calcular_valores_automaticos(self):
-        """Calcula valores base automaticamente para sugerir lançamentos"""
-        # Saldo de salário (bolsa)
-        if self.dias_trabalhados_mes and self.valor_bolsa:
-            saldo_salario = (self.valor_bolsa / 30) * self.dias_trabalhados_mes
-        else:
-            saldo_salario = Decimal('0.00')
+    # Properties auxiliares para acesso rápido aos valores calculados (opcional)
+    @property
+    def saldo_salario_valor(self):
+        return self.calcular_valores_automaticos()['saldo_salario']
 
-        # Recesso proporcional
-        if self.dias_recesso_devidos and self.valor_bolsa:
-            recesso = (self.valor_bolsa / 30) * self.dias_recesso_devidos
-        else:
-            recesso = Decimal('0.00')
+    @property
+    def recesso_valor(self):
+        return self.calcular_valores_automaticos()['recesso']
 
-        return {
-            'saldo_salario': saldo_salario.quantize(Decimal('0.01')), 'recesso': recesso.quantize(Decimal('0.01'))
-        }
+    # --- SAVE OVERRIDE ---
 
     def save(self, *args, **kwargs):
-        # Snapshot do contrato
+        # 1. Snapshot (Cópia dos dados do contrato)
         if self.contrato and not self.estagiario_nome:
             self.estagiario_nome = self.contrato.estagiario.candidato.nome
             self.parte_concedente_nome = self.contrato.parte_concedente.razao_social
             self.valor_bolsa = self.contrato.valor_bolsa
             self.data_inicio = self.contrato.data_inicio
 
+        # 2. Preenche Dias Automaticamente (se vazio)
+        if not self.dias_trabalhados_mes:
+            self.dias_trabalhados_mes = self.calcular_dias_trabalhados_mes()
+
+        if not self.dias_recesso_devidos:
+            self.dias_recesso_devidos = self.calcular_dias_recesso_proporcional()
+
+        # 3. Salva o Pai (Recibo) para garantir que temos um ID
         super().save(*args, **kwargs)
 
-    class Meta:
-        verbose_name = 'Recibo de Rescisão'
-        verbose_name_plural = 'Recibos de Rescisão'
-
-    def __str__(self):
-        return f'Rescisão Estágio - {self.estagiario_nome} - {self.data_rescisao.strftime("%d/%m/%Y")}'
+        # 4. Chama o Robô para criar os filhos (Lançamentos)
+        self.sincronizar_lancamentos_automaticos()
 
 
 class Lancamento(models.Model):
     recibo = models.ForeignKey(Recibo, on_delete=models.CASCADE, related_name='lancamentos')
     tipo_evento = models.ForeignKey(TipoEvento, on_delete=models.PROTECT)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.tipo_evento.descricao} - R${self.valor}'
+
+
+class LancamentoRescisao(models.Model):
+    recibo_rescisao = models.ForeignKey(ReciboRescisao, on_delete=models.CASCADE, related_name='lancamentos_rescisao', null=True)
+    tipo_evento = models.ForeignKey(TipoEvento, on_delete=models.PROTECT)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        verbose_name = 'Lançamento de rescisão'
+        verbose_name_plural = 'Lançamentos de rescisão'
 
     def __str__(self):
         return f'{self.tipo_evento.descricao} - R${self.valor}'

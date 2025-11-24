@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
-    MotivoRescisao, ReciboRescisao
+    MotivoRescisao, ReciboRescisao, LancamentoRescisao
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 
 
@@ -192,6 +192,11 @@ class LancamentoAdmin(admin.ModelAdmin):
     list_display = ('recibo', 'tipo_evento', 'valor')
 
 
+@admin.register(LancamentoRescisao)
+class LancamentoRescisaoAdmin(admin.ModelAdmin):
+    list_display = ('recibo_rescisao', 'tipo_evento', 'valor')
+
+
 @admin.register(Recibo)
 class ReciboAdmin(admin.ModelAdmin):
     list_display = ('estagiario_nome', 'contrato__parte_concedente', 'gerar_termo_link')
@@ -214,10 +219,15 @@ class ReciboAdmin(admin.ModelAdmin):
 
 @admin.register(ReciboRescisao)
 class ReciboRescisaoAdmin(admin.ModelAdmin):
-    list_display = ('parte_concedente_nome', 'estagiario_nome')
+    list_display = ('parte_concedente_nome', 'estagiario_nome', 'gerar_termo_link')
     search_fields = ('parte_concedente_nome', 'estagiario_nome')
     list_filter = ('parte_concedente_nome', 'estagiario_nome')
     list_per_page = 20
 
     class Media:
         js = ('js/preencher_recibo.js',)
+
+    def gerar_termo_link(self, obj):
+        # Cria a URL para o endpoint da API que gera o PDF
+        url = reverse('recibo-rescisao-gerar-recibo-rescisao', kwargs={'pk': obj.pk})
+        return format_html('<a class="button" href="{}" target="_blank">Gerar PDF</a>', url)

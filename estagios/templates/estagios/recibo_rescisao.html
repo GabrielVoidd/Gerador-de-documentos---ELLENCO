@@ -9,7 +9,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #000; padding: 6px; font-size: 13px; }
         .no-border td { border: none; }
-        .right { text-align: right; }
+        .left { text-align: left; }
     </style>
 </head>
 <body>
@@ -27,7 +27,7 @@
         <tr><td><strong>Estagiário:</strong> {{ recibo_rescisao.estagiario_nome }}</td></tr>
         <tr><td><strong>CPF:</strong> {{ recibo_rescisao.contrato.estagiario.candidato.cpf }}</td></tr>
         <tr>
-            <td><strong>Período:</strong> {{ recibo_rescisao.data_inicio|date:"d/m/Y" }} a {{ recibo.data_fim|date:"d/m/Y" }}</td>
+            <td><strong>Período:</strong> {{ recibo_rescisao.data_inicio|date:"d/m/Y" }} a {{ recibo_rescisao.data_fim|date:"d/m/Y" }}</td>
         </tr>
     </table>
 
@@ -37,27 +37,35 @@
             <tr>
                 <th>Descrição</th>
                 <th>Tipo</th>
-                <th class="right">Valor (R$)</th>
+                <th class="left">Valor (R$)</th>
             </tr>
         </thead>
         <tbody>
-            {% for lancamento in recibo.lancamentos.all %}
+            {% for lancamento in recibo_rescisao.lancamentos_rescisao.all %}
             <tr>
-                <td>{{ lancamento.tipo_evento.descricao }}</td>
-                <td>{{ lancamento.tipo_evento.get_tipo_display }}</td>
-                <td class="right">{{ lancamento.valor|floatformat:2 }}</td>
+                <td>
+                    {{ lancamento.tipo_evento.descricao }}
+                    {% if lancamento.tipo_evento.descricao == 'Saldo de Bolsa' %}
+                    ({{ recibo.dias_trabalhados_mes }} dias)
+                    {% elif lancamento.tipo_evento.descricao == 'Recesso Indenizado' %}
+                    ({{ recibo.dias_recesso_devidos }} dias)
+                    {% endif %}
+                </td>
+                <td>{{ lancamento.tipo_evento.tipo }}</td>
+                <td>{{ lancamento.valor }}</td>
             </tr>
-            {% empty %}
-            <tr><td colspan="3">Nenhum lançamento registrado.</td></tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <table class="no-border">
-        <tr><td><strong>Total de Créditos:</strong></td><td class="right">{{ recibo.total_creditos|floatformat:2 }}</td></tr>
-        <tr><td><strong>Total de Débitos:</strong></td><td class="right">{{ recibo.total_debitos|floatformat:2 }}</td></tr>
-        <tr><td><strong>Valor Base:</strong></td><td class="right">{{ recibo.valor_bolsa|floatformat:2 }}</td></tr>
-        <tr><td><strong>Valor Líquido:</strong></td><td class="right"><strong>{{ recibo.valor_liquido|floatformat:2 }}</strong></td></tr>
+    <table>
+        <tr><td><strong>Total de Créditos:</strong></td><td class="right">{{ recibo_rescisao.total_creditos|floatformat:2 }}</td></tr>
+        <tr><td><strong>Total de Débitos:</strong></td><td class="right">{{ recibo_rescisao.total_debitos|floatformat:2 }}</td></tr>
+        <tr><td><strong>Valor Base:</strong></td><td class="right">{{ recibo_rescisao.valor_bolsa|floatformat:2 }}</td></tr>
+        <tr><td><strong>Recesso Proporcional:</strong></td><td class="right">{{ recibo_rescisao.calcular_dias_recesso_proporcional|floatformat:2 }}</td></tr>
+        <tr><td><strong>Dias Trabalhados:</strong></td><td class="right">{{ recibo_rescisao.dias_trabalhados_mes }}</td></tr>
+        <tr><td><strong>Dias de Recesso:</strong></td><td class="right">{{ recibo_rescisao.dias_recesso_devidos }}</td></tr>
+        <tr><td><strong>Saldo Liquido Final:</strong></td><td class="right">{{ recibo_rescisao.saldo_liquido|floatformat:2 }}</td></tr>
     </table>
 
     <br><br>
