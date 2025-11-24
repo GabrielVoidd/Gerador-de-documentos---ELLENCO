@@ -469,6 +469,18 @@ class Recibo(models.Model):
         return self.lancamentos.filter(tipo_evento__tipo='DEBITO').aggregate(total=models.Sum('valor'))['total'] or Decimal(0.00)
 
     @property
+    def valor_proporcional(self):
+        if not self.valor_bolsa or not self.dias_referencia or self.dias_referencia == 0:
+            return Decimal('0.00')
+
+        dias_trabalhados_dec = Decimal(self.dias_trabalhados) if self.dias_trabalhados else Decimal('0')
+        dias_referencia_dec = Decimal(self.dias_referencia)
+
+        proporcao = dias_trabalhados_dec / dias_referencia_dec
+        base = (self.valor_bolsa * proporcao).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        return base
+
+    @property
     def valor_liquido(self):
         if not self.valor_bolsa or not self.dias_referencia:
             return Decimal('0.00')

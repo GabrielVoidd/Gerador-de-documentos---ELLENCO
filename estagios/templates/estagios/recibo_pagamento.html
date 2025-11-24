@@ -53,10 +53,11 @@
         </tbody>
     </table>
 
-    <table class="no-border">
+    <table>
         <tr><td><strong>Total de Créditos:</strong></td><td class="right">{{ recibo.total_creditos|floatformat:2 }}</td></tr>
         <tr><td><strong>Total de Débitos:</strong></td><td class="right">{{ recibo.total_debitos|floatformat:2 }}</td></tr>
         <tr><td><strong>Valor Base:</strong></td><td class="right">{{ recibo.valor_bolsa|floatformat:2 }}</td></tr>
+        <tr><td><strong>Valor Proporcional:</strong></td><td class="right">{{ recibo.valor_proporcional|floatformat:2 }}</td></tr>
         <tr><td><strong>Valor Líquido:</strong></td><td class="right"><strong>{{ recibo.valor_liquido|floatformat:2 }}</strong></td></tr>
     </table>
 
