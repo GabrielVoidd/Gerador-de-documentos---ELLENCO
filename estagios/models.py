@@ -8,6 +8,8 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal, ROUND_HALF_UP
 
 
+# null para o banco, blank para forms e admin
+
 class InstituicaoEnsino(models.Model):
     razao_social = models.CharField(max_length=250)
     cnpj = models.CharField(max_length=18, unique=True)
@@ -29,6 +31,10 @@ class InstituicaoEnsino(models.Model):
 
 
 class ParteConcedente(models.Model):
+    class Documentos(models.TextChoices):
+        CPF = 'C', 'CPF'
+        RG = 'R', 'RG'
+
     razao_social = models.CharField(max_length=250)
     endereco = models.CharField(max_length=250)
     bairro = models.CharField(max_length=100)
@@ -40,6 +46,7 @@ class ParteConcedente(models.Model):
     cep = models.CharField(max_length=9)
     telefone = models.CharField(max_length=15)
     email = models.EmailField()
+    ramo_atividade = models.CharField(max_length=200, null=True, verbose_name='Ramo de atividade')
 
     class Meta:
         verbose_name = 'Parte Concedente'
@@ -62,11 +69,9 @@ class ContratoSocial(models.Model):
     # Informações adicionais da Parte Concedente para a criação do contrato social
     parte_concedente = models.ForeignKey(ParteConcedente, on_delete=models.PROTECT, related_name='adicionais')
     nome_dono = models.CharField(max_length=100, null=True, blank=True, verbose_name='Nome do(a) dono(a)')
-    documentos_dono = models.FileField(verbose_name='Anexar documento',
-        upload_to='documentos_dono/gerais/%Y%/%m/%d/', help_text='RG, CPF ou CNH', null=True, blank=True)
+    documentos_dono = models.CharField(verbose_name='CPF do(a) dono(a)', null=True, unique=True)
     nome_socio = models.CharField(max_length=100, null=True, blank=True, verbose_name='Nome do(a) sócio(a)')
-    documentos_socio = models.FileField(verbose_name='Anexar documento', upload_to='documentos_socio/gerais/%Y%/%m/%d/',
-        help_text='RG, CPF ou CNH', null=True, blank=True)
+    documentos_socio = models.FileField(verbose_name='CPF do(a) sócio(a)', null=True, unique=True)
     nome_resp_rh = models.CharField(max_length=100, verbose_name='Nome do(a) responsável do RH')
     numero_resp_rh = models.CharField(max_length=11, help_text='Número do telefone com DDD e sem traços',
          verbose_name='Número do(a) responsável do RH')
