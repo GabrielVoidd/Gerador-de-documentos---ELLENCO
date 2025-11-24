@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
-    MotivoRescisao, ReciboRescisao, LancamentoRescisao
+    MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 
 
@@ -67,13 +67,20 @@ class DetalhesParteConcedenteInline(admin.TabularInline):
     extra = 1
 
 
+class ContratoSocialInline(admin.StackedInline):
+    model = ContratoSocial
+    fields = ('nome_dono', 'documentos_dono', 'nome_socio', 'documentos_socio', 'nome_resp_rh', 'numero_resp_rh',
+              'email_resp_rh', 'nome_resp_estagio')
+    extra = 1
+
+
 @admin.register(ParteConcedente)
 class ParteConcedenteAdmin(admin.ModelAdmin):
     list_display = ('razao_social', 'cnpj', 'telefone', 'email')
     search_fields = ('razao_social', 'cnpj', 'cidade')
     list_filter = ('razao_social', 'cidade')
 
-    inlines = [DetalhesParteConcedenteInline]
+    inlines = [DetalhesParteConcedenteInline, ContratoSocialInline]
 
     def get_inlines(self, request, obj=None):
         if request.user.is_superuser or request.user.groups.filter(name='Comercial').exists():

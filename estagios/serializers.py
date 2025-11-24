@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
-TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao
+TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial
 
 
 class InstituicaoEnsinoSerializer(serializers.ModelSerializer):

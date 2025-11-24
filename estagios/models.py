@@ -58,6 +58,26 @@ class DetalhesParteConcedente(models.Model):
     taxa_cliente = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
 
 
+class ContratoSocial(models.Model):
+    # Informações adicionais da Parte Concedente para a criação do contrato social
+    parte_concedente = models.ForeignKey(ParteConcedente, on_delete=models.PROTECT, related_name='adicionais')
+    nome_dono = models.CharField(max_length=100, null=True, blank=True, verbose_name='Nome do(a) dono(a)')
+    documentos_dono = models.FileField(verbose_name='Anexar documento',
+        upload_to='documentos_dono/gerais/%Y%/%m/%d/', help_text='RG, CPF ou CNH', null=True, blank=True)
+    nome_socio = models.CharField(max_length=100, null=True, blank=True, verbose_name='Nome do(a) sócio(a)')
+    documentos_socio = models.FileField(verbose_name='Anexar documento', upload_to='documentos_socio/gerais/%Y%/%m/%d/',
+        help_text='RG, CPF ou CNH', null=True, blank=True)
+    nome_resp_rh = models.CharField(max_length=100, verbose_name='Nome do(a) responsável do RH')
+    numero_resp_rh = models.CharField(max_length=11, help_text='Número do telefone com DDD e sem traços',
+         verbose_name='Número do(a) responsável do RH')
+    email_resp_rh = models.EmailField(verbose_name='Email do(a) responsável do RH')
+    nome_resp_estagio = models.CharField(max_length=100, verbose_name='Nome do(a) responsável do estágio')
+
+    class Meta:
+        verbose_name = 'Contrato Social'
+        verbose_name_plural = 'Contratos Sociais'
+
+
 class Candidato(models.Model):
     class EstadosCivis(models.TextChoices):
         SOLTEIRO = 'S', 'Solteiro(a)'
