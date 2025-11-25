@@ -238,3 +238,15 @@ class ReciboRescisaoAdmin(admin.ModelAdmin):
         # Cria a URL para o endpoint da API que gera o PDF
         url = reverse('recibo-rescisao-gerar-recibo-rescisao', kwargs={'pk': obj.pk})
         return format_html('<a class="button" href="{}" target="_blank">Gerar PDF</a>', url)
+
+
+@admin.register(ContratoSocial)
+class ContratoSocialAdmin(admin.ModelAdmin):
+    list_display = ('parte_concedente__razao_social', 'gerar_termo_link')
+    search_fields = ('parte_concedente__razao_social',)
+
+    def gerar_termo_link(self, obj):
+        # Cria a URL para o endpoint da API que gera o PDF
+        url = reverse('contrato-social-gerar-contrato-social', kwargs={'pk': obj.pk})
+        return format_html('<a class="button" href="{}" target="_blank">Gerar Contrato</a>', url)
+

@@ -6,6 +6,8 @@ from unidecode import unidecode
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal, ROUND_HALF_UP
+import re
+from unicodedata import normalize
 
 
 # null para o banco, blank para forms e admin
@@ -69,9 +71,9 @@ class ContratoSocial(models.Model):
     # Informações adicionais da Parte Concedente para a criação do contrato social
     parte_concedente = models.ForeignKey(ParteConcedente, on_delete=models.PROTECT, related_name='adicionais')
     nome_dono = models.CharField(max_length=100, null=True, blank=True, verbose_name='Nome do(a) dono(a)')
-    documentos_dono = models.CharField(verbose_name='CPF do(a) dono(a)', null=True, unique=True)
+    documentos_dono = models.CharField(verbose_name='CPF do(a) dono(a)', null=True, unique=True, blank=True)
     nome_socio = models.CharField(max_length=100, null=True, blank=True, verbose_name='Nome do(a) sócio(a)')
-    documentos_socio = models.FileField(verbose_name='CPF do(a) sócio(a)', null=True, unique=True)
+    documentos_socio = models.FileField(verbose_name='CPF do(a) sócio(a)', null=True, unique=True, blank=True)
     nome_resp_rh = models.CharField(max_length=100, verbose_name='Nome do(a) responsável do RH')
     numero_resp_rh = models.CharField(max_length=11, help_text='Número do telefone com DDD e sem traços',
          verbose_name='Número do(a) responsável do RH')
@@ -137,15 +139,15 @@ class Candidato(models.Model):
     # --- DADOS PESSOAIS ---
     nome = models.CharField(max_length=100)
     sexo = models.CharField(max_length=50)
-    rg = models.CharField(max_length=9, unique=True, blank=True)
+    rg = models.CharField(max_length=9, unique=True, blank=True, verbose_name='RG')
     anexar_rg = models.FileField(
         verbose_name='Anexar RG',
         upload_to='documentos_candidatos/rg/%Y%/%m/%d/', null=True, blank=True)
-    cpf = models.CharField(max_length=11, unique=True)
+    cpf = models.CharField(max_length=11, unique=True, verbose_name='CPF')
     anexar_cpf = models.FileField(
         verbose_name='Anexar CPF',
         upload_to='documentos_candidatos/cpf/%Y%/%m/%d/', null=True, blank=True)
-    data_nascimento = models.DateField()
+    data_nascimento = models.DateField(verbose_name='Data de Nascimento')
     estado_civil = models.CharField(max_length=1, choices=EstadosCivis.choices)
     tem_filhos = models.BooleanField(help_text='Tem filhos?', default=False)
     filhos_detalhes = models.CharField(help_text='Quais as idades?', max_length=150, null=True, blank=True)
@@ -153,30 +155,30 @@ class Candidato(models.Model):
     celular2 = models.CharField(max_length=11, unique=True, help_text='Opcional', null=True, blank=True)
     email = models.EmailField()
     rede_social = models.CharField(max_length=100, null=True, blank=True, help_text='Instagram ou Facebook')
-    cep = models.CharField(max_length=9, null=True, blank=True, help_text='00000-000')
-    endereco = models.CharField(max_length=200)
-    numero = models.CharField(max_length=10)
+    cep = models.CharField(max_length=9, null=True, blank=True, help_text='00000-000', verbose_name='CEP')
+    endereco = models.CharField(max_length=200, verbose_name='Endereço')
+    numero = models.CharField(max_length=10, verbose_name='Número')
     complemento = models.CharField(max_length=50, null=True, blank=True)
     bairro = models.CharField(max_length=100)
     cidade = models.CharField(max_length=50)
     estado = models.CharField(max_length=2)
 
     # --- INFORMAÇÕES ADICIONAIS ---
-    habilitacao = models.CharField(max_length=2, choices=Habilitacoes.choices)
+    habilitacao = models.CharField(max_length=2, choices=Habilitacoes.choices, verbose_name='Habilitação')
     fumante = models.BooleanField(help_text='É fumante?', default=False)
     religiao = models.CharField(
-        max_length=100, null=True, blank=True, help_text='Possui alguma religião? Se sim, qual?')
+        max_length=100, null=True, blank=True, help_text='Possui alguma religião? Se sim, qual?', verbose_name='Religião')
     anexar_reservista = models.FileField(
         verbose_name='Anexar Reservista',
         upload_to='documentos_candidatos/reservistas/%Y%/%m/%d/', null=True, blank=True)
-    conheceu_agencia = models.CharField(max_length=100, help_text='Como conheceu a agência?')
+    conheceu_agencia = models.CharField(max_length=100, verbose_name='Como conheceu a agência?')
 
     # --- FORMAÇÃO ACADÊMICA ---
     escolaridade = models.CharField(max_length=3, choices=Escolaridades.choices)
     curso = models.CharField(max_length=70, help_text='Nome do curso', null=True, blank=True)
-    periodo = models.CharField(max_length=1, choices=Periodos.choices)
-    serie_semestre = models.CharField(max_length=50, help_text='2° semestre / 3°ano')
-    data_termino = models.DateField(help_text='Quando o curso / escola acaba?', null=True, blank=True)
+    periodo = models.CharField(max_length=1, choices=Periodos.choices, verbose_name='Período')
+    serie_semestre = models.CharField(max_length=50, help_text='2° semestre / 3°ano', verbose_name='Série ou Semestre')
+    data_termino = models.DateField(verbose_name='Quando o curso / escola acaba?', null=True, blank=True)
     instituicao_ensino = models.ForeignKey(InstituicaoEnsino, on_delete=models.PROTECT)
     nome_da_instituicao = models.CharField(max_length=150, null=True, blank=True, help_text='Caso não esteja na lista')
     app_escolar = models.CharField(max_length=50, blank=True,
@@ -196,8 +198,9 @@ class Candidato(models.Model):
         max_length=2, choices=Microsoft_365.choices, help_text='Nível de conhecimento do pacote office')
     experiencia_profissional = models.TextField(
         help_text='Exemplo: Empresa X, 08/23-03/25, atividades que desempenhava', null=True, blank=True)
-    area_interesse = models.CharField(max_length=100, help_text='Qual a sua área de interesse?')
-    vaga_pretendida = models.CharField(max_length=100, help_text='Para qual vaga você deseja ser encaminhado(a)?')
+    area_interesse = models.CharField(max_length=100, help_text='Qual a sua área de interesse?', verbose_name='Área de interesse')
+    vaga_pretendida = models.CharField(max_length=100, help_text='Para qual vaga você deseja ser encaminhado(a)?',
+                                       editable=False)
     pretensao_salarial = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     anexar_curriculo = models.FileField(null=True, blank=True, upload_to='documentos_candidatos/curriculo/%Y/%m/%d/')
 
@@ -295,7 +298,10 @@ class Candidato(models.Model):
 
     def save(self, *args, **kwargs):
         if self.nome:
-            self.nome = unidecode(self.nome)
+            texto= self.nome.upper()
+            # NFKD separa a letra do acento, e o encode remove o acento solto
+            texto = normalize('NFKD', texto).encode('ASCII', 'ignore').decode('ASCII')
+            self.nome = re.sub(r'[^A-Z]', '', texto)
 
         super().save(*args, **kwargs)
 

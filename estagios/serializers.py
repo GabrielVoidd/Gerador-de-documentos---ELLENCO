@@ -238,3 +238,9 @@ class ReciboRescisaoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({
                 'contrato': 'É necessário informar um contrato válido'
             })
+
+
+class ContratoSocialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContratoSocial
+        fields = '__all__'

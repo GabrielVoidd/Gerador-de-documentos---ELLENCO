@@ -160,11 +160,6 @@
             font-family: sans-serif; /* Sua fonte aqui */
         }
 
-        .item-letra {
-            min-width: 25px; /* Largura fixa para a letra "a)" */
-            font-weight: bold; /* Opcional */
-        }
-
         .item-texto {
             flex: 1; /* Ocupa todo o espaço restante */
             text-align: justify; /* Opcional: igual documentos legais */
@@ -173,7 +168,6 @@
     </style>
 </head>
 <body>
-
     <table style="margin-bottom: 10px;">
         <tr>
             <td style="width: 25%;" class="header-logo">
@@ -187,9 +181,11 @@
 
     <div class="clause">Contrato que entre si celebram, nesta data, as partes a seguir qualificadas:</div>
 
-    <div class="clause"><strong>{{ parte_concedente.razao_social }} - CNPJ: {{ parte_concedente.cnpj }}</strong></div>
-    <p>Endereço: {{ parte_concedente.endereco }} - {{ parte_concedente.bairro }} - CEP: {{ parte_concedente.cep }} -
-    {{ parte_concedente.cidade }} - {{ parte_concedente.estado }}</p>
+    <div class="clause"><strong>{{ contrato_social.parte_concedente.razao_social }} - CNPJ:
+        {{ contrato_social.parte_concedente.cnpj }}</strong></div>
+    <p>Endereço: {{ contrato_social.parte_concedente.endereco }} - {{ contrato_social.parte_concedente.bairro }} - CEP:
+        {{ contrato_social.parte_concedente.cep }} -
+    {{ contrato_social.parte_concedente.cidade }} - {{ contrato_social.parte_concedente.estado }}</p>
     <p>Ramo de atividade: {{ contrato_social.ramo_atividade }}</p>
     <p>Responsável: {% firstof contrato_social.nome_dono contrato_social.nome_socio %} - CPF:
     {% firstof contrato_social.documentos_dono contrato_social.documentos_socio %}</p>
@@ -198,7 +194,6 @@
     <p>Endereço: Rua Marret, n°426 - Vila Progresso - CEP: 07095-140 - Guarulhos - SP</p>
     <p>Agente de integração - Representado por: Vilma A.S. Ávilla - Cargo: Sócia proprietária - CPF: 067.156.228-25,
     doravante denominado Interveniente</p>
-
 
     <div class="clause">
         <strong>Cláusula 1ª</strong> - Este convênio estabelece Cooperação Recíproca entre as partes, visando o
@@ -226,29 +221,79 @@
         <strong>Cláusula 2ª</strong> - Caberá ao Interveniente:
     </div>
 
-    <div class="clausula-item">
+    <div class="clause">
         <span class="item-letra">a)</span>
-        <span class="item-texto">a)	Manter convênios específicos com as Instituições de Ensino, contendo as condições
+        <span class="item-texto">Manter convênios específicos com as Instituições de Ensino, contendo as condições
             exigidas para a caracterização e definição do estágio dos seus alunos;</span>
     </div>
 
     <div class="clause">
-        <strong>Cláusula 6ª</strong> - O horário do estágio não deverá, em hipótese alguma, prejudicar a frequência do Aluno às aulas.
+        <span class="item-letra">b)</span>
+        <span class="item-texto">Obter da Concedente a identificação e características dos programas e das
+            oportunidades de estágio a serem concedidas;</span>
     </div>
 
     <div class="clause">
-        <strong>Cláusula 7ª</strong> - A assiduidade do Estagiário será demonstrada pela marcação de entrada e saída em cartão de ponto ou qualquer outra modalidade de
-controle adotada pela Parte Concedente.
+        <span class="item-letra">c)</span>
+        <span class="item-texto">Promover o ajuste das condições de estágio definidas pelas Instituições de Ensino com
+            as disponibilidades da Concedente, indicando as principais atividades a serem desenvolvidas pelos
+            estagiários, observando sua compatibilidade com programas e currículos escolares e com as diretrizes
+            estabelecidas da LDB – Lei 9394/96;</span>
     </div>
 
     <div class="clause">
-        <strong>Cláusula 8ª</strong> - O estágio, como ato educativo escolar supervisionado, deverá ter acompanhamento efetivo pelo professor orientador da Instituição de Ensino
-e por supervisor da Parte Concedente.
+        <span class="item-letra">d)</span>
+        <span class="item-texto">Encaminhar à Concedente os estudantes interessados nas oportunidades de estágio;</span>
     </div>
 
     <div class="clause">
-        <strong>Cláusula 9ª</strong> - Ficam estabelecidas ainda entre as partes:
+        <span class="item-letra">e)</span>
+        <span class="item-texto">Preparar toda a documentação legal, referente ao estágio, incluindo:</span>
+        <span class="item-texto">- Acordo de Cooperação entre a Instituição de Ensino e a Concedente, instrumento
+            jurídico de que trata o art. 9º, inciso I,II,III,IV,V,VI,VII da Lei 11.788 de 25/09/2008;</span>
+        <span class="item-texto">- Termo de Compromisso de Estágio – TCE, entre a Concedente e o estudante, com
+            interveniência e assinatura da Instituição de Ensino, nos termos do § 2º do art. 3º inciso III da Lei 11.788
+            de 25/09/2008.</span>
+        <span class="item-texto">- Efetivação do Seguro Contra Acidentes Pessoais em favor do estagiário, (Invalidez
+            permanente ou morte);</span>
     </div>
+
+    <div class="clause">
+        <span class="item-letra">f)</span>
+        <span class="item-texto">Acompanhar a realização do estágio junto à Concedente, disponibilizando às
+            respectivas Instituições de Ensino as informações pertinentes;</span>
+    </div>
+
+    <div class="clause">
+        <span class="item-letra">g)</span>
+        <span class="item-texto">Notificar à Concedente qualquer irregularidade na situação escolar dos estagiários,
+            sempre que informada pelas Instituições de Ensino;</span>
+    </div>
+
+    <div class="clause">
+        <span class="item-letra">h)</span>
+        <span class="item-texto">Elaborar relatórios pertinentes ao estágio.</span>
+    </div>
+
+    <div class="clause">
+        <strong>Cláusula 3ª</strong> - Caberá à Concedente de Estágio:
+    </div>
+
+    <div class="clause">
+        <span class="item-letra">a)</span>
+        <span class="item-texto">Formalizar as oportunidades de estágio, em conjunto com o Interveniente, atendendo as
+            condições definidas pelas Instituições de Ensino dos estágios;</span>
+    </div>
+
+
+
+
+
+
+
+
+
+
 
     <div class="clause">
         O valor da bolsa-estágio descrito no ítem 4 deste instrumento poderá variar em decorrência do não cumprimento das obrigações acordadas no presente
@@ -307,8 +352,6 @@ preconizado pelos arts. 7o e 11 da LGPD, são de uso exclusivo para cumprir fina
 cancelamentos e andamento do processo.
     </div>
 
-    <div class="clause"><strong>Esse contrato foi gerado por: {{ usuario_logado.username }}</strong></div>
-
     <div class="conditions-title">DO AGENTE DE INTEGRAÇÃO</div>
 
     <div class="clause">
@@ -330,7 +373,7 @@ técnicas e administrativas, devendo o mesmo cientificar, por escrito, todas as 
     </div>
 
     <div class="signature-date">
-        GUARULHOS, {{ contrato.data_criacao|date:"d \\d\\e F \\d\\e Y" }}
+        <!--GUARULHOS, {{ contrato.data_criacao|date:"d \\d\\e F \\d\\e Y" }}-->
     </div>
 
     <table>
@@ -338,42 +381,18 @@ técnicas e administrativas, devendo o mesmo cientificar, por escrito, todas as 
             <td style="width: 50%; padding: 45px 25px;">
                 <div class="signature-block">
                     <div class="signature-line"></div>
-                    <div>{{ contrato.parte_concedente.razao_social }}</div>
-                    <div class="signature-stamp">(assinatura e carimbo)</div>
+                    <div>{{ contrato_social.parte_concedente.razao_social }}</div>
+                    <div>CNPJ: {{ contrato_social.parte_concedente.cnpj }}</div>
                 </div>
             </td>
             <td style="width: 50%; padding: 45px 25px;">
                 <div class="signature-block">
                     <div class="signature-line"></div>
-                    <div>{{ contrato.estagiario.instituicao_ensino.razao_social }}</div>
-                    <div class="signature-stamp">(assinatura e carimbo)</div>
+                    <div>Ellenco Estágios e Treinamentos Ltda. ME</div>
+                    <div>CNPJ: 27.063.179/0001-82</div>
                 </div>
             </td>
-        </tr>
-        <tr>
-            <td style="width: 50%; padding: 45px 25px;">
-                <div class="signature-block">
-                    <div class="signature-line"></div>
-                    <div>{{ contrato.estagiario.candidato.nome }}</div>
-                </div>
-            </td>
-            <td style="width: 50%; padding: 45px 25px;">
-                <div class="signature-block">
-                    <div class="signature-line"></div>
-                    <div>Pais/Responsável</div>
-                </div>
-            </td>
-        </tr>
-         <tr>
-            <td style="width: 50%; padding: 45px 25px;">
-                <div class="signature-block">
-                    <div class="signature-line"></div>
-                    <div>{{ contrato.agente_integrador.razao_social }}</div>
-                </div>
-            </td>
-            <td style="width: 50%; padding: 45px 25px;"></td>
         </tr>
     </table>
-
 </body>
 </html>
