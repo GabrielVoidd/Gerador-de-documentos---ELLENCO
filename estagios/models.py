@@ -79,6 +79,7 @@ class ContratoSocial(models.Model):
          verbose_name='Número do(a) responsável do RH')
     email_resp_rh = models.EmailField(verbose_name='Email do(a) responsável do RH')
     nome_resp_estagio = models.CharField(max_length=100, verbose_name='Nome do(a) responsável do estágio')
+    data_cadastro = models.DateField(auto_now_add=True, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Contrato Social'
