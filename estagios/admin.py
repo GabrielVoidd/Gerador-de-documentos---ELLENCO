@@ -5,9 +5,7 @@ from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estag
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
     MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
-
-
-admin.site.list_per_page = 25
+import string
 
 
 @admin.register(Contrato)
@@ -120,12 +118,25 @@ class EmpresaInline(NestedTabularInline):
     inlines = [DetalhesEmpresaInline]
 
 
+class FiltroPrimeiraLetra(admin.SimpleListFilter):
+    title = 'primeira letra' # Título que aparece na barra lateral
+    parameter_name = 'letra' # Parâmetro que vai na URL
+
+    def lookups(self, request, model_admin):
+        return [(letra, letra) for letra in string.ascii_uppercase]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(nome__istartswith=self.value())
+        return queryset
+
+
 @admin.register(Candidato)
 class CandidatoAdmin(NestedModelAdmin):
     list_display = (
         'nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
-    list_filter = ('nome', 'bairro', 'cpf', 'rg')
+    list_filter = (FiltroPrimeiraLetra, 'bairro', 'escolaridade', 'serie_semestre')
     actions = ['exportar_para_excel']
     list_per_page = 20
 
