@@ -83,8 +83,8 @@ class ContratoSocial(models.Model):
     data_cadastro = models.DateField(auto_now_add=True, null=True, blank=True)
 
     class Meta:
-        verbose_name = 'Contrato Social'
-        verbose_name_plural = 'Contratos Sociais'
+        verbose_name = 'Contrato Empresa'
+        verbose_name_plural = 'Contratos para Empresas'
 
     def __str__(self):
         return f'Contrato_Social_{self.parte_concedente.razao_social}'
@@ -95,8 +95,8 @@ class Aditivo(models.Model):
     data_cadastro = models.DateField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Aditivo'
-        verbose_name_plural = 'Aditivos'
+        verbose_name = 'Aditivo Contratual'
+        verbose_name_plural = 'Aditivos Contratuais'
 
     def __str__(self):
         return f'Aditivo_{self.contrato_social.parte_concedente.razao_social}'
