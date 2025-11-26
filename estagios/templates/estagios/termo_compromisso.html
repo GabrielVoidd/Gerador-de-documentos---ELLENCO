@@ -202,7 +202,7 @@
     <div class="section-title">PARTE CONCEDENTE</div>
     <table class="info-table">
         <tr>
-            <td colspan="2"><strong>Razão Social:</strong> {{ contrato.parte_concedente.razao_social }}</td>
+            <td colspan="2"><strong>Razão Social:</strong> {% contrato.parte_concedente.nome contrato.parte_concedente.razao_social %}</td>
         </tr>
         <tr>
             <td colspan="2"><strong>Endereço:</strong> {{ contrato.parte_concedente.endereco }}</td>
@@ -449,7 +449,7 @@ técnicas e administrativas, devendo o mesmo cientificar, por escrito, todas as 
             <td style="width: 50%; padding: 45px 25px;">
                 <div class="signature-block">
                     <div class="signature-line"></div>
-                    <div>{{ contrato.parte_concedente.razao_social }}</div>
+                    <div>{% contrato.parte_concedente.nome contrato.parte_concedente.razao_social %}</div>
                     <div class="signature-stamp">(assinatura e carimbo)</div>
                 </div>
             </td>

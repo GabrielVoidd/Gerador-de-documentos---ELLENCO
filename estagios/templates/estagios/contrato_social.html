@@ -181,7 +181,7 @@
 
     <div class="clause">Contrato que entre si celebram, nesta data, as partes a seguir qualificadas:</div>
 
-    <div class="clause"><strong>{{ contrato_social.parte_concedente.razao_social }} - CNPJ:
+    <div class="clause"><strong>{% firstof contrato_social.parte_concedente.nome contrato_social.parte_concedente.razao_social %} - CNPJ:
         {{ contrato_social.parte_concedente.cnpj }}</strong></div>
     <p>Endereço: {{ contrato_social.parte_concedente.endereco }} - {{ contrato_social.parte_concedente.bairro }} - CEP:
         {{ contrato_social.parte_concedente.cep }} -

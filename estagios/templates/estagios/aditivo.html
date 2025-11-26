@@ -232,7 +232,7 @@
             <td style="width: 50%; padding: 45px 25px;">
                 <div class="signature-block">
                     <div class="signature-line"></div>
-                    <div>{{ aditivo.contrato_social.parte_concedente.razao_social }}</div>
+                    <div>{% firstof aditivo.contrato_social.parte_concedente.nome aditivo.contrato_social.parte_concedente.razao_social %}</div>
                     <div>CNPJ: {{ aditivo.contrato_social.parte_concedente.cnpj }}</div>
                 </div>
             </td>

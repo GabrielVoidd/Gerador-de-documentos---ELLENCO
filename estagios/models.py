@@ -37,7 +37,8 @@ class ParteConcedente(models.Model):
         CPF = 'C', 'CPF'
         RG = 'R', 'RG'
 
-    razao_social = models.CharField(max_length=250)
+    nome = models.CharField(max_length=250, null=True, blank=True)
+    razao_social = models.CharField(max_length=250, null=True, blank=True)
     endereco = models.CharField(max_length=250)
     bairro = models.CharField(max_length=100)
     local_trabalho = models.CharField(max_length=100, null=True, blank=True)
