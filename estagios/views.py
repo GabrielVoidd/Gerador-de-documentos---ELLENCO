@@ -17,12 +17,13 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.shortcuts import render
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
-    TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial
-from .serializers import(
-InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
-ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
-TipoEventoSerializer, LancamentoSerializer, ReciboSerializer, ReciboRescisaoSerializer, LancamentoRescisaoSerializer,
-ContratoSocialSerializer
+    TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo
+from .serializers import (
+    InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
+    ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
+    TipoEventoSerializer, LancamentoSerializer, ReciboSerializer, ReciboRescisaoSerializer,
+    LancamentoRescisaoSerializer,
+    ContratoSocialSerializer, Aditivo, AditivoSerializer
 )
 
 class InstituicaoEnsinoViewSet(viewsets.ModelViewSet):
@@ -441,5 +442,31 @@ class ContratoSocialViewSet(viewsets.ModelViewSet):
         # Cria a resposta HTTP
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="Contrato_Social_{contrato_social.parte_concedente.razao_social}.pdf"'
+
+        return response
+
+
+class AditivoViewSet(viewsets.ModelViewSet):
+    queryset = Aditivo.objects.all()
+    serializer_class = AditivoSerializer
+
+    @action(detail=True, methods=['get'], url_path='gerar-aditivo', url_name='gerar-aditivo')
+    def gerar_contrato_social(self, request, pk=None):
+        aditivo = self.get_object()
+
+        logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
+        logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
+
+        # Renderiza o template HTML com o contexto do cadastro
+        html_string = render_to_string('estagios/aditivo.html',
+                                       {'aditivo': aditivo, 'logo_path': logo_path})
+
+        # Gera o PDF
+        pdf_file = HTML(string=html_string).write_pdf()
+
+        # Cria a resposta HTTP
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response[
+            'Content-Disposition'] = f'attachment; filename="aditivo_{aditivo.contrato_social.parte_concedente.razao_social}.pdf"'
 
         return response

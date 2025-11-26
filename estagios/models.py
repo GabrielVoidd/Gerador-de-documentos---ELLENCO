@@ -85,6 +85,21 @@ class ContratoSocial(models.Model):
         verbose_name = 'Contrato Social'
         verbose_name_plural = 'Contratos Sociais'
 
+    def __str__(self):
+        return f'Contrato_Social_{self.parte_concedente.razao_social}'
+
+
+class Aditivo(models.Model):
+    contrato_social = models.ForeignKey(ContratoSocial, on_delete=models.PROTECT, related_name='contrato_social')
+    data_cadastro = models.DateField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Aditivo'
+        verbose_name_plural = 'Aditivos'
+
+    def __str__(self):
+        return f'Aditivo_{self.contrato_social.parte_concedente.razao_social}'
+
 
 class Candidato(models.Model):
     class EstadosCivis(models.TextChoices):

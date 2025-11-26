@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
-    MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial
+    MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 
 
@@ -250,3 +250,13 @@ class ContratoSocialAdmin(admin.ModelAdmin):
         url = reverse('contrato-social-gerar-contrato-social', kwargs={'pk': obj.pk})
         return format_html('<a class="button" href="{}" target="_blank">Gerar Contrato</a>', url)
 
+
+@admin.register(Aditivo)
+class AditivoAdmin(admin.ModelAdmin):
+    list_display = ('contrato_social__parte_concedente__razao_social', 'data_cadastro', 'gerar_termo_link')
+    search_fields = ('contrato_social__parte_concedente__razao_social',)
+
+    def gerar_termo_link(self, obj):
+        # Cria a URL para o endpoint da API que gera o PDF
+        url = reverse('aditivo-gerar-aditivo', kwargs={'pk': obj.pk})
+        return format_html('<a class="button" href="{}" target="_blank">Gerar Aditivo</a>', url)
