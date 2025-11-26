@@ -441,7 +441,7 @@ class ContratoSocialViewSet(viewsets.ModelViewSet):
 
         # Cria a resposta HTTP
         response = HttpResponse(pdf_file, content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="Contrato_Social_{contrato_social.parte_concedente.razao_social}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="Empresa_x_Empresa_{contrato_social.parte_concedente.razao_social}.pdf"'
 
         return response
 
