@@ -25,6 +25,8 @@ from .serializers import (
     LancamentoRescisaoSerializer,
     ContratoSocialSerializer, Aditivo, AditivoSerializer
 )
+import openpyxl
+
 
 class InstituicaoEnsinoViewSet(viewsets.ModelViewSet):
     queryset = InstituicaoEnsino.objects.all()

@@ -5,7 +5,8 @@ from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estag
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
     MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
-import string
+import string, openpyxl
+from django.http import HttpResponse
 
 
 @admin.register(Contrato)
@@ -21,6 +22,36 @@ class ContratoAdmin(admin.ModelAdmin):
 
     gerar_termo_link.short_description = 'Termo de Compromisso'
     gerar_termo_link.allow_tags = True
+
+    actions = ['exportar_para_excel']
+
+    @admin.action(description='Exportar contratos Excel')
+    def exportar_para_excel(self, request, queryset):
+        # Configuração do Excel
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        response['Content-Disposition'] = 'attachment; filename="contratos.xlsx"'
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = 'Contratos'
+        ws.append(['Nome da Empresa', 'CNPJ', 'Nome do Estagiário', 'CPF', 'Nome da Escola / Faculdade',
+               'Data de Início', 'Data de Término Prevista', 'Valor da Bolsa'])
+
+        queryset = Contrato.objects.all().values_list(
+            'parte_concedente__razao_social', 'parte_concedente__cnpj', 'estagiario__candidato__nome',
+            'estagiario__candidato__cpf', 'estagiario__candidato__instituicao_ensino__razao_social',
+            'data_inicio', 'data_termino_prevista', 'valor_bolsa'
+        )
+
+        # Preenchendo os dados
+        for linha in queryset:
+            # Cada linha é uma tupla ('Empresa X', '46536567/0001-99',)
+            ws.append(linha)
+
+        wb.save(response)
+        return response
 
 
 @admin.register(MotivoRescisao)
