@@ -96,20 +96,13 @@ class DetalhesParteConcedenteInline(admin.TabularInline):
     extra = 1
 
 
-class ContratoSocialInline(admin.StackedInline):
-    model = ContratoSocial
-    fields = ('nome_dono', 'documentos_dono', 'nome_socio', 'documentos_socio', 'nome_resp_rh', 'numero_resp_rh',
-              'email_resp_rh', 'nome_resp_estagio')
-    extra = 1
-
-
 @admin.register(ParteConcedente)
 class ParteConcedenteAdmin(admin.ModelAdmin):
     list_display = ('razao_social', 'cnpj', 'telefone', 'email')
     search_fields = ('razao_social', 'cnpj', 'cidade')
     list_filter = ('razao_social', 'cidade')
 
-    inlines = [DetalhesParteConcedenteInline, ContratoSocialInline]
+    inlines = [DetalhesParteConcedenteInline]
 
     def get_inlines(self, request, obj=None):
         if request.user.is_superuser or request.user.groups.filter(name='Comercial').exists():
