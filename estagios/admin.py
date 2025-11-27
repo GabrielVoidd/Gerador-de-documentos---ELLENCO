@@ -211,6 +211,17 @@ class CandidatoAdmin(NestedModelAdmin):
     gerar_termo_link.short_description = 'Ficha de Cadastro'
     gerar_termo_link.allow_tags = True
 
+    def get_fields(self, request, obj=None):
+        fields = list(super().get_fields(request, obj))
+
+        tem_permissao = request.user.is_superuser or request.user.groups.filter(name='Recrutamento').exists()
+
+        if not tem_permissao:
+            if 'serie_semestre' in fields:
+                fields.remove('serie_semestre')
+
+        return fields
+
     def get_readonly_fields(self, request, obj = None):
         """"Define os campos observacoes e restrito como somente leitura se o usuário não perterncer ao grupo Recrutamento"""
         readonly_fields = super().get_readonly_fields(request, obj)
