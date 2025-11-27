@@ -167,7 +167,7 @@ class CandidatoAdmin(NestedModelAdmin):
     list_display = (
         'nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
-    list_filter = (FiltroPrimeiraLetra, 'bairro', 'escolaridade', 'serie_semestre')
+    list_filter = (FiltroPrimeiraLetra, 'bairro', 'escolaridade', 'ano_semestre')
     actions = ['exportar_para_excel']
     list_per_page = 20
 

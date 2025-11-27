@@ -103,6 +103,24 @@ class Aditivo(models.Model):
 
 
 class Candidato(models.Model):
+    class AnosSemestres(models.TextChoices):
+        PRIMEIRO_ANO = '1A', '1° Ano'
+        SEGUNDO_ANO = '2A', '2° Ano'
+        TERCEIRO_ANO = '3A', '3° Ano'
+        QUARTO_ANO = '4A', '4° Ano'
+        PRIMEIRO_SEMESTRE = '1S', '1° Semestre'
+        SEGUNDO_SEMESTRE = '2S', '2° Semestre'
+        TERCEIRO_SEMESTRE = '3S', '3° Semestre'
+        QUARTO_SEMESTRE = '4S', '4° Semestre'
+        QUINTO_SEMESTRE = '5S', '5° Semestre'
+        SEXTO_SEMESTRE = '6S', '6° Semestre'
+        SETIMO_SEMESTRE = '7S', '7° Semestre'
+        OITAVO_SEMESTRE = '8S', '8° Semestre'
+        NONO_SEMESTRE = '9S', '9° Semestre'
+        DECIMO_SEMESTRE = '1OS', '10° Semestre'
+        DECIMO_PRIMEIRO_SEMESTRE = '11S', '11° Semestre'
+        DECIMO_SEGUNDO_SEMESTRE = '12S', '12° Semestre'
+
     class EstadosCivis(models.TextChoices):
         SOLTEIRO = 'S', 'Solteiro(a)'
         CASADO = 'C', 'Casado(a)'
@@ -194,7 +212,8 @@ class Candidato(models.Model):
     escolaridade = models.CharField(max_length=3, choices=Escolaridades.choices)
     curso = models.CharField(max_length=70, help_text='Nome do curso', null=True, blank=True)
     periodo = models.CharField(max_length=1, choices=Periodos.choices, verbose_name='Período')
-    serie_semestre = models.CharField(max_length=50, help_text='2° semestre / 3°ano', verbose_name='Série ou Semestre')
+    ano_semestre = models.CharField(max_length=3, choices=AnosSemestres.choices, null=True)
+    serie_semestre = models.CharField(max_length=50, help_text='2° semestre / 3°ano', verbose_name='Série ou Semestre', editable=False)
     data_termino = models.DateField(verbose_name='Quando o curso / escola acaba?', null=True, blank=True)
     instituicao_ensino = models.ForeignKey(InstituicaoEnsino, on_delete=models.PROTECT)
     nome_da_instituicao = models.CharField(max_length=150, null=True, blank=True, help_text='Caso não esteja na lista')
