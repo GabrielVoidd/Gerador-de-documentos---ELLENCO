@@ -337,7 +337,7 @@ class Candidato(models.Model):
             texto= self.nome.upper()
             # NFKD separa a letra do acento, e o encode remove o acento solto
             texto = normalize('NFKD', texto).encode('ASCII', 'ignore').decode('ASCII')
-            self.nome = re.sub(r'[^A-Z]', '', texto)
+            self.nome = re.sub(r'[^A-Z ]', '', texto)
 
         super().save(*args, **kwargs)
 
