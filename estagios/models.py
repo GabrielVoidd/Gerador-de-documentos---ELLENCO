@@ -578,7 +578,10 @@ class Recibo(models.Model):
             self.dias_trabalhados = self.dias_referencia - self.dias_falta
 
         if not self.valor:
-            self.valor = self.calcular_valor_final()
+            if self.pk:
+                self.valor = self.valor_liquido
+            else:
+                self.valor = self.valor_proporcional
 
         # Atualiza dias_trabalhados antes de salvar
         self.dias_trabalhados = max(0, self.dias_referencia - self.dias_falta)
