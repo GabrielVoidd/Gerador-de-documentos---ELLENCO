@@ -174,11 +174,11 @@ class Candidato(models.Model):
     # --- DADOS PESSOAIS ---
     nome = models.CharField(max_length=100)
     sexo = models.CharField(max_length=50)
-    rg = models.CharField(max_length=9, unique=True, blank=True, verbose_name='RG')
+    rg = models.CharField(max_length=9, unique=True, blank=True, verbose_name='RG', help_text='Somente números')
     anexar_rg = models.FileField(
         verbose_name='Anexar RG',
         upload_to='documentos_candidatos/rg/%Y%/%m/%d/', null=True, blank=True)
-    cpf = models.CharField(max_length=11, unique=True, verbose_name='CPF')
+    cpf = models.CharField(max_length=11, unique=True, verbose_name='CPF', help_text='Somente números')
     anexar_cpf = models.FileField(
         verbose_name='Anexar CPF',
         upload_to='documentos_candidatos/cpf/%Y%/%m/%d/', null=True, blank=True)
