@@ -81,6 +81,7 @@ class EstagiarioAdmin(admin.ModelAdmin):
     list_display = ('candidato', 'candidato__curso', 'candidato__serie_semestre', 'instituicao_ensino__razao_social')
     search_fields = ('candidato__nome', 'candidato__curso', 'candidato__serie_semestre', 'instituicao_ensino__razao_social')
     list_filter = ('candidato__curso', 'candidato__serie_semestre', 'instituicao_ensino__razao_social')
+    autocomplete_fields = ['candidato', 'instituicao_ensino']
 
 
 @admin.register(InstituicaoEnsino)
