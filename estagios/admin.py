@@ -14,7 +14,7 @@ class ContratoAdmin(admin.ModelAdmin):
     list_display = ('numero_contrato', 'estagiario', 'parte_concedente', 'data_inicio', 'gerar_termo_link')
     search_fields = ('numero_contrato', 'estagiario__candidato__nome', 'parte_concedente__razao_social')
     list_filter = ('parte_concedente', 'data_inicio')
-    autocomplete_fields = ['instituicao_ensino', 'candidato']
+    autocomplete_fields = ['instituicao_ensino', 'estagiario']
 
     def gerar_termo_link(self, obj):
         # Cria a URL para o endpoint da API que gera o PDF
