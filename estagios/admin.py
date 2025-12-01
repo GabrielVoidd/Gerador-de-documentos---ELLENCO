@@ -158,7 +158,7 @@ class FiltroPrimeiraLetra(admin.SimpleListFilter):
 @admin.register(Candidato)
 class CandidatoAdmin(NestedModelAdmin):
     list_display = (
-        'restrito', 'nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro')
+        'nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = (FiltroPrimeiraLetra, 'bairro', 'escolaridade', 'ano_semestre')
     actions = ['exportar_para_excel']
@@ -191,8 +191,8 @@ class CandidatoAdmin(NestedModelAdmin):
 
 
     class Media:
-        css = {'all': ('admin/css/custom_admin.css',)}
-        js = ('admin/js/custom_admin.js',)
+        # css = {'all': ('admin/css/custom_admin.css',)}
+        js = ('js/admin_custom.js',)
 
     inlines = [CartaEncaminhamentoInline, ArquivosInline, EmpresaInline]
 
