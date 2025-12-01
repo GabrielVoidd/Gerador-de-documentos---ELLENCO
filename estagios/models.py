@@ -262,7 +262,7 @@ class Candidato(models.Model):
     # --- INFORMAÇÕES PARA O(A) RECRUTADOR (A) ---
     observacoes = models.TextField(null=True, blank=True)
     data_cadastro = models.DateField(auto_now_add=True, null=True, blank=True)
-    restrito = models.BooleanField(default=False)
+    restrito = models.BooleanField(default=True)
 
     def clean(self):
         super().clean()
