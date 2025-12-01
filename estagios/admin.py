@@ -158,7 +158,7 @@ class FiltroPrimeiraLetra(admin.SimpleListFilter):
 @admin.register(Candidato)
 class CandidatoAdmin(NestedModelAdmin):
     list_display = (
-        'nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
+        'restrito', 'nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = (FiltroPrimeiraLetra, 'bairro', 'escolaridade', 'ano_semestre')
     actions = ['exportar_para_excel']
