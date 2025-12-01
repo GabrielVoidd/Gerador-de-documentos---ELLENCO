@@ -167,15 +167,6 @@ class CandidatoAdmin(NestedModelAdmin):
     autocomplete_fields = ['instituicao_ensino']
     list_per_page = 20
 
-    def get_changeform_initial_data(self, request):
-        dados_iniciais = super().get_changeform_initial_data(request)
-        padrao = InstituicaoEnsino.objects.filter(razao_social='Não está na lista')
-
-        if padrao:
-            dados_iniciais['instituicao_ensino'] = padrao.pk
-
-        return dados_iniciais
-
     def exportar_para_excel(self, request, queryset):
         '''Exporta os dados do candidato junto com a Parte Concedente e Instituição de Ensino. Inclui somente os
         registros selecionados no admin'''
