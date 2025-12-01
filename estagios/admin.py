@@ -162,6 +162,7 @@ class CandidatoAdmin(NestedModelAdmin):
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = (FiltroPrimeiraLetra, 'bairro', 'escolaridade', 'ano_semestre')
     actions = ['exportar_para_excel']
+    autocomplete_fields = ['instituicao_ensino']
     list_per_page = 20
 
     def exportar_para_excel(self, request, queryset):
