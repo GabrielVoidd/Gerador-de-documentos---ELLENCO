@@ -220,7 +220,8 @@ class CandidatoAdmin(NestedModelAdmin):
 
         if not tem_permissao:
             if 'serie_semestre' in fields:
-                fields.remove('serie_semestre', 'criterio_exclusao')
+                fields.remove('serie_semestre')
+                fields.remove('criterio_exclusao')
 
         return fields
 
