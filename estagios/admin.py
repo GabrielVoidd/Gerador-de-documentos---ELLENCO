@@ -7,6 +7,8 @@ from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estag
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 import string, openpyxl
 from django.http import HttpResponse
+from django.forms import CheckboxSelectMultiple
+from django.db import models
 
 
 @admin.register(Contrato)
@@ -222,6 +224,8 @@ class CandidatoAdmin(NestedModelAdmin):
             if 'serie_semestre' in fields:
                 fields.remove('serie_semestre')
                 fields.remove('criterio_exclusao')
+                fields.remove('observacoes')
+                fields.remove('restrito')
 
         return fields
 
@@ -243,6 +247,10 @@ class CandidatoAdmin(NestedModelAdmin):
             return self.inlines
 
         return []
+
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
 
 
 @admin.register(TipoEvento)
