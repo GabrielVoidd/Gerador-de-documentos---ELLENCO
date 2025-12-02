@@ -22,8 +22,8 @@ from .serializers import (
     InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
     ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
     TipoEventoSerializer, LancamentoSerializer, ReciboSerializer, ReciboRescisaoSerializer,
-    LancamentoRescisaoSerializer,
-    ContratoSocialSerializer, Aditivo, AditivoSerializer
+    LancamentoRescisaoSerializer, ContratoSocialSerializer, Aditivo, AditivoSerializer, CriterioExclusao, \
+    CriterioExclusaoSerializer
 )
 import openpyxl
 
@@ -472,3 +472,8 @@ class AditivoViewSet(viewsets.ModelViewSet):
             'Content-Disposition'] = f'attachment; filename="aditivo_{aditivo.contrato_social.parte_concedente.razao_social}.pdf"'
 
         return response
+
+
+class CriterioExclusaoViewSet(viewsets.ModelViewSet):
+    queryset = CriterioExclusao.objects.all()
+    serializer_class = CriterioExclusaoSerializer

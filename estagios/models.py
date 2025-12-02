@@ -102,6 +102,17 @@ class Aditivo(models.Model):
         return f'Aditivo_{self.contrato_social.parte_concedente.razao_social}'
 
 
+class CriterioExclusao(models.Model):
+    criterio = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = 'Critério de Exclusão'
+        verbose_name_plural = 'Critérios de Exclusão'
+
+    def __str__(self):
+        return self.criterio
+
+
 class Candidato(models.Model):
     class AnosSemestres(models.TextChoices):
         PRIMEIRO_ANO = '1A', '1° Ano'
@@ -263,6 +274,7 @@ class Candidato(models.Model):
     observacoes = models.TextField(null=True, blank=True)
     data_cadastro = models.DateField(auto_now_add=True, null=True, blank=True)
     restrito = models.BooleanField(default=False)
+    criterio_exclusao = models.ManyToManyField(CriterioExclusao, verbose_name='Critérios de Exclusão', null=True, blank=True)
 
     def clean(self):
         super().clean()

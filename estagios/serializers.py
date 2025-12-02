@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
-TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo
+TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, CriterioExclusao
 
 
 class InstituicaoEnsinoSerializer(serializers.ModelSerializer):
@@ -249,4 +249,10 @@ class ContratoSocialSerializer(serializers.ModelSerializer):
 class AditivoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Aditivo
+        fields = '__all__'
+
+
+class CriterioExclusaoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CriterioExclusao
         fields = '__all__'

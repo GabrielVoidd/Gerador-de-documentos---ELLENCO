@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
-    MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo
+    MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, CriterioExclusao
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 import string, openpyxl
 from django.http import HttpResponse
@@ -157,12 +157,18 @@ class FiltroPrimeiraLetra(admin.SimpleListFilter):
         return queryset
 
 
+@admin.register(CriterioExclusao)
+class CriterioExclusaoAdmin(admin.ModelAdmin):
+    list_display = ('criterio',)
+    list_filter = ('criterio',)
+
+
 @admin.register(Candidato)
 class CandidatoAdmin(NestedModelAdmin):
     list_display = (
         'nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
-    list_filter = (FiltroPrimeiraLetra, 'bairro', 'escolaridade', 'ano_semestre')
+    list_filter = (FiltroPrimeiraLetra, 'bairro', 'escolaridade', 'ano_semestre', 'criterio_exclusao__criterio')
     actions = ['exportar_para_excel']
     autocomplete_fields = ['instituicao_ensino']
     list_per_page = 20
