@@ -437,16 +437,15 @@ class Contrato(models.Model):
     estagiario = models.ForeignKey(Estagiario, on_delete=models.PROTECT)
     parte_concedente = models.ForeignKey(ParteConcedente, on_delete=models.PROTECT)
     agente_integrador = models.ForeignKey(AgenteIntegrador, on_delete=models.PROTECT)
-    data_inicio = models.DateField()
-    data_termino_prevista = models.DateField()
-    horario_estagio = models.CharField(max_length=100)
+    data_inicio = models.DateField(verbose_name='Data de início')
+    data_termino_prevista = models.DateField(verbose_name='Data de término prevista')
+    horario_estagio = models.CharField(editable=False)
     atividades = models.TextField()
     setor = models.CharField(max_length=100)
-    supervisor_nome = models.CharField(max_length=100)
+    supervisor_nome = models.CharField(max_length=100, verbose_name='Nome do(a) supervisor')
     numero_apolice_seguro = models.CharField(max_length=50, default='363787')
-    jornada_estagio = models.CharField(max_length=150, null=True, blank=True,
-                                       help_text='de segunda a domingo com uma folga na semana e 15 minutos de pausa')
-    valor_bolsa = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    jornada_estagio = models.TextField(null=True, verbose_name='Jornada de estágio')
+    valor_bolsa = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, verbose_name='Valor da bolsa')
     data_criacao = models.DateField(auto_now_add=True, null=True, blank=True)
 
     def save(self, *args, **kwargs):
