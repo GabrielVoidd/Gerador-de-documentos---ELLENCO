@@ -483,6 +483,24 @@ class Contrato(models.Model):
         return f'Contrato {self.numero_contrato} - {self.estagiario.candidato.nome}'
 
 
+class ContratoAceite(models.Model):
+    class Planos(models.TextChoices):
+        PLUS = 'P', 'Plus'
+        SENIOR = 'S', 'Sênior'
+
+    parte_concedente = models.ForeignKey(ParteConcedente, on_delete=models.PROTECT)
+    vaga = models.CharField(max_length=100)
+    salario = models.DecimalField(max_digits=8, decimal_places=2)
+    plano = models.CharField(max_length=1, choices=Planos.choices)
+
+    class Meta:
+        verbose_name = 'Contrato R&S - Aceite'
+        verbose_name_plural = 'Contratos R&S - Aceite'
+
+    def __str__(self):
+        return f'{self.parte_concedente.razao_social} - {self.vaga} - {self.salario}'
+
+
 class MotivoRescisao(models.Model):
     motivo = models.CharField(max_length=100, unique=True)
 

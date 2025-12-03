@@ -17,13 +17,13 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.shortcuts import render
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
-    TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo
+    TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, ContratoAceite
 from .serializers import (
     InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
     ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
     TipoEventoSerializer, LancamentoSerializer, ReciboSerializer, ReciboRescisaoSerializer,
     LancamentoRescisaoSerializer, ContratoSocialSerializer, Aditivo, AditivoSerializer, CriterioExclusao, \
-    CriterioExclusaoSerializer
+    CriterioExclusaoSerializer, ContratoAceiteSerializer
 )
 import openpyxl
 
@@ -477,3 +477,29 @@ class AditivoViewSet(viewsets.ModelViewSet):
 class CriterioExclusaoViewSet(viewsets.ModelViewSet):
     queryset = CriterioExclusao.objects.all()
     serializer_class = CriterioExclusaoSerializer
+
+
+class ContratoAceiteViewSet(viewsets.ModelViewSet):
+    queryset = ContratoAceite.objects.all()
+    serializer_class = ContratoAceiteSerializer
+
+    @action(detail=True, methods=['get'], url_path='gerar-contrato-aceite', url_name='gerar-contrato-aceite')
+    def gerar_contrato_aceite(self, request, pk=None):
+        contrato_aceite = self.get_object()
+
+        agencia_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'agencia.png')
+        agencia_path = 'file:///' + agencia_path_raw.replace('\\', '/')
+
+        # Renderiza o template HTML com o contexto do cadastro
+        html_string = render_to_string('estagios/contrato_aceite.html',
+                                       {'contrato_aceite': contrato_aceite, 'agencia_path': agencia_path})
+
+        # Gera o PDF
+        pdf_file = HTML(string=html_string).write_pdf()
+
+        # Cria a resposta HTTP
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response[
+            'Content-Disposition'] = f'attachment; filename="ContratoR&S_{contrato_aceite.parte_concedente.razao_social}.pdf"'
+
+        return response

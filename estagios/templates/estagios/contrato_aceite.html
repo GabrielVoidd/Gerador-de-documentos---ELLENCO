@@ -1,0 +1,251 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Contratação de R&S</title>
+    <style>
+        @page {
+            margin: 1.5cm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 9pt;
+            }
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10.5pt;
+            line-height: 1.3; /* Aumentado para melhor legibilidade */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 1px 3px;
+            vertical-align: top;
+        }
+
+        .header-logo {
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            font-size: 14pt;
+        }
+
+        .header-main-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11pt;
+        }
+
+        .header-subtitle {
+            text-align: center;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+
+        /* --- ESTILO MODIFICADO --- */
+        .contract-box {
+            /* border: 1px solid black; -> REMOVIDO */
+            text-align: center;
+        }
+        .contract-box-title {
+            font-size: 8pt;
+            font-weight: bold;
+            /* border-bottom: 1px solid black; -> REMOVIDO */
+            padding: 1px;
+        }
+        .contract-box-content {
+            font-size: 10pt;
+            font-weight: bold;
+            padding: 2px;
+        }
+
+        .centered-text {
+            text-align: center;
+            font-size: 9pt;
+            margin: 10px 0;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 9pt;
+            text-transform: uppercase;
+            margin-top: 10px;
+            margin-bottom: 2px;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-bottom: 1px solid black;
+            margin-bottom: 20px; /* ESPAÇAMENTO AUMENTADO */
+        }
+
+        .info-table td {
+            font-size: 9pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 2px 0;
+            width: 50%;
+        }
+
+        .info-table strong {
+            font-weight: normal;
+            text-transform: none;
+        }
+
+        .lowercase {
+            text-transform: none !important;
+        }
+
+        .conditions-title {
+            text-align: left;
+            font-weight: bold;
+            font-size: 9pt;
+            /* border: 1px solid black; -> REMOVIDO */
+            /* border-bottom: none; -> REMOVIDO */
+            /* padding: 2px; -> REMOVIDO */
+            margin-top: 25px; /* ESPAÇAMENTO AUMENTADO */
+        }
+        .conditions-content {
+            text-align: left; /* Alinhamento padrão para o conteúdo */
+            font-size: 9pt;
+            /* border: 1px solid black; -> REMOVIDO */
+            /* padding: 3px; -> REMOVIDO */
+            margin-top: 5px;
+        }
+
+        /* Estilos específicos para conteúdo que deve ser centralizado ou negrito */
+        .conditions-content.centered {
+             text-align: left;
+        }
+        /*.conditions-content.bold {
+            font-weight: bold;
+        }*/
+
+        .clause {
+            font-size: 9pt;
+            text-align: justify;
+            margin-top: 12px; /* ESPAÇAMENTO AUMENTADO */
+        }
+
+        .signature-date {
+            text-align: center;
+            margin-top: 40px; /* ESPAÇAMENTO AUMENTADO */
+            margin-bottom: 30px;
+            font-size: 10pt;
+        }
+
+        .signature-block {
+            text-align: left;
+            font-size: 9pt;
+        }
+        .signature-line {
+            border-top: 1px solid black;
+            margin: 0 0 2px 0;
+            width: 70%;
+        }
+        .signature-stamp {
+            font-size: 8pt;
+        }
+
+        .clausula-item {
+            display: flex; /* O segredo: coloca letra e texto lado a lado */
+            align-items: flex-start; /* Alinha ambos no topo */
+            margin-bottom: 10px;
+            font-family: sans-serif; /* Sua fonte aqui */
+        }
+
+        .item-texto {
+            flex: 1; /* Ocupa todo o espaço restante */
+            text-align: justify; /* Opcional: igual documentos legais */
+        }
+        /* --- FIM DAS MODIFICAÇÕES DE ESTILO --- */
+    </style>
+</head>
+<body>
+    <table style="margin-bottom: 10px;">
+        <tr>
+            <td style="width: 25%;" class="header-logo">
+                <img src="{{ logo_path }}" alt="Logo da Empresa" style="max-width: 100%; height: auto;">
+            </td>
+            <td style="width: 50%; vertical-align: middle;">
+                <div class="header-main-title">Contratação de R&S</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="clause">{{  }}</div>
+
+    <div class="clause"><strong>{{ aditivo.contrato_social.parte_concedente.razao_social }} - CNPJ:
+        {{ aditivo.contrato_social.parte_concedente.cnpj }}</strong></div>
+    <p>Endereço: {{ aditivo.contrato_social.parte_concedente.endereco }} - {{ aditivo.contrato_social.parte_concedente.bairro }} - CEP:
+        {{ aditivo.contrato_social.parte_concedente.cep }} -
+    {{ aditivo.contrato_social.parte_concedente.cidade }} - {{ aditivo.contrato_social.parte_concedente.estado }}</p>
+    <p>Ramo de atividade: {{ aditivo.contrato_social.parte_concedente.ramo_atividade }}</p>
+
+    <div class="clause">Doravante denominada CONCEDENTE, e a EMPRESA</div>
+
+    <div class="clause"><strong>ELLENCO ESTÁGIOS E TREINAMENTOS LTDA.ME - CNPJ: 27.063.179/0001-82</strong></div>
+    <p>Endereço: Rua Marret, n°426 - Vila Progresso - CEP: 07095-140 - Guarulhos - SP - Fone: (11)4386-3431</p>
+    <p>Agente de integração - Representado por: Vilma A.S. Ávilla - Cargo: Sócia proprietária - CPF: 067.156.228-25</p>
+
+    <div class="clause">Doravante denominada Interveniente</div>
+
+    <div class="clause"><strong>ADITIVO: </strong>Os valores acordados referentes à prestação de serviços pela
+    contratada, passará a ser:</div>
+
+    <div class="clause">R$90,00 (noventa reais) a partir de 10 estagiários, por estudante/mês contratado ao abrigo
+        deste convênio;</div>
+
+    <div class="clause">R$80,00 (oitenta reais) a partir de 15 estagiários, por estudante/mês contratado ao abrigo
+        deste convênio;</div>
+
+    <div class="clause">Se for encaminhado pela contratada Ellenco Estágios, haverá taxa de colocação no valor de
+        R$50,00 (cinquenta reais) por estudante/mês contratado ao abrigo deste convênio;
+    </div>
+
+    <div class="clause">Se o estagiário, for encaminhado pela empresa, será isento da taxa de colocação;</div>
+
+    <div class="clause">Se a quantidade de estagiários for inferior, ao aqui acordado, ficará valendo os termos do
+        contrato original;</div>
+
+    <div class="clause">O vencimento da mensalidade, passa a ser todo dia 01 de cada mês.</div>
+
+    <div class="clause">As partes informam ainda, que as demais cláusulas contratuais, continuam inalteradas.</div>
+
+    <br>
+
+    <div class="clause">
+        E por estarem de acordo, as partes assinam o presente Convênio, em 2 (duas) vias de igual teor.</div>
+
+    <div class="signature-date">
+        GUARULHOS, {{ aditivo.contrato_social.data_cadastro|date:"d \\d\\e F \\d\\e Y" }}
+    </div>
+
+    <table>
+        <tr>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{% firstof aditivo.contrato_social.parte_concedente.nome aditivo.contrato_social.parte_concedente.razao_social %}</div>
+                    <div>CNPJ: {{ aditivo.contrato_social.parte_concedente.cnpj }}</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>Ellenco Estágios e Treinamentos Ltda. ME</div>
+                    <div>CNPJ: 27.063.179/0001-82</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

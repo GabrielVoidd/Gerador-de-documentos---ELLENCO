@@ -186,7 +186,7 @@
     <p>Endereço: {{ contrato_social.parte_concedente.endereco }} - {{ contrato_social.parte_concedente.bairro }} - CEP:
         {{ contrato_social.parte_concedente.cep }} -
     {{ contrato_social.parte_concedente.cidade }} - {{ contrato_social.parte_concedente.estado }}</p>
-    <p>Ramo de atividade: {{ contrato_social.ramo_atividade }}</p>
+    <p>Ramo de atividade: {{ contrato_social.parte_concedente.ramo_atividade }}</p>
     <p>Responsável: {% firstof contrato_social.nome_dono contrato_social.nome_socio %} - CPF:
     {% firstof contrato_social.documentos_dono contrato_social.documentos_socio %}</p>
 
