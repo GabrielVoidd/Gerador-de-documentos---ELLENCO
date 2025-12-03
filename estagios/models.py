@@ -185,7 +185,8 @@ class Candidato(models.Model):
     # --- DADOS PESSOAIS ---
     nome = models.CharField(max_length=100)
     sexo = models.CharField(max_length=50)
-    rg = models.CharField(max_length=9, unique=True, blank=True, verbose_name='RG', help_text='Somente números')
+    rg = models.CharField(max_length=9, unique=True, blank=True, verbose_name='RG',
+                          help_text='Somente números, campo não necessário caso você tenha o CIN', null=True)
     anexar_rg = models.FileField(
         verbose_name='Anexar RG',
         upload_to='documentos_candidatos/rg/%Y%/%m/%d/', null=True, blank=True)
@@ -274,7 +275,7 @@ class Candidato(models.Model):
     observacoes = models.TextField(null=True, blank=True)
     data_cadastro = models.DateField(auto_now_add=True, null=True, blank=True)
     restrito = models.BooleanField(default=False)
-    criterio_exclusao = models.ManyToManyField(CriterioExclusao, verbose_name='Critérios de Exclusão', null=True, blank=True)
+    criterio_exclusao = models.ManyToManyField(CriterioExclusao, verbose_name='Critérios de Exclusão', blank=True)
 
     def clean(self):
         super().clean()
