@@ -489,16 +489,30 @@ class ContratoAceite(models.Model):
         SENIOR = 'S', 'Sênior'
 
     parte_concedente = models.ForeignKey(ParteConcedente, on_delete=models.PROTECT)
-    vaga = models.CharField(max_length=100)
-    salario = models.DecimalField(max_digits=8, decimal_places=2)
     plano = models.CharField(max_length=1, choices=Planos.choices)
+    data_cadastro = models.DateField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Contrato R&S - Aceite'
         verbose_name_plural = 'Contratos R&S - Aceite'
 
     def __str__(self):
-        return f'{self.parte_concedente.razao_social} - {self.vaga} - {self.salario}'
+        return f'{self.parte_concedente.razao_social} - {self.plano}'
+
+
+class DetalhesContratoAceite(models.Model):
+    contrato_aceite = models.ForeignKey(ContratoAceite, on_delete=models.PROTECT, related_name='detalhes')
+    quantidade = models.IntegerField()
+    vaga = models.CharField(max_length=100)
+    salario = models.DecimalField(max_digits=8, decimal_places=2)
+
+    class Meta:
+        verbose_name = 'Detalhe do Contrato R&S'
+        verbose_name_plural = 'Detalhes dos Contratos R&S'
+
+    def __str__(self):
+        return (f'{self.contrato_aceite.parte_concedente.razao_social} - {self.quantidade} vagas de {self.vaga} com salário '
+                f'de {self.salario}')
 
 
 class MotivoRescisao(models.Model):

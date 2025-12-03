@@ -38,7 +38,7 @@
         .header-main-title {
             text-align: center;
             font-weight: bold;
-            font-size: 11pt;
+            font-size: 17pt;
         }
 
         .header-subtitle {
@@ -168,63 +168,75 @@
     </style>
 </head>
 <body>
-    <table style="margin-bottom: 10px;">
-        <tr>
-            <td style="width: 25%;" class="header-logo">
-                <img src="{{ logo_path }}" alt="Logo da Empresa" style="max-width: 100%; height: auto;">
-            </td>
-            <td style="width: 50%; vertical-align: middle;">
-                <div class="header-main-title">Contratação de R&S</div>
-            </td>
-        </tr>
-    </table>
+    <div class="header-main-title">Contrato de R&S - Aceite</div>
 
-    <div class="clause">{{  }}</div>
+    <img src="{{ agencia_path }}" alt="Logo da Empresa" style="display: block; margin-left: auto; margin-right: auto;
+        width: 70%; margin-bottom: 20px; margin-top: 20px;">
 
-    <div class="clause"><strong>{{ aditivo.contrato_social.parte_concedente.razao_social }} - CNPJ:
-        {{ aditivo.contrato_social.parte_concedente.cnpj }}</strong></div>
-    <p>Endereço: {{ aditivo.contrato_social.parte_concedente.endereco }} - {{ aditivo.contrato_social.parte_concedente.bairro }} - CEP:
-        {{ aditivo.contrato_social.parte_concedente.cep }} -
-    {{ aditivo.contrato_social.parte_concedente.cidade }} - {{ aditivo.contrato_social.parte_concedente.estado }}</p>
-    <p>Ramo de atividade: {{ aditivo.contrato_social.parte_concedente.ramo_atividade }}</p>
+    <div class="clause">{% firstof contrato_aceite.parte_concedente.razao_social contrato_aceite.parte_concedente.nome %}</div>
 
-    <div class="clause">Doravante denominada CONCEDENTE, e a EMPRESA</div>
+    <div class="clause">Conforme Proposta enviada, segue aceite para contratação de vagas.</div>
 
-    <div class="clause"><strong>ELLENCO ESTÁGIOS E TREINAMENTOS LTDA.ME - CNPJ: 27.063.179/0001-82</strong></div>
-    <p>Endereço: Rua Marret, n°426 - Vila Progresso - CEP: 07095-140 - Guarulhos - SP - Fone: (11)4386-3431</p>
-    <p>Agente de integração - Representado por: Vilma A.S. Ávilla - Cargo: Sócia proprietária - CPF: 067.156.228-25</p>
+    <div class="clause">Foi solicitado, o recrutamento de:</div>
 
-    <div class="clause">Doravante denominada Interveniente</div>
+    {% for item in contrato_aceite.detalhes.all %}
+        <div class="clause">
+            ({{ item.quantidade }}) - {{ item.vaga }} - {{ item.salario|floatformat:2 }}
+        </div>
+    {% empty %}
+        <div class="clause">Nenhuma vaga cadastrada para essa empresa</div>
+    {% endfor %}
 
-    <div class="clause"><strong>ADITIVO: </strong>Os valores acordados referentes à prestação de serviços pela
-    contratada, passará a ser:</div>
-
-    <div class="clause">R$90,00 (noventa reais) a partir de 10 estagiários, por estudante/mês contratado ao abrigo
-        deste convênio;</div>
-
-    <div class="clause">R$80,00 (oitenta reais) a partir de 15 estagiários, por estudante/mês contratado ao abrigo
-        deste convênio;</div>
-
-    <div class="clause">Se for encaminhado pela contratada Ellenco Estágios, haverá taxa de colocação no valor de
-        R$50,00 (cinquenta reais) por estudante/mês contratado ao abrigo deste convênio;
+    <div class="clause">Obs: Nessa proposta destaca-se apenas função e salário, posteriormente após o aceite da
+        mesma será solicitado a descrição do cargo pelo setor de recrutamento.
     </div>
 
-    <div class="clause">Se o estagiário, for encaminhado pela empresa, será isento da taxa de colocação;</div>
+    <div class="conditions-title">1.0 - Dos Honorários Profissionais e da Forma de Pagamento</div>
 
-    <div class="clause">Se a quantidade de estagiários for inferior, ao aqui acordado, ficará valendo os termos do
-        contrato original;</div>
+    <div class="clause">Para a execução do trabalho, serão cobrados o valor da remuneração do candidato a ser
+        contratado. A emissão da Nota Fiscal será emitida no ato do início das atividades do candidato na empresa. O
+        pagamento deverá ser efetuado através de Depósito ou Boleto Bancário da seguinte forma:
+    </div>
 
-    <div class="clause">O vencimento da mensalidade, passa a ser todo dia 01 de cada mês.</div>
+    <div class="clause">Opção 1 – (50%) Com Reposição Condição <strong>10/30 da emissão da Nota Fiscal</strong>.</div>
 
-    <div class="clause">As partes informam ainda, que as demais cláusulas contratuais, continuam inalteradas.</div>
+    <div class="clause">Opção 2 – (30%) Sem Reposição Condição <strong>10 dias da emissão da Nota Fiscal</strong>.</div>
 
-    <br>
+    <div class="clause">1.2 Se o valor acordado com o profissional contratado for diferente do valor inicial
+        mencionado nesta proposta, a diferença deverá ser paga junto com a <strong>1° parcela</strong>.
+    </div>
 
-    <div class="clause">
-        E por estarem de acordo, as partes assinam o presente Convênio, em 2 (duas) vias de igual teor.</div>
+    <div class="clause">1.3 Caso o cliente necessite cancelar o processo seletivo contratado por qualquer
+        motivo, estando à atividade já encaminhada parcialmente, fica ele obrigado a pagar 10% do valor da proposta.
+    </div>
+
+    <div class="conditions-title">2.0 - Das Obrigações do Contratante</div>
+
+    <div class="clause">Para melhor acompanhamento, a CONTRATANTE deverá manter a CONTRATADA informada sobre o
+        desempenho do candidato (a) até que se encerre o prazo de garantia de reposição. Este novo processo ocorrerá no
+        prazo de até 30 dias, após a comunicação por parte da CONTRATANTE.
+    </div>
+
+    {% if contrato_aceite.plano == 'P' %}
+        <div class="conditions-title">Plano Selecionado: PLUS</div>
+
+        <div class="clause">CONTRATAÇÃO 50% (cinquenta por cento) do valor da remuneração do candidato a ser contratado,
+            COM REPOSIÇÃO em até 30 dias conforme aviso antecipado.
+        </div>
+    {% elif contrato_aceite.plano == 'S' %}
+        <div class="conditions-title">Plano Selecionado: SÊNIOR</div>
+
+        <div class="clause">CONTRATAÇÃO 30% (trinta por cento) do valor da remuneração do candidato a ser contratado,
+            sem reposição.
+        </div>
+    {% endif %}
+
+    <div class="clause">Sendo o que tínhamos para o momento, colocamo-nos a inteira disposição para quaisquer
+        esclarecimentos julgados necessários.
+    </div>
 
     <div class="signature-date">
-        GUARULHOS, {{ aditivo.contrato_social.data_cadastro|date:"d \\d\\e F \\d\\e Y" }}
+        GUARULHOS, {{ contrato_aceite.data_cadastro|date:"d \\d\\e F \\d\\e Y" }}
     </div>
 
     <table>
@@ -232,17 +244,24 @@
             <td style="width: 50%; padding: 45px 25px;">
                 <div class="signature-block">
                     <div class="signature-line"></div>
-                    <div>{% firstof aditivo.contrato_social.parte_concedente.nome aditivo.contrato_social.parte_concedente.razao_social %}</div>
-                    <div>CNPJ: {{ aditivo.contrato_social.parte_concedente.cnpj }}</div>
+                    <div>Ellenco Estágios e Treinamentos Ltda. ME</div>
+                    <div>CNPJ: 27.063.179/0001-82</div>
                 </div>
             </td>
         </tr>
+    </table>
+
+    <div class="clause">De Acordo:</div>
+
+    <br><br>
+
+    <table>
         <tr>
             <td style="width: 50%; padding: 45px 25px;">
                 <div class="signature-block">
                     <div class="signature-line"></div>
-                    <div>Ellenco Estágios e Treinamentos Ltda. ME</div>
-                    <div>CNPJ: 27.063.179/0001-82</div>
+                    <div>{% firstof contrato_aceite.parte_concedente.nome contrato_aceite.parte_concedente.razao_social %}</div>
+                    <div>CNPJ: {{ contrato_aceite.parte_concedente.cnpj }}</div>
                 </div>
             </td>
         </tr>

@@ -3,7 +3,8 @@ from django.urls import reverse
 from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
-    MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, CriterioExclusao
+    MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, CriterioExclusao, ContratoAceite, \
+    DetalhesContratoAceite
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 import string, openpyxl
 from django.http import HttpResponse
@@ -324,3 +325,21 @@ class AditivoAdmin(admin.ModelAdmin):
         # Cria a URL para o endpoint da API que gera o PDF
         url = reverse('aditivo-gerar-aditivo', kwargs={'pk': obj.pk})
         return format_html('<a class="button" href="{}" target="_blank">Gerar Aditivo</a>', url)
+
+
+class DetalhesContratoAceiteInline(admin.TabularInline):
+    model = DetalhesContratoAceite
+    extra = 1
+
+
+@admin.register(ContratoAceite)
+class ContratoAceiteAdmin(admin.ModelAdmin):
+    list_display = ('parte_concedente__razao_social', 'plano', 'gerar_termo_link')
+    list_filter = ('plano',)
+
+    inlines = [DetalhesContratoAceiteInline]
+
+    def gerar_termo_link(self, obj):
+        # Cria a URL para o endpoint da API que gera o PDF
+        url = reverse('contrato-aceite-gerar-contrato-aceite', kwargs={'pk': obj.pk})
+        return format_html('<a class="button" href="{}" target="_blank">Gerar Contrato R&S</a>', url)
