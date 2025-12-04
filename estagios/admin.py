@@ -10,6 +10,10 @@ import string, openpyxl
 from django.http import HttpResponse
 from django.forms import CheckboxSelectMultiple
 from django.db import models
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
+
+admin.site.unregister(User)
 
 
 @admin.register(Contrato)
@@ -343,3 +347,30 @@ class ContratoAceiteAdmin(admin.ModelAdmin):
         # Cria a URL para o endpoint da API que gera o PDF
         url = reverse('contrato-aceite-gerar-contrato-aceite', kwargs={'pk': obj.pk})
         return format_html('<a class="button" href="{}" target="_blank">Gerar Contrato R&S</a>', url)
+
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            return qs.filter(is_superuser=False)
+        return qs
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = set(super().get_readonly_fields(request, obj))
+
+        # Se quem está logado NÃO é superuser, tornamos alguns campos sensíveis apenas leitura
+        if not request.user.is_superuser:
+            readonly_fields.add('is_superuser')
+            readonly_fields.add('user_permissions')
+
+        return list(readonly_fields)
+
+    def get_fieldsets(self, request, obj=None):
+        # Opcional: Se você quiser ESCONDER campos inteiros em vez de apenas travar
+        fieldsets = super().get_fieldsets(request, obj)
+        if not request.user.is_superuser:
+            # Aqui você poderia filtrar campos específicos se quisesse
+            pass
+        return fieldsets
