@@ -1,0 +1,9 @@
+{% extends "admin/index.html" %}
+
+{% block sidebar %}
+    {# Lógica: Se for superusuário, mostra o histórico. Se for candidato, esconde. #}
+    {% if request.user.is_superuser %}
+        {{ block.super }}
+    {% else %}
+        {% endif %}
+{% endblock %}
