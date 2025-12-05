@@ -12,16 +12,82 @@ from django.forms import CheckboxSelectMultiple
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
+from datetime import date, timedelta
 
 admin.site.unregister(User)
 
 
+class VencimentoContratoFilter(admin.SimpleListFilter):
+    title = 'Urgência de Vencimento'
+
+    # O parâmetro que vai na URL (ex: ?vencimento=15_dias)
+    parameter_name = 'vencimento'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('vencidos', 'Já vencidos'),
+            ('15_dias', 'Vencem nos próximos 15 dias'),
+            ('30_dias', 'Vencem nos próximos 30 dias'),
+            ('60_dias', 'Vencem nos próximos 60 dias')
+        )
+
+    def queryset(self, request, queryset):
+        # A lógica da filtragem
+        hoje = date.today()
+
+        if self.value() == 'vencidos':
+            return queryset.filter(data_termino_prevista__lt=hoje)
+
+        if self.value() == '15_dias':
+            limite = hoje + timedelta(days=15)
+            # Filtra de hoje até daqui 15 dias
+            return queryset.filter(data_termino_prevista__gte=hoje, data_termino_prevista__lt=limite)
+
+        if self.value() == '30_dias':
+            limite = hoje + timedelta(days=30)
+            return queryset.filter(data_termino_prevista__gte=hoje, data_termino_prevista__lt=limite)
+
+        if self.value() == '60_dias':
+            limite = hoje + timedelta(days=60)
+            return queryset.filter(data_termino_prevista__gte=hoje, data_termino_prevista__lt=limite)
+
+        return queryset
+
+
 @admin.register(Contrato)
 class ContratoAdmin(admin.ModelAdmin):
-    list_display = ('numero_contrato', 'estagiario', 'parte_concedente', 'data_inicio', 'gerar_termo_link')
+    list_display = ('numero_contrato', 'estagiario', 'parte_concedente', 'data_inicio', 'gerar_termo_link', 'status_cor')
     search_fields = ('numero_contrato', 'estagiario__candidato__nome', 'parte_concedente__razao_social')
-    list_filter = ('parte_concedente', 'data_inicio')
+    list_filter = (VencimentoContratoFilter, 'parte_concedente', 'data_inicio')
     autocomplete_fields = ['parte_concedente', 'estagiario']
+
+    def status_cor(self, obj):
+        if not obj.data_termino_prevista:
+            return ''
+
+        hoje = date.today()
+        dias_restantes = (obj.data_termino_prevista - hoje).days
+
+        color = ''
+
+        # Lógica das cores (hexadecimais)
+        if dias_restantes <= 15:
+            color = '#ff6666' # Vermelho forte
+        elif dias_restantes <= 30:
+            color = '#ffb3b3' # Vermelho médio
+        elif dias_restantes <= 60:
+            color = '#ffe6e6' # Vermelho claro
+
+        # Retorna um span oculto com a cor, que o JS vai ler
+        return format_html(
+            '<span class="row-color-indicator" style="display:none;" data-color="{}"></span>',
+            color
+        )
+
+    status_cor.short_description = ''
+
+    class Media:
+        js = ('js/admin_row_color.js',)
 
     def gerar_termo_link(self, obj):
         # Cria a URL para o endpoint da API que gera o PDF
