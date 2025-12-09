@@ -250,7 +250,7 @@ class Candidato(models.Model):
     anexar_declaracao = models.FileField(null=True, blank=True, upload_to='documentos_candidatos/declaracao/%Y%/%m/%d/')
 
     # --- INFORMAÇÕES PROFISSIONAIS ---
-    trabalho = models.CharField(max_length=2, choices=Trabalhos.choices)
+    trabalho = models.CharField(max_length=2, choices=Trabalhos.choices, verbose_name='Já trabalhou?')
     anexar_carteira_trabalho = models.FileField(
         verbose_name='Anexar Carteira de Trabalho',
         upload_to='documentos_candidatos/carteiras_trabalho/%Y%/%m/%d/', null=True, blank=True)
