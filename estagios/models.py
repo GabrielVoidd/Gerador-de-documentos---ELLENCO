@@ -161,6 +161,7 @@ class Candidato(models.Model):
         COM_REGISTRO = 'CR', 'Sim, com registro'
         SEM_REGISTRO = 'SR', 'Sim, sem registro'
         NAO = 'N', 'Não'
+        FREELANCER = 'F', 'Freelancer'
 
     class Microsoft_365(models.TextChoices):
         SEM_CONHECIMENTO = 'SC', 'Sem conhecimento'
@@ -181,6 +182,18 @@ class Candidato(models.Model):
         SIM = 'S', 'Sim'
         NAO = 'N', 'Não'
         PREFIRO_NAO_RESPONDER = 'PNR', 'Prefiro não responder'
+
+    class Medicamento(models.TextChoices):
+        SIM = 'S', 'Sim'
+        NAO = 'N', 'Não'
+
+    class Alergia(models.TextChoices):
+        SIM = 'S', 'Sim'
+        NAO = 'N', 'Não'
+
+    class ProblemaSaude(models.TextChoices):
+        SIM = 'S', 'Sim'
+        NAO = 'N', 'Não'
 
     # --- DADOS PESSOAIS ---
     nome = models.CharField(max_length=100)
@@ -222,7 +235,7 @@ class Candidato(models.Model):
 
     # --- FORMAÇÃO ACADÊMICA ---
     escolaridade = models.CharField(max_length=3, choices=Escolaridades.choices)
-    curso = models.CharField(max_length=70, help_text='Nome do curso', null=True, blank=True)
+    curso = models.CharField(max_length=70, help_text='Nome do curso, caso esteja na faculdade', null=True, blank=True)
     periodo = models.CharField(max_length=1, choices=Periodos.choices, verbose_name='Período')
     ano_semestre = models.CharField(max_length=3, choices=AnosSemestres.choices, null=True, verbose_name='Ano ou semestre')
     serie_semestre = models.CharField(max_length=50, verbose_name='Último contato / atualização')
@@ -253,9 +266,16 @@ class Candidato(models.Model):
     anexar_curriculo = models.FileField(null=True, blank=True, upload_to='documentos_candidatos/curriculo/%Y/%m/%d/')
 
     # --- INFORMAÇÕES MÉDICAS ---
-    medicamento_constante = models.CharField(max_length=100, help_text='Faz uso de algum medicamento constante?')
-    alergia = models.CharField(max_length=100, help_text='Tem alergia a algum medicamento? Se sim, qual?')
-    problema_saude = models.CharField(max_length=100, help_text='Tem algum problema de saúde?')
+    usa_medicamento = models.CharField(max_length=1, choices=Medicamento.choices, verbose_name='Faz uso de algum'
+        ' medicamento?', default='N')
+    nome_medicamento = models.CharField(max_length=100, blank=True, default='', verbose_name='Nome do(s) medicamento(s)')
+    tem_alergia = models.CharField(max_length=1, choices=Alergia.choices, blank=True, default='N', verbose_name='Tem '
+        'alergia a algum medicamento?')
+    nome_alergia = models.CharField(max_length=100, blank=True, default='', verbose_name='Alergia a qual(is)'
+        ' medicamento(s)?')
+    tem_problema_saude = models.CharField(max_length=1, choices=ProblemaSaude.choices, blank=True, default='N',
+        verbose_name='Tem algum problema de saúde?')
+    nome_problema_saude = models.CharField(max_length=100, blank=True, default='', verbose_name='Nome do(s) problema(s)')
     pcd = models.CharField(max_length=3, help_text='Você é uma pessoa com deficiência (PCD)?', choices=PCD.choices)
     pcd_detalhes = models.CharField(max_length=150, help_text='Se sim, qual(is)?', null=True, blank=True)
 

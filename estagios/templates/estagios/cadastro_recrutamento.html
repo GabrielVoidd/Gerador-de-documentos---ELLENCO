@@ -267,11 +267,11 @@
     <div class="section-title">Informações Médicas</div>
     <table class="info-table">
         <tr>
-            <td colspan="2"><strong>Medicamento Constante:</strong> {{ candidato.medicamento_constante }}</td>
+            <td colspan="2"><strong>Medicamento Constante:</strong> {{ candidato.get_usa_medicamento_display }}</td>
             <td colspan="2"><strong>Alergia:</strong> {{ candidato.alergia }}</td>
         </tr>
         <tr>
-            <td colspan="2"><strong>Problema de Saúde:</strong> {{ candidato.problema_saude }}</td>
+            <td colspan="2"><strong>Problema de Saúde:</strong> {{ candidato.get_tem_problema_saude_display }}</td>
             <td colspan="2"><strong>PCD:</strong> {{ candidato.get_pcd_display }}</td>
         </tr>
         <tr>
