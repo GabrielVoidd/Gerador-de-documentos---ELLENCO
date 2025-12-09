@@ -158,10 +158,11 @@ class Candidato(models.Model):
         NAO_TEM = 'NT', 'Não tem'
 
     class Trabalhos(models.TextChoices):
-        COM_REGISTRO = 'CR', 'Sim, com registro'
+        COM_REGISTRO = 'CR', 'Sim, com registro (CLT)'
         SEM_REGISTRO = 'SR', 'Sim, sem registro'
         NAO = 'N', 'Não'
         FREELANCER = 'F', 'Freelancer'
+        ESTAGIO = 'E', 'Estágio'
 
     class Microsoft_365(models.TextChoices):
         SEM_CONHECIMENTO = 'SC', 'Sem conhecimento'
