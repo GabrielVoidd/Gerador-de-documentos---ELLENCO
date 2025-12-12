@@ -13,6 +13,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from datetime import date, timedelta
+import re
 
 admin.site.unregister(User)
 
@@ -239,7 +240,7 @@ class CriterioExclusaoAdmin(admin.ModelAdmin):
 @admin.register(Candidato)
 class CandidatoAdmin(NestedModelAdmin):
     list_display = (
-        'nome', 'rg', 'celular', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
+        'nome', 'rg', 'celular', 'botao_whatsapp', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = (FiltroPrimeiraLetra, 'bairro', 'escolaridade', 'ano_semestre', 'criterio_exclusao__criterio')
     actions = ['exportar_para_excel']
@@ -271,6 +272,39 @@ class CandidatoAdmin(NestedModelAdmin):
                 'CNPJ (Parte Concedente)': parte_concedente.cnpj if parte_concedente else '',
             })
 
+    def botao_whatsapp(self, obj):
+        if not obj.celular:
+            return '-'
+
+        # \D significa 'tudo o que não for dígito'
+        apenas_numeros = re.sub(r'\D', '', str(obj.celular or ''))
+
+        if not apenas_numeros.startswith('55'):
+            apenas_numeros = f'55{apenas_numeros}'
+
+        url = f'https://wa.me/{apenas_numeros}?'
+
+        return format_html(
+            '''
+            <a href="{}" target="_blank" style="
+                background-color: #25D366; 
+                color: white; 
+                padding: 5px 10px; 
+                border-radius: 20px; 
+                text-decoration: none; 
+                font-weight: bold; 
+                font-size: 12px;
+                white-space: nowrap;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 80px;
+            ">Abrir WhatsApp</a>''',
+            url
+        )
+
+    botao_whatsapp.short_description = 'Contato'
+    botao_whatsapp.allow_tags = True
 
     class Media:
         # css = {'all': ('admin/css/custom_admin.css',)}
