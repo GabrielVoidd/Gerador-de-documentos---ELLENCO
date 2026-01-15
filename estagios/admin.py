@@ -252,6 +252,26 @@ class CandidatoAdmin(NestedModelAdmin):
     autocomplete_fields = ['instituicao_ensino']
     list_per_page = 20
 
+    def get_search_results(self, request, queryset, search_term):
+        # 1. Executa a busca padrão do Django
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+
+        # 2. Se houver um termo de busca, é procurado nos labels do TextChoices
+        if search_term:
+            choices_list = self.model._meta.get_field('periodo').choices
+            # Encontra quais chaves tem os labels batendo com a busca
+            chaves_encontradas = [
+                valor for valor, label in choices_list
+                if search_term.lower() in label.lower()
+            ]
+
+            # 3. Se achou alguma chave correspondente, filtra o queryset
+            if chaves_encontradas:
+                # Usando |= (or) para somar os resultados que o Django já encontrou
+                queryset |= self.model.objects.filter(periodo__in=chaves_encontradas)
+
+        return queryset, use_distinct
+
     def exportar_para_excel(self, request, queryset):
         '''Exporta os dados do candidato junto com a Parte Concedente e Instituição de Ensino. Inclui somente os
         registros selecionados no admin'''

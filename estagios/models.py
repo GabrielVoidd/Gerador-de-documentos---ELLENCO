@@ -99,7 +99,11 @@ class Aditivo(models.Model):
         verbose_name_plural = 'Aditivos Contratuais'
 
     def __str__(self):
-        return f'Aditivo_{self.contrato_social.parte_concedente.razao_social}'
+        concedente = self.contrato_social.parte_concedente
+
+        identificador = concedente.razao_social or concedente.nome
+
+        return f'Aditivo_{identificador}'
 
 
 class CriterioExclusao(models.Model):
