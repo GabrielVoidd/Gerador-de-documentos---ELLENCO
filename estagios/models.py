@@ -204,7 +204,7 @@ class Candidato(models.Model):
     # --- DADOS PESSOAIS ---
     nome = models.CharField(max_length=100)
     sexo = models.CharField(max_length=50)
-    rg = models.CharField(max_length=9, unique=True, blank=True, verbose_name='RG',
+    rg = models.CharField(max_length=12, unique=True, blank=True, verbose_name='RG',
                           help_text='Somente números, campo não necessário caso você tenha o CIN', null=True)
     anexar_rg = models.FileField(
         verbose_name='Anexar RG',
@@ -486,6 +486,7 @@ class Contrato(models.Model):
     jornada_estagio = models.TextField(null=True, verbose_name='Jornada de estágio')
     valor_bolsa = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, verbose_name='Valor da bolsa')
     data_criacao = models.DateField(auto_now_add=True, null=True, blank=True)
+    assinatura = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         try:

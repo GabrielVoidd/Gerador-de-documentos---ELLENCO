@@ -57,10 +57,22 @@ class VencimentoContratoFilter(admin.SimpleListFilter):
 
 @admin.register(Contrato)
 class ContratoAdmin(admin.ModelAdmin):
-    list_display = ('numero_contrato', 'estagiario', 'parte_concedente', 'data_inicio', 'gerar_termo_link', 'status_cor')
+    list_display = ('estagiario', 'parte_concedente', 'data_inicio', 'gerar_termo_link', 'status_cor', 'assinatura_icon')
     search_fields = ('numero_contrato', 'estagiario__candidato__nome', 'parte_concedente__razao_social')
     list_filter = (VencimentoContratoFilter, 'parte_concedente', 'data_inicio')
     autocomplete_fields = ['parte_concedente', 'estagiario']
+
+    def assinatura_icon(self, obj):
+        if obj.assinatura:
+            # Tamanho (1.2rem) e cor (orange) pra destacar.
+            return format_html('<span style="color: orange; font-size: 1.4rem;">★</span>')
+
+        # Se for False, mantém o 'X' vermelho padrão do Django
+        return format_html('<img src="/static/admin/img/icon-no.svg" alt="Não Assinado">')
+
+    # Configurações da coluna
+    assinatura_icon.short_description = 'Assinatura'  # Nome que aparece no cabeçalho da tabela
+    assinatura_icon.admin_order_field = 'assinatura' # Permite ordenar a coluna clicando no cabeçalho
 
     def status_cor(self, obj):
         if not obj.data_termino_prevista:
@@ -333,7 +345,8 @@ class CandidatoAdmin(NestedModelAdmin):
 
     class Media:
         # css = {'all': ('admin/css/custom_admin.css',)}
-        js = ('js/admin_custom.js', 'js/jquery.mask.min.js', 'js/mascaras_admin.js', 'js/mascara_cpf_admin.js')
+        js = ('js/admin_custom.js', 'js/jquery.mask.min.js', 'js/mascaras_admin.js', 'js/mascara_cpf_admin.js',
+              'js/mascara_rg_admin.js')
 
     inlines = [CartaEncaminhamentoInline, ArquivosInline, EmpresaInline]
 
