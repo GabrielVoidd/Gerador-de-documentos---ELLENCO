@@ -56,6 +56,8 @@ class ParteConcedente(models.Model):
         verbose_name_plural = 'Partes Concedentes'
 
     def __str__(self):
+        if self.nome:
+            return self.nome
         return self.razao_social
 
 
