@@ -176,10 +176,10 @@ class InstituicaoEnsinoAdmin(admin.ModelAdmin):
     search_fields = ('razao_social', 'cnpj', 'cidade')
     list_filter = ('razao_social', 'cidade')
 
-    def get_model_perms(self, request):
-        if request.user.is_superuser:
-            return super().get_model_perms(request)
-        return {}
+    # def get_model_perms(self, request):
+    #     if request.user.is_superuser:
+    #         return super().get_model_perms(request)
+    #     return {}
 
 
 class DetalhesParteConcedenteInline(admin.TabularInline):
