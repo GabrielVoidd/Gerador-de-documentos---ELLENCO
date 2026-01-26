@@ -347,7 +347,7 @@ class CandidatoAdmin(NestedModelAdmin):
     class Media:
         # css = {'all': ('admin/css/custom_admin.css',)}
         js = ('js/admin_custom.js', 'js/jquery.mask.min.js', 'js/mascaras_admin.js', 'js/mascara_cpf_admin.js',
-              'js/mascara_rg_admin.js')
+              'js/mascara_rg_admin.js', 'js/viacep_admin.js')
 
     inlines = [CartaEncaminhamentoInline, ArquivosInline, EmpresaInline]
 
