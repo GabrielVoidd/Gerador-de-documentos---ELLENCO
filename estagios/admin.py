@@ -257,10 +257,11 @@ class CriterioExclusaoAdmin(admin.ModelAdmin):
 @admin.register(Candidato)
 class CandidatoAdmin(NestedModelAdmin):
     list_display = (
-        'nome', 'rg', 'celular', 'botao_whatsapp', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito')
+        'nome', 'rg', 'celular', 'botao_whatsapp', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro',
+        'restrito', 'stand_by', 'trabalhando')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
-    list_filter = (FiltroPrimeiraLetra, 'bairro', 'escolaridade', 'ano_semestre', 'criterio_exclusao__criterio',
-                   'instituicao_ensino__razao_social')
+    list_filter = ('bairro', 'escolaridade', 'ano_semestre', 'periodo', 'restrito', 'stand_by', 'trabalhando',
+                   'criterio_exclusao__criterio', 'instituicao_ensino__razao_social')
     actions = ['exportar_para_excel']
     autocomplete_fields = ['instituicao_ensino']
     list_per_page = 20

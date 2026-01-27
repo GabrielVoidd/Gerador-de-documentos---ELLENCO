@@ -303,6 +303,8 @@ class Candidato(models.Model):
     observacoes = models.TextField(null=True, blank=True)
     data_cadastro = models.DateField(auto_now_add=True, null=True, blank=True)
     restrito = models.BooleanField(default=False)
+    stand_by = models.BooleanField(default=False)
+    trabalhando = models.BooleanField(default=False)
     criterio_exclusao = models.ManyToManyField(CriterioExclusao, verbose_name='Critérios de Exclusão', blank=True)
 
     def clean(self):
