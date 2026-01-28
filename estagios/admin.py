@@ -14,6 +14,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from datetime import date, timedelta
 import re
+import io
+import os
+from django.conf import settings
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 
 admin.site.unregister(User)
 
@@ -110,7 +115,7 @@ class ContratoAdmin(admin.ModelAdmin):
     gerar_termo_link.short_description = 'Termo de Compromisso'
     gerar_termo_link.allow_tags = True
 
-    actions = ['exportar_para_excel']
+    actions = ['exportar_para_excel', 'exportar_para_pdf']
 
     @admin.action(description='Exportar contratos Excel')
     def exportar_para_excel(self, request, queryset):
@@ -139,6 +144,95 @@ class ContratoAdmin(admin.ModelAdmin):
 
         wb.save(response)
         return response
+
+    @admin.action(description='Exportar Relatório PDF')
+    def exportar_para_pdf(self, request, queryset):
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="relatorio_tce_ellenco.pdf"'
+
+        queryset = queryset.select_related('estagiario__candidato', 'parte_concedente')
+
+        buffer = io.BytesIO()
+        p = canvas.Canvas(buffer, pagesize=A4)
+        width, height = A4
+
+        margem_esq = 50
+        y_topo_capa = height - 50 # página 1 tem logo
+        y_topo_comum = height - 50 # página 2 em diante sem logo
+
+        caminho_logo = os.path.join(settings.BASE_DIR, 'static', 'images/LOGO.jpg')
+
+        # --- Função do Cabeçalho ---
+        def desenhar_cabecalho(is_capa=False):
+            y_atual = y_topo_capa if is_capa else y_topo_comum
+
+            if is_capa:
+                # Desenha o logo e título apenas se for a capa
+                try:
+                    p.drawImage(caminho_logo, margem_esq, y_atual - 20, width=150, height=50, preserveAspectRatio=True,
+                                mask='auto')
+                except:
+                    p.drawString(margem_esq, y_atual, 'ELLENCO ESTÁGIOS')
+
+                p.setFont('Helvetica-Bold', 16)
+                p.drawString(margem_esq + 170, y_atual + 15, 'Relatório de TCE - Ativos')
+
+                y_colunas = y_atual - 40
+
+            else:
+                y_colunas = y_atual
+
+            # --- Os títulos das colunas se repetem ---
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(margem_esq, y_colunas, 'ESTAGIÁRIO / CPF / NASC.')
+            p.drawString(margem_esq + 300, y_colunas, 'EMPRESA')
+
+            p.line(margem_esq, y_colunas - 10, width - margem_esq, y_colunas - 10)
+
+            return y_colunas - 30
+
+        y = desenhar_cabecalho(is_capa=True)
+
+        # Loop dos dados
+        p.setFont('Helvetica', 10)
+
+        for contrato in queryset:
+            if y < 50:
+                p.showPage()
+                y = desenhar_cabecalho(is_capa=False)
+                p.setFont('Helvetica', 10)
+
+            candidato = contrato.estagiario.candidato
+            nome = candidato.nome or 'N/A'
+            cpf = candidato.cpf or 'N/A'
+            nasc = candidato.data_nascimento.strftime('%d/%m/%Y') if candidato.data_nascimento else 'N/A'
+
+            pc = contrato.parte_concedente
+            empresa = pc.nome if pc.nome else pc.razao_social
+
+            # Coluna 1
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(margem_esq, y, nome.upper()[:45])
+            p.setFont('Helvetica', 9)
+            p.drawString(margem_esq, y - 12, f'CPF: {cpf} | Nasc: {nasc}')
+
+            # Coluna 2
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(margem_esq + 300, y, str(empresa).upper()[:40])
+
+            y -= 45
+
+            p.setStrokeColorRGB(0.9, 0.9, 0.9)
+            p.line(margem_esq, y + 22, width - margem_esq, y + 22)
+            p.setStrokeColorRGB(0, 0, 0)
+
+        p.showPage()
+        p.save()
+        pdf = buffer.getvalue()
+        buffer.close()
+        response.write(pdf)
+        return response
+
 
 
 @admin.register(MotivoRescisao)
