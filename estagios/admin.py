@@ -19,6 +19,7 @@ import os
 from django.conf import settings
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import simpleSplit
 
 admin.site.unregister(User)
 
@@ -156,9 +157,14 @@ class ContratoAdmin(admin.ModelAdmin):
         p = canvas.Canvas(buffer, pagesize=A4)
         width, height = A4
 
-        margem_esq = 50
+        margem_esq = 30
         y_topo_capa = height - 50 # página 1 tem logo
         y_topo_comum = height - 50 # página 2 em diante sem logo
+        coluna_empresa_x = 280
+        margem_dir = 30
+
+        # Calcula quanto espaço a empresa tem disponível para escrever
+        largura_max_empresa = width - coluna_empresa_x - margem_dir
 
         caminho_logo = os.path.join(settings.BASE_DIR, 'static', 'images/LOGO.jpg')
 
@@ -176,7 +182,6 @@ class ContratoAdmin(admin.ModelAdmin):
 
                 p.setFont('Helvetica-Bold', 16)
                 p.drawString(margem_esq + 170, y_atual + 15, 'Relatório de TCE - Ativos')
-
                 y_colunas = y_atual - 40
 
             else:
@@ -185,9 +190,9 @@ class ContratoAdmin(admin.ModelAdmin):
             # --- Os títulos das colunas se repetem ---
             p.setFont('Helvetica-Bold', 10)
             p.drawString(margem_esq, y_colunas, 'ESTAGIÁRIO / CPF / NASC.')
-            p.drawString(margem_esq + 300, y_colunas, 'EMPRESA')
+            p.drawString(coluna_empresa_x, y_colunas, 'EMPRESA')
 
-            p.line(margem_esq, y_colunas - 10, width - margem_esq, y_colunas - 10)
+            p.line(margem_esq, y_colunas - 10, width - margem_dir, y_colunas - 10)
 
             return y_colunas - 30
 
@@ -197,7 +202,7 @@ class ContratoAdmin(admin.ModelAdmin):
         p.setFont('Helvetica', 10)
 
         for contrato in queryset:
-            if y < 50:
+            if y < 60:
                 p.showPage()
                 y = desenhar_cabecalho(is_capa=False)
                 p.setFont('Helvetica', 10)
@@ -208,7 +213,12 @@ class ContratoAdmin(admin.ModelAdmin):
             nasc = candidato.data_nascimento.strftime('%d/%m/%Y') if candidato.data_nascimento else 'N/A'
 
             pc = contrato.parte_concedente
-            empresa = pc.nome if pc.nome else pc.razao_social
+            empresa_texto = pc.nome if pc.nome else pc.razao_social
+            empresa_texto = str(empresa_texto).upper()
+
+            # --- Lógica da quebra de texto ---
+            p.setFont('Helvetica-Bold', 10)
+            linhas_empresa = simpleSplit(empresa_texto, 'Helvetica-Bold', 10, largura_max_empresa)
 
             # Coluna 1
             p.setFont('Helvetica-Bold', 10)
@@ -217,14 +227,45 @@ class ContratoAdmin(admin.ModelAdmin):
             p.drawString(margem_esq, y - 12, f'CPF: {cpf} | Nasc: {nasc}')
 
             # Coluna 2
-            p.setFont('Helvetica-Bold', 10)
-            p.drawString(margem_esq + 300, y, str(empresa).upper()[:40])
+            y_empresa = y  # Guarda a posição Y inicial para escrever as linhas
+            p.setFont("Helvetica-Bold", 10)
 
-            y -= 45
+            for linha in linhas_empresa:
+                p.drawString(coluna_empresa_x, y_empresa, linha)
+                y_empresa -= 12  # Desce 12 pontos para a próxima linha da empresa
+
+            # --- 4. Cálculo da Altura Dinâmica ---
+            # A altura usada é o máximo entre:
+            # A) O espaço do estagiário (aprox 20 pts)
+            # B) O espaço da empresa (número de linhas * 12 pts)
+            altura_usada_empresa = len(linhas_empresa) * 12
+            altura_usada_estagiario = 24  # Título + subtítulo
+
+            # O "pulo" para o próximo registro deve considerar o maior dos dois + uma margem
+            pulo = max(altura_usada_empresa, altura_usada_estagiario) + 30
+
+            proximo_y = y -pulo
+
+            # Desenha a linha separadora baseada no pulo calculado
+            # (y - pulo + 8) coloca a linha um pouco antes do próximo texto
+            # posicao_linha = y - pulo + 8
+            posicao_linha = proximo_y + 20
 
             p.setStrokeColorRGB(0.9, 0.9, 0.9)
-            p.line(margem_esq, y + 22, width - margem_esq, y + 22)
+            p.line(margem_esq, posicao_linha, width - margem_dir, posicao_linha)
             p.setStrokeColorRGB(0, 0, 0)
+
+            # Atualiza o Y principal para o próximo loop
+            y -= pulo
+
+            # p.setFont('Helvetica-Bold', 10)
+            # p.drawString(margem_esq + 300, y, str(empresa_texto).upper()[:40])
+            #
+            # y -= 45
+            #
+            # p.setStrokeColorRGB(0.9, 0.9, 0.9)
+            # p.line(margem_esq, y + 22, width - margem_esq, y + 22)
+            # p.setStrokeColorRGB(0, 0, 0)
 
         p.showPage()
         p.save()
