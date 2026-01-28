@@ -470,18 +470,20 @@ técnicas e administrativas, devendo o mesmo cientificar, por escrito, todas as 
             <td style="width: 50%; padding: 45px 25px;">
                 <div class="signature-block">
                     <div class="signature-line"></div>
-                    <div>Pais/Responsável</div>
+                    <div>{{ contrato.agente_integrador.razao_social }}</div>
                 </div>
             </td>
         </tr>
          <tr>
             <td style="width: 50%; padding: 45px 25px;">
-                <div class="signature-block">
-                    <div class="signature-line"></div>
-                    <div>{{ contrato.agente_integrador.razao_social }}</div>
-                </div>
+                {% if precisa_responsavel %}
+                    <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div>Pais/Responsável</div>
+                    </div>
+                {% endif %}
             </td>
-            <td style="width: 50%; padding: 45px 25px;"></td>
+            <!--<td style="width: 50%; padding: 45px 25px;"></td>-->
         </tr>
     </table>
 

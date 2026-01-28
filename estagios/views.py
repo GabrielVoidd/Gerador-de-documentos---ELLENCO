@@ -63,12 +63,27 @@ class ContratoViewSet(viewsets.ModelViewSet):
     def gerar_termo_compromisso(self, request, pk=None):
         usuario_que_gerou = request.user
         contrato = self.get_object()
+        candidato = contrato.estagiario.candidato
+
+        # --- Verificação de maioridade para renderização do campo de assinatura do responsável ---
+        precisa_responsavel = False
+        if candidato.data_nascimento:
+            hoje = date.today()
+            nasc = candidato.data_nascimento
+
+            # Cálculo da idade
+            idade = hoje.year - nasc.year - ((hoje.month, hoje.day) < (nasc.month, nasc.day))
+
+            if idade < 18:
+                precisa_responsavel = True
 
         logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
         logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
 
         # Renderiza o template HTML com o contexto do contrato
-        html_string = render_to_string('estagios/termo_compromisso.html', {'contrato': contrato, 'logo_path': logo_path, 'usuario_logado': usuario_que_gerou})
+        html_string = render_to_string('estagios/termo_compromisso.html',
+    {'contrato': contrato, 'logo_path': logo_path, 'usuario_logado': usuario_que_gerou,
+            'precisa_responsavel': precisa_responsavel})
 
         # Gera o PDF
         pdf_file = HTML(string=html_string).write_pdf()
