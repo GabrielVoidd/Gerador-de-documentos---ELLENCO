@@ -329,12 +329,10 @@
                 </div>
             </td>
             <td style="width: 50%; padding: 45px 25px;">
-                {% if precisa_responsavel %}
-                    <div class="signature-block">
-                        <div class="signature-line"></div>
-                        <div>Pais/Responsável</div>
-                    </div>
-                {% endif %}
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{% firstof rescisao.contrato.parte_concedente.nome rescisao.contrato.parte_concedente.razao_social %}</div>
+                </div>
             </td>
         </tr>
          <!--<tr>
