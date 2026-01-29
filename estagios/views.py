@@ -25,6 +25,7 @@ from .serializers import (
     LancamentoRescisaoSerializer, ContratoSocialSerializer, Aditivo, AditivoSerializer, CriterioExclusao, \
     CriterioExclusaoSerializer, ContratoAceiteSerializer
 )
+from django.db import transaction
 import openpyxl
 
 
@@ -436,6 +437,91 @@ class ReciboRescisaoViewSet(viewsets.ModelViewSet):
             'Content-Disposition'] = f'attachment; filename="Recibo_Bolsa_Auxilio_{recibo_rescisao.contrato.estagiario.candidato.nome}.pdf"'
 
         return response
+
+    # ---
+    @action(detail=False, methods=['post'], url_path='gerar-lote-empresa')
+    def gerar_lote_empresa(self, request):
+        '''Gera recibos para todos os estagiários ativos de uma empresa e retorna um único PDF para todos eles'''
+
+        parte_concedente_id = request.data.get('parte_concedente_id')
+        dias_falta_padrao = int(request.data.get('dias_falta', 0))
+
+        if not parte_concedente_id:
+            return Response({'error': 'Empresa (parte_concedente_id) é obrigatória'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Define a data de referência (mês anterior)
+        hoje = date.today()
+        data_referencia = hoje.replace(day=1) - relativedelta(months=1)
+
+        # Busca contratos ativos da empresa
+        contratos = Contrato.objects.filter(
+            parte_concedente_id=parte_concedente_id,
+            data_termino_prevista__gte=data_referencia
+        ).select_related('estagiario__candidato', 'parte_concedente')
+
+        if not contratos.exists():
+            return Response({'error': 'Nenhum contrato ativo encontrado para esta empresa'}, status=status.HTTP_404_NOT_FOUND)
+
+        recibos_gerados = []
+
+        try:
+            with transaction.atomic():
+                for contrato in contratos:
+                    # Verificação de duplicidade
+                    if Recibo.objects.filter(contrato=contrato, data_referencia=data_referencia).exists():
+                        # Se já existe, pega o existente para imprimir ou pula
+                        recibo_existente = Recibo.objects.get(contrato=contrato, data_referencia=data_referencia)
+                        recibos_gerados.append(recibo_existente)
+
+                    # Lógica de texto
+                    texto_beneficio = '(BENEFÍCIO): A CRITÉRIO'
+                    texto_horario = contrato.jornada_estagio or ''
+                    texto_combinado = f'{texto_beneficio} {texto_horario}'
+
+                    # Criação do recibo
+                    novo_recibo = Recibo.objects.create(
+                        contrato=contrato,
+                        beneficio_horario=texto_combinado,
+                        data_referencia=data_referencia,
+                        dias_falta=dias_falta_padrao
+                    )
+
+                    # Criação do lançamento
+                    tipo_bolsa = TipoEvento.objects.filter(descricao='Bolsa Auxílio').first()
+                    if tipo_bolsa:
+                        Lancamento.objects.create(
+                            recibo=novo_recibo,
+                            tipo_evento=tipo_bolsa,
+                            valor=contrato.valor_bolsa
+                        )
+
+                    recibos_gerados.append(novo_recibo)
+
+            return self._gerar_pdf_lote(recibos_gerados, request)
+
+        except Exception as e:
+            return Response({'error': f'Erro processando lote: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def _gerar_pdf_lote(self, lista_recibos, request):
+        '''Método auxiliar para gerar PDF com múltiplos recibos'''
+        logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
+        logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
+
+        # Renderiza UM html contendo TODOS os recibos
+        html_string = render_to_string('estagios/recibo_pagamento.html', {
+            'lista_recibos': lista_recibos,
+            'logo_path': logo_path
+        })
+
+        pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
+
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        nome_empresa = lista_recibos[0].contrato.parte_concedente.razao_social.replace(' ', '_')
+        mes_ref = lista_recibos[0].data_referencia.strftime('%m-%Y')
+        response['Content-Disposition'] = f'attachment; filename="Recibos_{nome_empresa}_{mes_ref}.pdf"'
+
+        return response
+    # ---
 
 
 class ContratoSocialViewSet(viewsets.ModelViewSet):

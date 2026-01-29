@@ -20,6 +20,8 @@ from django.conf import settings
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import simpleSplit
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 admin.site.unregister(User)
 
@@ -555,6 +557,8 @@ class ReciboAdmin(admin.ModelAdmin):
     search_fields = ('estagiario_nome', 'contrato__parte_concedente__razao_social')
     readonly_fields = ('valor', 'dias_trabalhados', 'estagiario_nome', 'parte_concedente_nome', 'valor_bolsa',
         'data_inicio', 'data_fim')
+    list_select_related = ('contrato', 'contrato__parte_concedente', 'contrato__estagiario__candidato')
+    actions = ['imprimir_selecionados']
 
     class Media:
         js = ('js/preencher_recibo.js',)
@@ -566,6 +570,27 @@ class ReciboAdmin(admin.ModelAdmin):
 
     gerar_termo_link.short_description = 'Recibo de pagamento bolsa auxílio'
     gerar_termo_link.allow_tags = True
+
+    @admin.action(description='Imprimir recibos selecionados (PDF unificado)')
+    def imprimir_selecionados(self, request, queryset):
+        # Ordena por empresa e nome
+        recibos = queryset.select_related('contrato__estagiario__candidato', 'contrato__parte_concedente').order_by(
+            'contrato__parte_concedente__nome', 'contrato__estagiario__candidato__nome'
+        )
+
+        logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
+        logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
+
+        html_string = render_to_string('estagios/recibo_pagamento.html', {
+            'lista_recibos': recibos, 'logo_path': logo_path
+        })
+
+        pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
+
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="recibos.pdf"'
+
+        return response
 
 
 @admin.register(ReciboRescisao)

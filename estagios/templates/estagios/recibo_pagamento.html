@@ -1,76 +1,256 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Recibo de Pagamento - Bolsa Auxílio</title>
+    <title>Recibos de Pagamento</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 30px; }
-        h1 { text-align: center; text-transform: uppercase; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #000; padding: 6px; font-size: 13px; }
-        .no-border td { border: none; }
-        .right { text-align: right; }
+        /* Configuração A4 */
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+
+        body {
+            font-family: "Helvetica", sans-serif;
+            font-size: 11px;
+            color: #000;
+            line-height: 1.3;
+        }
+
+        /* Classe para separar os recibos em páginas diferentes */
+        .quebra-pagina {
+            page-break-after: always;
+            display: block;
+        }
+
+        /* Container Principal com borda arredondada estilo Holerite */
+        .recibo-box {
+            border: 1px solid #000;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+            min-height: 400px; /* Garante um tamanho mínimo visual */
+        }
+
+        /* Tabelas Auxiliares */
+        .tabela-cabecalho { width: 100%; margin-bottom: 10px; border-collapse: collapse; }
+        .tabela-cabecalho td { vertical-align: middle; }
+
+        .titulo-empresa { font-size: 14px; font-weight: bold; }
+        .titulo-recibo { font-size: 12px; font-weight: bold; text-align: right; }
+
+        /* Tabela de Dados do Estagiário */
+        .tabela-dados {
+            width: 100%;
+            border: 1px solid #000;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        .tabela-dados td {
+            border: 1px solid #000;
+            padding: 4px 8px;
+        }
+        .label { font-size: 9px; text-transform: uppercase; color: #555; }
+        .valor-texto { font-weight: bold; font-size: 11px; }
+
+        /* Tabela Principal (Vencimentos x Descontos) */
+        .tabela-holerite {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+        .tabela-holerite th {
+            border: 1px solid #000;
+            background-color: #e0e0e0;
+            padding: 5px;
+            text-align: center;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        .tabela-holerite td {
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        /* Colunas específicas */
+        .col-cod { width: 50px; text-align: center; }
+        .col-desc { text-align: left; }
+        .col-ref { width: 60px; text-align: center; }
+        .col-venc { width: 90px; text-align: right; }
+        .col-descnt { width: 90px; text-align: right; }
+
+        /* Linha de Totais */
+        .tabela-totais {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+            border-top: none; /* Cola na tabela de cima */
+        }
+        .tabela-totais td {
+            padding: 6px 8px;
+            border-right: 1px solid #000;
+        }
+
+        /* Rodapé de Assinatura */
+        .area-assinatura {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .linha-assinatura {
+            border-top: 1px solid #000;
+            width: 60%;
+            margin: 0 auto 5px auto;
+        }
+        .aviso-legal {
+            margin-top: 20px;
+            font-size: 9px;
+            text-align: justify;
+            color: #444;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Recibo de Pagamento - Bolsa Auxílio</h1>
+    {% for recibo in lista_recibos %}
 
-    <table class="no-border">
-        <tr><td><strong>Referência:</strong> {{ recibo.data_referencia|date:"m/Y" }}</td></tr>
-    </table>
+    <div class="{% if not forloop.last %}quebra-pagina{% endif %}">
 
-    <table>
-        <tr><td><strong>Parte Concedente:</strong> {{ recibo.contrato.parte_concedente.razao_social }}</td></tr>
-        <tr><td><strong>CNPJ:</strong> {{ recibo.contrato.parte_concedente.cnpj }}</td></tr>
-        <tr><td><strong>Agente de Integração:</strong> {{ recibo.contrato.agente_integrador.razao_social }}</td></tr>
-        <tr><td><strong>Estagiário:</strong> {{ recibo.estagiario_nome }}</td></tr>
-        <tr><td><strong>CPF:</strong> {{ recibo.contrato.estagiario.candidato.cpf }}</td></tr>
-        <tr>
-            <td><strong>Período:</strong> {{ recibo.data_inicio|date:"d/m/Y" }} a {{ recibo.data_fim|date:"d/m/Y" }}</td>
-        </tr>
-    </table>
+        <div class="recibo-box">
+            <table class="tabela-cabecalho">
+                <tr>
+                    <td style="width: 120px;">
+                        <img src="{{ logo_path }}" style="width: 100px; max-height: 60px; object-fit: contain;">
+                    </td>
+                    <td>
+                        <div class="titulo-empresa">{{ recibo.parte_concedente_nome|upper }}</div>
+                        <div>Recibo de Pagamento de Bolsa Auxílio</div>
+                    </td>
+                    <td style="text-align: right;">
+                        <div class="titulo-recibo">RECIBO DE PAGAMENTO</div>
+                        <div>Referência: <strong>{{ recibo.data_referencia|date:"m/Y" }}</strong></div>
+                    </td>
+                </tr>
+            </table>
 
-    <h3>Lançamentos</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Descrição</th>
-                <th>Tipo</th>
-                <th class="right">Valor (R$)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for lancamento in recibo.lancamentos.all %}
-            <tr>
-                <td>{{ lancamento.tipo_evento.descricao }}</td>
-                <td>{{ lancamento.tipo_evento.get_tipo_display }}</td>
-                <td class="right">{{ lancamento.valor|floatformat:2 }}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="3">Nenhum lançamento registrado.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            <table class="tabela-dados">
+                <tr>
+                    <td style="width: 60%;">
+                        <div class="label">Estagiário</div>
+                        <div class="valor-texto">{{ recibo.estagiario_nome|upper }}</div>
+                    </td>
+                    <td style="width: 25%;">
+                        <div class="label">Data Início</div>
+                        <div class="valor-texto">{{ recibo.data_inicio|date:"d/m/Y" }}</div>
+                    </td>
+                    <td style="width: 15%;">
+                        <div class="label">Bolsa Base</div>
+                        <div class="valor-texto">R$ {{ recibo.valor_bolsa }}</div>
+                    </td>
+                </tr>
+            </table>
 
-    <table>
-        <tr><td><strong>Total de Créditos:</strong></td><td class="right">{{ recibo.total_creditos|floatformat:2 }}</td></tr>
-        <tr><td><strong>Total de Débitos:</strong></td><td class="right">{{ recibo.total_debitos|floatformat:2 }}</td></tr>
-        <tr><td><strong>Valor Base:</strong></td><td class="right">{{ recibo.valor_bolsa|floatformat:2 }}</td></tr>
-        <tr><td><strong>Valor Proporcional:</strong></td><td class="right">{{ recibo.valor_proporcional|floatformat:2 }}</td></tr>
-        <tr><td><strong>Valor Líquido:</strong></td><td class="right"><strong>{{ recibo.valor_liquido|floatformat:2 }}</strong></td></tr>
-    </table>
+            <table class="tabela-holerite">
+                <thead>
+                    <tr>
+                        <th class="col-cod">Cód.</th>
+                        <th class="col-desc">Descrição</th>
+                        <th class="col-ref">Ref.</th>
+                        <th class="col-venc">Vencimentos</th>
+                        <th class="col-descnt">Descontos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="col-cod">001</td>
+                        <td class="col-desc">
+                            BOLSA AUXÍLIO
+                            {% if recibo.dias_falta > 0 %}
+                            <span style="font-size: 9px; font-style: italic;">(Proporcional)</span>
+                            {% endif %}
+                        </td>
+                        <td class="col-ref">{{ recibo.dias_trabalhados }}d</td>
+                        <td class="col-venc">{{ recibo.valor_proporcional|floatformat:2 }}</td>
+                        <td class="col-descnt"></td>
+                    </tr>
 
-    <br><br>
-    <table class="no-border">
-        <tr>
-            <td><strong>Data:</strong> ____/____/______</td>
-            <td style="text-align:center;">
-                ___________________________________________<br>
-                <small>Assinatura do Estagiário</small>
-            </td>
-        </tr>
-    </table>
+                    {% for lancamento in recibo.lancamentos.all %}
+                        <tr>
+                            <td class="col-cod">{{ forloop.counter|add:"100" }}</td> <td class="col-desc">{{ lancamento.tipo_evento.descricao|upper }}</td>
+                            <td class="col-ref"> - </td>
+
+                            {% if lancamento.tipo_evento.tipo == 'CREDITO' %}
+                                <td class="col-venc">{{ lancamento.valor|floatformat:2 }}</td>
+                                <td class="col-descnt"></td>
+                            {% else %}
+                                <td class="col-venc"></td>
+                                <td class="col-descnt">{{ lancamento.valor|floatformat:2 }}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+
+                    {% for i in "12345" %}
+                    <tr>
+                        <td class="col-cod">&nbsp;</td>
+                        <td class="col-desc"></td>
+                        <td class="col-ref"></td>
+                        <td class="col-venc"></td>
+                        <td class="col-descnt"></td>
+                    </tr>
+                    {% endfor %}
+
+                    <tr style="border-bottom: 1px solid #000;">
+                        <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="tabela-totais">
+                <tr style="background-color: #f5f5f5;">
+                    <td style="text-align: right; width: 60%;"><strong>TOTAIS</strong></td>
+
+                    <td style="width: 15%; text-align: right; font-weight: bold;">
+                        R$ {{ recibo.valor_liquido|add:recibo.total_debitos|floatformat:2 }}
+                    </td>
+
+                    <td style="width: 15%; text-align: right; font-weight: bold; color: red;">
+                         R$ {{ recibo.total_debitos|floatformat:2 }}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="padding: 10px;">
+                        <div style="float: left; font-size: 10px;">
+                            <strong>Mensagem:</strong><br>
+                            {{ recibo.beneficio_horario|default:"-" }}
+                        </div>
+                        <div style="float: right; border: 2px solid #000; padding: 5px 15px; background: #ddd;">
+                            <div class="label">VALOR LÍQUIDO A RECEBER</div>
+                            <div style="font-size: 14px; font-weight: bold; text-align: right;">R$ {{ recibo.valor_liquido|floatformat:2 }}</div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="area-assinatura">
+                <p>Declaro ter recebido a importância líquida acima discriminada.</p>
+                <br><br>
+                <div class="linha-assinatura"></div>
+                <strong>{{ recibo.estagiario_nome|upper }}</strong><br>
+                <span style="font-size: 10px;">CPF: {{ recibo.contrato.estagiario.candidato.cpf }}</span><br>
+                <span style="font-size: 10px;">{{ recibo.data_referencia|date:"d/m/Y" }}</span>
+            </div>
+
+            <div class="aviso-legal">
+                * Este recibo de pagamento de bolsa-auxílio não comprova vínculo empregatício, regendo-se pela Lei nº 11.788/2008 (Lei do Estágio).
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
 
 </body>
 </html>
