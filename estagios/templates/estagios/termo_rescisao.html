@@ -228,30 +228,36 @@
     <div class="section-title">ESTAGIÁRIO(A)</div>
     <table class="info-table">
         <tr>
-            <td colspan="2"><strong>Nome:</strong> {{ rescisao.contrato.estagiario.nome }}</td>
+            <td colspan="2"><strong>Nome:</strong> {{ rescisao.contrato.estagiario.candidato.nome }}</td>
         </tr>
         <tr>
-            <td colspan="2"><strong>Endereço:</strong> {{ rescisao.contrato.estagiario.endereco }}</td>
+            <td colspan="2"><strong>Endereço:</strong> {{ rescisao.contrato.estagiario.candidato.endereco }}</td>
         </tr>
         <tr>
-            <td><strong>Bairro:</strong> {{ rescisao.contrato.estagiario.bairro }}</td>
-            <td><strong>Estado:</strong> {{ rescisao.contrato.estagiario.estado }}</td>
+            <td><strong>Bairro:</strong> {{ rescisao.contrato.estagiario.candidato.bairro }}</td>
+            <td><strong>Estado:</strong> {{ rescisao.contrato.estagiario.candidato.estado }}</td>
         </tr>
         <tr>
-            <td><strong>CPF:</strong> {{ rescisao.contrato.estagiario.cpf }}</td>
-            <td><strong>Data nascimento:</strong> {{ rescisao.contrato.estagiario.data_nascimento|date:"d/m/Y" }}</td>
+            <td><strong>CPF:</strong> {{ rescisao.contrato.estagiario.candidato.cpf }}</td>
+            <td><strong>Data nascimento:</strong> {{ rescisao.contrato.estagiario.candidato.data_nascimento|date:"d/m/Y" }}</td>
         </tr>
         <tr>
-            <td><strong>Cidade:</strong> {{ rescisao.contrato.estagiario.cidade }}</td>
-            <td><strong>Cep:</strong> {{ rescisao.contrato.estagiario.cep }}</td>
+            <td><strong>Cidade:</strong> {{ rescisao.contrato.estagiario.candidato.cidade }}</td>
+            <td><strong>Cep:</strong> {{ rescisao.contrato.estagiario.candidato.cep }}</td>
         </tr>
         <tr>
-            <td><strong>Telefone:</strong> {{ rescisao.contrato.estagiario.telefone }}</td>
-            <td><strong>Email:</strong> <span class="lowercase">{{ rescisao.contrato.estagiario.email }}</span></td>
+            <td><strong>Telefone:</strong> {{ rescisao.contrato.estagiario.candidato.celular }}</td>
+            <td><strong>Email:</strong> <span class="lowercase">{{ rescisao.contrato.estagiario.candidato.email }}</span></td>
         </tr>
         <tr>
             <td colspan="2" style="font-size: 8pt;">
-                Regularmente matriculado(a) no {{ rescisao.contrato.estagiario.ano_periodo }} do curso de {{ rescisao.contrato.estagiario.curso }} do nível (NM) NÍVEL MÉDIO
+                Regularmente matriculado(a) no {{ rescisao.contrato.estagiario.candidato.ano_periodo }}
+
+                {% if rescisao.contrato.estagiario.candidato.curso %}
+                    do curso de {{ rescisao.contrato.estagiario.candidato.curso }}
+                {% endif %}
+
+                do nível {{ rescisao.contrato.estagiario.candidato.get_escolaridade_display }}
             </td>
         </tr>
     </table>
@@ -319,14 +325,16 @@
             <td style="width: 50%; padding: 45px 25px;">
                 <div class="signature-block">
                     <div class="signature-line"></div>
-                    <div>{{ rescisao.contrato.estagiario.nome }}</div>
+                    <div>{{ rescisao.contrato.estagiario.candidato.nome }}</div>
                 </div>
             </td>
             <td style="width: 50%; padding: 45px 25px;">
-                <div class="signature-block">
-                    <div class="signature-line"></div>
-                    <div>Pais/Responsável</div>
-                </div>
+                {% if precisa_responsavel %}
+                    <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div>Pais/Responsável</div>
+                    </div>
+                {% endif %}
             </td>
         </tr>
          <!--<tr>

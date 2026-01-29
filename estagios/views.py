@@ -124,6 +124,19 @@ class RescisaoViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'], url_path='gerar-termo-rescisao', url_name='gerar-termo-rescisao')
     def gerar_termo_rescisao(self, request, pk=None):
         rescisao = self.get_object()
+        candidato = rescisao.contrato.estagiario.candidato
+
+        # --- Verificação de maioridade para renderização do campo de assinatura do responsável ---
+        precisa_responsavel = False
+        if candidato.data_nascimento:
+            hoje = date.today()
+            nasc = candidato.data_nascimento
+
+            # Cálculo da idade
+            idade = hoje.year - nasc.year - ((hoje.month, hoje.day) < (nasc.month, nasc.day))
+
+            if idade < 18:
+                precisa_responsavel = True
 
         logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
         logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
@@ -132,7 +145,7 @@ class RescisaoViewSet(viewsets.ModelViewSet):
         pdf_file = HTML(string=html_string).write_pdf()
 
         response = HttpResponse(pdf_file, content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="Rescisao_{rescisao.contrato.estagiario.nome}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="Rescisao_{rescisao.contrato.estagiario.candidato.nome}.pdf"'
 
         return response
 
