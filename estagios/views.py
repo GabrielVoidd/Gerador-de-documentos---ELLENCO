@@ -141,7 +141,8 @@ class RescisaoViewSet(viewsets.ModelViewSet):
         logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
         logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
 
-        html_string = render_to_string('estagios/termo_rescisao.html', {'rescisao': rescisao, 'logo_path': logo_path})
+        html_string = render_to_string('estagios/termo_rescisao.html',
+                                       {'rescisao': rescisao, 'logo_path': logo_path, 'precisa_responsavel': precisa_responsavel})
         pdf_file = HTML(string=html_string).write_pdf()
 
         response = HttpResponse(pdf_file, content_type='application/pdf')

@@ -332,18 +332,21 @@
                 <div class="signature-block">
                     <div class="signature-line"></div>
                     <div>{% firstof rescisao.contrato.parte_concedente.nome rescisao.contrato.parte_concedente.razao_social %}</div>
+                    <div class="signature-stamp">(assinatura e carimbo)</div>
                 </div>
             </td>
         </tr>
-         <!--<tr>
+        <tr>
             <td style="width: 50%; padding: 45px 25px;">
-                <div class="signature-block">
-                    <div class="signature-line"></div>
-                    <div>Pais/Responsável</div>
-                </div>
+                {% if precisa_responsavel %}
+                    <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div>Pais/Responsável</div>
+                    </div>
+                {% endif %}
             </td>
             <td style="width: 50%; padding: 45px 25px;"></td>
-        </tr>-->
+        </tr>
     </table>
 
 </body>
