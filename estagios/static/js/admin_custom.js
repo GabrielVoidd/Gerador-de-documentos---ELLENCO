@@ -1,5 +1,6 @@
 window.addEventListener("load", function() {
     (function($) {
+        console.log("Versão com 3 cores carregadas");
         // Itera sobre cada linha da tabela de resultados
         $('#result_list tbody tr').each(function() {
             var $row = $(this); // Cache do seletor
