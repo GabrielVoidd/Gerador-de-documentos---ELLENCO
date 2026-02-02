@@ -491,6 +491,10 @@ class Contrato(models.Model):
     valor_bolsa = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, verbose_name='Valor da bolsa')
     data_criacao = models.DateField(auto_now_add=True, null=True, blank=True)
     assinatura = models.BooleanField(default=False)
+    data_rescisao = models.DateField(
+        verbose_name='Data de Rescisão', null=True, blank=True, help_text='Preencher apenas se o contrato tiver sido'
+                                                                          'encerrado antes do prazo'
+    )
 
     def save(self, *args, **kwargs):
         try:

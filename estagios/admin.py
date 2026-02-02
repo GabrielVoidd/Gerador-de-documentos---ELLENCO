@@ -22,6 +22,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import simpleSplit
 from django.template.loader import render_to_string
 from weasyprint import HTML
+from django.utils.translation import gettext_lazy as _
 
 admin.site.unregister(User)
 
@@ -63,11 +64,44 @@ class VencimentoContratoFilter(admin.SimpleListFilter):
         return queryset
 
 
+class StatusContratoFilter(admin.SimpleListFilter):
+     title = _('Situação do Contrato')
+     parameter_name = 'status'
+
+     def lookups(self, request, model_admin):
+         return(
+            ('ativos', _('Apenas Ativos')),
+            ('rescindidos', _('Rescindidos')),
+            ('encerrados', _('Encerrados (Prazo Finalizado')),
+         )
+
+     def queryset(self, request, queryset):
+         hoje = date.today()
+
+         if self.value() == 'ativos':
+             # Ativo: Não tem data de rescisão e a data do término ainda não passou
+            return queryset.filter(
+                data_rescisao__isnull=True,
+                data_termino_prevista__gte=hoje
+            )
+
+         if self.value() == 'rescindidos':
+             # Tem data de rescisão preenchida
+            return queryset.filter(data_rescisao__isnull=False)
+
+         if self.value() == 'encerrados':
+             # Não foi rescindido, mas já passou da data de término
+            return queryset.filter(
+                data_rescisao__isnull=True,
+                data_termino_prevista__lt=hoje
+            )
+
+
 @admin.register(Contrato)
 class ContratoAdmin(admin.ModelAdmin):
     list_display = ('estagiario', 'parte_concedente', 'data_inicio', 'gerar_termo_link', 'status_cor', 'assinatura_icon')
     search_fields = ('numero_contrato', 'estagiario__candidato__nome', 'parte_concedente__razao_social')
-    list_filter = (VencimentoContratoFilter, 'parte_concedente', 'data_inicio')
+    list_filter = (StatusContratoFilter, VencimentoContratoFilter, 'parte_concedente', 'data_inicio')
     autocomplete_fields = ['parte_concedente', 'estagiario']
 
     def assinatura_icon(self, obj):
@@ -148,34 +182,43 @@ class ContratoAdmin(admin.ModelAdmin):
         wb.save(response)
         return response
 
+    # Função auxiliar para formatar moeda (caso não tenha babel instalado)
+    def format_currency(self, value):
+        if value is None:
+            return "R$ 0,00"
+        return f"R$ {value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
     @admin.action(description='Exportar Relatório PDF')
     def exportar_para_pdf(self, request, queryset):
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="relatorio_tce_ellenco.pdf"'
+        response['Content-Disposition'] = 'attachment; filename="relatorio_tce_detalhado.pdf"'
 
-        queryset = queryset.select_related('estagiario__candidato', 'parte_concedente')
+        # Otimização de banco de dados para buscar as relações profundas
+        queryset = queryset.select_related(
+            'estagiario__candidato',
+            'estagiario__instituicao_ensino',
+            'parte_concedente'
+        )
 
         buffer = io.BytesIO()
         p = canvas.Canvas(buffer, pagesize=A4)
         width, height = A4
 
+        # Configurações de Margem e Layout
         margem_esq = 30
-        y_topo_capa = height - 50 # página 1 tem logo
-        y_topo_comum = height - 50 # página 2 em diante sem logo
-        coluna_empresa_x = 280
         margem_dir = 30
+        largura_util = width - margem_esq - margem_dir
 
-        # Calcula quanto espaço a empresa tem disponível para escrever
-        largura_max_empresa = width - coluna_empresa_x - margem_dir
+        y_topo_capa = height - 50
+        y_topo_comum = height - 50
 
         caminho_logo = os.path.join(settings.BASE_DIR, 'static', 'images/LOGO.jpg')
 
-        # --- Função do Cabeçalho ---
+        # --- Função do Cabeçalho (Simplificada sem colunas) ---
         def desenhar_cabecalho(is_capa=False):
             y_atual = y_topo_capa if is_capa else y_topo_comum
 
             if is_capa:
-                # Desenha o logo e título apenas se for a capa
                 try:
                     p.drawImage(caminho_logo, margem_esq, y_atual - 20, width=150, height=50, preserveAspectRatio=True,
                                 mask='auto')
@@ -183,91 +226,90 @@ class ContratoAdmin(admin.ModelAdmin):
                     p.drawString(margem_esq, y_atual, 'ELLENCO ESTÁGIOS')
 
                 p.setFont('Helvetica-Bold', 16)
-                p.drawString(margem_esq + 170, y_atual + 15, 'Relatório de TCE - Ativos')
-                y_colunas = y_atual - 40
-
+                p.drawString(margem_esq + 170, y_atual + 15, 'Relatório de TCE - Detalhado')
+                y_retorno = y_atual - 40
             else:
-                y_colunas = y_atual
+                y_retorno = y_atual
 
-            # --- Os títulos das colunas se repetem ---
-            p.setFont('Helvetica-Bold', 10)
-            p.drawString(margem_esq, y_colunas, 'ESTAGIÁRIO / CPF / NASC.')
-            p.drawString(coluna_empresa_x, y_colunas, 'EMPRESA')
+            # Linha separadora do cabeçalho
+            p.setLineWidth(1)
+            p.line(margem_esq, y_retorno, width - margem_dir, y_retorno)
 
-            p.line(margem_esq, y_colunas - 10, width - margem_dir, y_colunas - 10)
-
-            return y_colunas - 30
+            return y_retorno - 20  # Espaço após o cabeçalho
 
         y = desenhar_cabecalho(is_capa=True)
 
-        # Loop dos dados
-        p.setFont('Helvetica', 10)
-
+        # --- Loop dos Dados ---
         for contrato in queryset:
-            if y < 60:
+            # Verifica se cabe na página (precisamos de aprox 80 pontos por registro)
+            if y < 100:
                 p.showPage()
                 y = desenhar_cabecalho(is_capa=False)
-                p.setFont('Helvetica', 10)
 
+            # --- Extração dos Dados ---
+            # Estagiário
             candidato = contrato.estagiario.candidato
             nome = candidato.nome or 'N/A'
             cpf = candidato.cpf or 'N/A'
+            sexo = candidato.sexo or 'N/A'  # Se for ChoiceField, usar: candidato.get_sexo_display()
             nasc = candidato.data_nascimento.strftime('%d/%m/%Y') if candidato.data_nascimento else 'N/A'
 
+            # Instituição
+            inst_nome = contrato.estagiario.instituicao_ensino.razao_social or 'Inst. N/A'
+
+            # Parte Concedente (Empresa)
             pc = contrato.parte_concedente
-            empresa_texto = pc.nome if pc.nome else pc.razao_social
-            empresa_texto = str(empresa_texto).upper()
+            empresa_nome = pc.nome if pc.nome else pc.razao_social
+            cidade_pc = pc.cidade or 'N/A'
+            endereco_pc = pc.endereco or 'N/A'
 
-            # --- Lógica da quebra de texto ---
-            p.setFont('Helvetica-Bold', 10)
-            linhas_empresa = simpleSplit(empresa_texto, 'Helvetica-Bold', 10, largura_max_empresa)
+            # Dados do Contrato
+            num_contrato = contrato.numero_contrato or 'S/N'
+            supervisor = contrato.supervisor_nome or 'N/A'
+            valor_bolsa = self.format_currency(contrato.valor_bolsa)
+            dt_inicio = contrato.data_inicio.strftime('%d/%m/%Y') if contrato.data_inicio else '--'
+            dt_fim = contrato.data_termino_prevista.strftime('%d/%m/%Y') if contrato.data_termino_prevista else '--'
 
-            # Coluna 1
+            # --- Desenhando o Bloco do Registro ---
+
+            # Linha 1: Nome (Destaque) | Contrato | Sexo
             p.setFont('Helvetica-Bold', 10)
-            p.drawString(margem_esq, y, nome.upper()[:45])
+            p.drawString(margem_esq, y, f"{nome.upper()[:45]}")
+
             p.setFont('Helvetica', 9)
-            p.drawString(margem_esq, y - 12, f'CPF: {cpf} | Nasc: {nasc}')
+            # Posicionando informações ao lado
+            p.drawString(margem_esq + 300, y, f"Contrato: {num_contrato}")
+            p.drawString(margem_esq + 420, y, f"Sexo: {sexo}")
 
-            # Coluna 2
-            y_empresa = y  # Guarda a posição Y inicial para escrever as linhas
-            p.setFont("Helvetica-Bold", 10)
+            # Linha 2: CPF | Nasc | Instituição
+            y -= 12
+            p.setFont('Helvetica', 9)
+            p.drawString(margem_esq, y, f"CPF: {cpf}  |  Nasc: {nasc}  |  Inst: {inst_nome[:50]}")
 
-            for linha in linhas_empresa:
-                p.drawString(coluna_empresa_x, y_empresa, linha)
-                y_empresa -= 12  # Desce 12 pontos para a próxima linha da empresa
+            # Linha 3: Empresa | Cidade | Endereço
+            y -= 12
+            p.drawString(margem_esq, y, f"Empresa: {str(empresa_nome).upper()[:35]}  |  Cidade: {cidade_pc[:30]}")
+            # Se o endereço for muito longo, pode-se colocar numa linha nova, mas aqui tentei agrupar
+            # p.drawString(margem_esq + 350, y, f"End: {endereco_pc[:25]}")
 
-            # --- 4. Cálculo da Altura Dinâmica ---
-            # A altura usada é o máximo entre:
-            # A) O espaço do estagiário (aprox 20 pts)
-            # B) O espaço da empresa (número de linhas * 12 pts)
-            altura_usada_empresa = len(linhas_empresa) * 12
-            altura_usada_estagiario = 24  # Título + subtítulo
+            # Linha 4: Endereço (Linha dedicada para caber tudo)
+            y -= 12
+            p.drawString(margem_esq, y, f"End. Empresa: {endereco_pc[:90]}")
 
-            # O "pulo" para o próximo registro deve considerar o maior dos dois + uma margem
-            pulo = max(altura_usada_empresa, altura_usada_estagiario) + 30
+            # Linha 5: Supervisor | Bolsa | Vigência
+            y -= 12
+            p.setFont('Helvetica-Oblique', 9)  # Itálico para diferenciar dados financeiros/datas
+            p.drawString(margem_esq, y,
+                         f"Supervisor: {supervisor[:30]}  |  Bolsa: {valor_bolsa}  |  Vigência: {dt_inicio} a {dt_fim}")
 
-            proximo_y = y -pulo
+            # --- Linha Separadora entre registros ---
+            y -= 15  # Espaço antes da linha
+            p.setStrokeColorRGB(0.9, 0.9, 0.9)  # Cinza claro
+            p.line(margem_esq, y, width - margem_dir, y)
+            p.setStrokeColorRGB(0, 0, 0)  # Volta para preto
 
-            # Desenha a linha separadora baseada no pulo calculado
-            # (y - pulo + 8) coloca a linha um pouco antes do próximo texto
-            # posicao_linha = y - pulo + 8
-            posicao_linha = proximo_y + 20
-
-            p.setStrokeColorRGB(0.9, 0.9, 0.9)
-            p.line(margem_esq, posicao_linha, width - margem_dir, posicao_linha)
-            p.setStrokeColorRGB(0, 0, 0)
-
-            # Atualiza o Y principal para o próximo loop
-            y -= pulo
-
-            # p.setFont('Helvetica-Bold', 10)
-            # p.drawString(margem_esq + 300, y, str(empresa_texto).upper()[:40])
-            #
-            # y -= 45
-            #
-            # p.setStrokeColorRGB(0.9, 0.9, 0.9)
-            # p.line(margem_esq, y + 22, width - margem_esq, y + 22)
-            # p.setStrokeColorRGB(0, 0, 0)
+            # Prepara Y para o próximo loop
+            y -= 25
 
         p.showPage()
         p.save()
@@ -275,7 +317,6 @@ class ContratoAdmin(admin.ModelAdmin):
         buffer.close()
         response.write(pdf)
         return response
-
 
 
 @admin.register(MotivoRescisao)
