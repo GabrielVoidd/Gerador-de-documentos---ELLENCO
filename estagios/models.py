@@ -146,6 +146,7 @@ class Candidato(models.Model):
 
     class Escolaridades(models.TextChoices):
         ENSINO_MEDIO = 'EM', 'Ensino Médio'
+        ENSINO_MEDIO_COMPLETO = 'EMC', 'Ensino Médio Completo'
         ENSINO_MEDIO_TECNICO = 'EMT', 'Ensino Médio Técnico'
         ENSINO_SUPERIOR_INCOMPLETO = 'ESI', 'Ensino Superior Incompleto'
         ENSINO_SUPERIOR = 'ES', 'Ensino Superior'
