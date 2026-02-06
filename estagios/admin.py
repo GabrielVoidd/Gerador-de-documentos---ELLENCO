@@ -726,4 +726,3 @@ class RegistroContatoEmpresaAdmin(admin.ModelAdmin):
     list_display = ('nome', 'contato', 'data')
     list_filter = ('nome',)
     search_fields = ('nome',)
-    autocomplete_fields = ('nome',)
