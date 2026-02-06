@@ -600,7 +600,7 @@ class ReciboAdmin(admin.ModelAdmin):
         'data_inicio', 'data_fim')
     list_select_related = ('contrato', 'contrato__parte_concedente', 'contrato__estagiario__candidato')
     actions = ['imprimir_selecionados']
-    autocomplete_fields = ('estagiario',)
+    autocomplete_fields = ('contrato',)
 
     class Media:
         js = ('js/preencher_recibo.js',)
