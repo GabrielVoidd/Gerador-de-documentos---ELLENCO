@@ -17,13 +17,14 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.shortcuts import render
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
-    TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, ContratoAceite
+    TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, ContratoAceite, \
+    RegistroContatoEmpresa
 from .serializers import (
     InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
     ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
     TipoEventoSerializer, LancamentoSerializer, ReciboSerializer, ReciboRescisaoSerializer,
     LancamentoRescisaoSerializer, ContratoSocialSerializer, Aditivo, AditivoSerializer, CriterioExclusao, \
-    CriterioExclusaoSerializer, ContratoAceiteSerializer
+    CriterioExclusaoSerializer, ContratoAceiteSerializer, RegistroContatoEmpresaSerializer
 )
 from django.db import transaction
 import openpyxl
@@ -618,3 +619,8 @@ class ContratoAceiteViewSet(viewsets.ModelViewSet):
             'Content-Disposition'] = f'attachment; filename="ContratoR&S_{contrato_aceite.parte_concedente.razao_social}.pdf"'
 
         return response
+
+
+class RegistroContatoEmpresaViewSet(viewsets.ModelViewSet):
+    queryset = RegistroContatoEmpresa.objects.all()
+    serializer_class = RegistroContatoEmpresaSerializer

@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
     MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, CriterioExclusao, ContratoAceite, \
-    DetalhesContratoAceite
+    DetalhesContratoAceite, RegistroContatoEmpresa
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 import string, openpyxl
 from django.http import HttpResponse
@@ -353,6 +353,7 @@ class InstituicaoEnsinoAdmin(admin.ModelAdmin):
     list_display = ('razao_social', 'cnpj', 'telefone', 'email')
     search_fields = ('razao_social', 'cnpj', 'cidade')
     list_filter = ('razao_social', 'cidade')
+    autocomplete_fields = ('razao_social',)
 
     # def get_model_perms(self, request):
     #     if request.user.is_superuser:
@@ -372,6 +373,7 @@ class ParteConcedenteAdmin(admin.ModelAdmin):
     list_display = ('razao_social', 'cnpj', 'telefone', 'email')
     search_fields = ('razao_social', 'cnpj', 'cidade')
     list_filter = ('razao_social', 'cidade')
+    autocomplete_fields = ('razao_social', 'nome')
 
     inlines = [DetalhesParteConcedenteInline]
 
@@ -600,6 +602,7 @@ class ReciboAdmin(admin.ModelAdmin):
         'data_inicio', 'data_fim')
     list_select_related = ('contrato', 'contrato__parte_concedente', 'contrato__estagiario__candidato')
     actions = ['imprimir_selecionados']
+    autocomplete_fields = ('estagiario_nome',)
 
     class Media:
         js = ('js/preencher_recibo.js',)
@@ -639,6 +642,7 @@ class ReciboRescisaoAdmin(admin.ModelAdmin):
     list_display = ('parte_concedente_nome', 'estagiario_nome', 'gerar_termo_link')
     search_fields = ('parte_concedente_nome', 'estagiario_nome')
     list_filter = ('parte_concedente_nome', 'estagiario_nome')
+    autocomplete_fields = ('estagiario_nome',)
     list_per_page = 20
 
     class Media:
@@ -715,3 +719,11 @@ class CustomUserAdmin(UserAdmin):
             # Aqui você poderia filtrar campos específicos se quisesse
             pass
         return fieldsets
+
+
+@admin.register(RegistroContatoEmpresa)
+class RegistroContatoEmpresaAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'contato', 'data')
+    list_filter = ('nome',)
+    search_fields = ('nome',)
+    autocomplete_fields = ('nome',)

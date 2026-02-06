@@ -861,3 +861,22 @@ class LancamentoRescisao(models.Model):
 
     def __str__(self):
         return f'{self.tipo_evento.descricao} - R${self.valor}'
+
+
+class RegistroContatoEmpresa(models.Model):
+    class Contatos(models.TextChoices):
+        TELEFONE = 'T', 'Telefone'
+        EMAIL = 'E', 'Email'
+        WHATSAPP = 'W', 'WhatsApp'
+
+    nome = models.CharField(max_length=100, verbose_name='Nome ou Razão Social da empresa')
+    contato = models.CharField(choices=Contatos.choices, verbose_name='De que forma se deu o contato?')
+    numero_email = models.CharField(max_length=150, verbose_name='Número ou email da empresa')
+    data = models.DateField(auto_now_add=True, verbose_name='Data do contato')
+
+    class Meta:
+        verbose_name = 'Registro de contato da empresa'
+        verbose_name_plural = 'Registros de contato das empresas'
+
+    def __str__(self):
+        return f'{self.nome} nos contatou através de {self.contato} no dia {self.data}'

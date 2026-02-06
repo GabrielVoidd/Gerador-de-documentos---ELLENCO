@@ -3,7 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     InstituicaoEnsinoViewSet, ParteConcedenteViewSet, EstagiarioViewSet, ContratoViewSet, RescisaoViewSet,
     AgenteIntegracaoViewSet, CandidatoViewSet, TipoEventoViewSet, LancamentoViewSet, ReciboViewSet, get_contrato_data,
-    ReciboRescisaoViewSet, ContratoSocialViewSet, AditivoViewSet, CriterioExclusaoViewSet, ContratoAceiteViewSet
+    ReciboRescisaoViewSet, ContratoSocialViewSet, AditivoViewSet, CriterioExclusaoViewSet, ContratoAceiteViewSet,
+    RegistroContatoEmpresaViewSet
 )
 
 router = DefaultRouter()
@@ -22,6 +23,7 @@ router.register(r'contrato_social', ContratoSocialViewSet, basename='contrato-so
 router.register(r'aditivo', AditivoViewSet, basename='aditivo')
 router.register(r'criterios-exclusao', CriterioExclusaoViewSet, basename='criterios-exclusao')
 router.register(r'contratos-aceite', ContratoAceiteViewSet, basename='contrato-aceite')
+router.register(r'registros-contato-empresas', RegistroContatoEmpresaViewSet, basename='registro-contato-empresa')
 
 urlpatterns = [
     path('', include(router.urls)),
