@@ -353,7 +353,6 @@ class InstituicaoEnsinoAdmin(admin.ModelAdmin):
     list_display = ('razao_social', 'cnpj', 'telefone', 'email')
     search_fields = ('razao_social', 'cnpj', 'cidade')
     list_filter = ('razao_social', 'cidade')
-    autocomplete_fields = ('razao_social',)
 
     # def get_model_perms(self, request):
     #     if request.user.is_superuser:
@@ -373,7 +372,6 @@ class ParteConcedenteAdmin(admin.ModelAdmin):
     list_display = ('razao_social', 'cnpj', 'telefone', 'email')
     search_fields = ('razao_social', 'cnpj', 'cidade')
     list_filter = ('razao_social', 'cidade')
-    autocomplete_fields = ('razao_social', 'nome')
 
     inlines = [DetalhesParteConcedenteInline]
 
@@ -602,7 +600,7 @@ class ReciboAdmin(admin.ModelAdmin):
         'data_inicio', 'data_fim')
     list_select_related = ('contrato', 'contrato__parte_concedente', 'contrato__estagiario__candidato')
     actions = ['imprimir_selecionados']
-    autocomplete_fields = ('estagiario_nome',)
+    autocomplete_fields = ('estagiario',)
 
     class Media:
         js = ('js/preencher_recibo.js',)
@@ -642,7 +640,7 @@ class ReciboRescisaoAdmin(admin.ModelAdmin):
     list_display = ('parte_concedente_nome', 'estagiario_nome', 'gerar_termo_link')
     search_fields = ('parte_concedente_nome', 'estagiario_nome')
     list_filter = ('parte_concedente_nome', 'estagiario_nome')
-    autocomplete_fields = ('estagiario_nome',)
+    autocomplete_fields = ('estagiario',)
     list_per_page = 20
 
     class Media:
