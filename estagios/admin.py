@@ -640,7 +640,7 @@ class ReciboRescisaoAdmin(admin.ModelAdmin):
     list_display = ('parte_concedente_nome', 'estagiario_nome', 'gerar_termo_link')
     search_fields = ('parte_concedente_nome', 'estagiario_nome')
     list_filter = ('parte_concedente_nome', 'estagiario_nome')
-    autocomplete_fields = ('estagiario',)
+    autocomplete_fields = ('contrato',)
     list_per_page = 20
 
     class Media:
