@@ -549,6 +549,8 @@ class CandidatoAdmin(NestedModelAdmin):
                 fields.remove('criterio_exclusao')
                 fields.remove('observacoes')
                 fields.remove('restrito')
+                fields.remove('stand_by')
+                fields.remove('trabalhando')
 
         return fields
 
