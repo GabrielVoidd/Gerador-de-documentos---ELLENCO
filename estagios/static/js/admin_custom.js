@@ -8,8 +8,8 @@ window.addEventListener("load", function() {
             // --- 1. RESTRITO (Prioridade Alta - Vermelho) ---
             // Verifica se tem o ícone de 'yes' na coluna de restrito
             if ($row.find('.field-restrito img[src*="icon-yes"]').length > 0) {
-                $row.css('background-color', '#ffe6e6');
-                $row.find('td, th').css('color', '#a80000');
+                $row.css('background-color', '#fc6868');
+                $row.find('td, th').css('color', '#ffffff');
             }
 
             // --- 2. STAND BY (Roxo) ---
