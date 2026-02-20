@@ -137,6 +137,7 @@ class Candidato(models.Model):
         DECIMO_SEMESTRE = '1OS', '10° Semestre'
         DECIMO_PRIMEIRO_SEMESTRE = '11S', '11° Semestre'
         DECIMO_SEGUNDO_SEMESTRE = '12S', '12° Semestre'
+        NA = 'NA', 'N/A'
 
     class EstadosCivis(models.TextChoices):
         SOLTEIRO = 'S', 'Solteiro(a)'
@@ -158,6 +159,7 @@ class Candidato(models.Model):
         NOITE = 'N', 'Noite'
         INTEGRAL = 'I', 'Integral'
         EAD = 'E', 'EAD'
+        NA = 'NA', 'N/A'
 
     class ValeTransporte(models.TextChoices):
         TOP = 'T', 'Top'
