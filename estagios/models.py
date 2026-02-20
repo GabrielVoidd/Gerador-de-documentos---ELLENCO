@@ -247,7 +247,7 @@ class Candidato(models.Model):
     # --- FORMAÇÃO ACADÊMICA ---
     escolaridade = models.CharField(max_length=3, choices=Escolaridades.choices)
     curso = models.CharField(max_length=70, help_text='Nome do curso, caso esteja na faculdade', null=True, blank=True)
-    periodo = models.CharField(max_length=1, choices=Periodos.choices, verbose_name='Período')
+    periodo = models.CharField(max_length=2, choices=Periodos.choices, verbose_name='Período')
     ano_semestre = models.CharField(max_length=3, choices=AnosSemestres.choices, null=True, verbose_name='Ano ou semestre')
     serie_semestre = models.CharField(max_length=50, verbose_name='Último contato / atualização')
     data_termino = models.DateField(verbose_name='Quando o curso / escola acaba?', null=True, blank=True)
