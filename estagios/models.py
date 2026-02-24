@@ -308,6 +308,11 @@ class Candidato(models.Model):
     restrito = models.BooleanField(default=False)
     stand_by = models.BooleanField(default=False)
     trabalhando = models.BooleanField(verbose_name='Ativo', default=False)
+    aprovado = models.BooleanField(default=False)
+    reprovado = models.BooleanField(default=False)
+    nao_compareceu = models.BooleanField(default=False, verbose_name='Não Compareceu')
+    desistiu = models.BooleanField(default=False, verbose_name='Desistiu')
+    encaminhado = models.BooleanField(default=False)
     criterio_exclusao = models.ManyToManyField(CriterioExclusao, verbose_name='Critérios de Exclusão', blank=True)
 
     def clean(self):
