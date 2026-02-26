@@ -551,6 +551,11 @@ class CandidatoAdmin(NestedModelAdmin):
                 fields.remove('restrito')
                 fields.remove('stand_by')
                 fields.remove('trabalhando')
+                fields.remove('aprovado')
+                fields.remove('reprovado')
+                fields.remove('nao_compareceu')
+                fields.remove('desistiu')
+                fields.remove('encaminhado')
 
         return fields
 
