@@ -53,6 +53,12 @@ window.addEventListener("load", function() {
                 $row.css('background-color', '#3498db');
                 $row.find('td, th').css('color', '#ffffff');
             }
+
+            // --- 9. Em processo (Indica processo - Roxo) ---
+            else if ($row.find('.field-em_processo img[src*="icon-yes"]').length > 0) {
+                $row.css('background-color', '#9b59b6');
+                $row.find('td, th').css('color', '#ffffff');
+            }
         });
     })(django.jQuery);
 });

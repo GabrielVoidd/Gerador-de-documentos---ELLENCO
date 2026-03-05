@@ -308,6 +308,7 @@ class Candidato(models.Model):
     restrito = models.BooleanField(default=False)
     stand_by = models.BooleanField(default=False)
     trabalhando = models.BooleanField(verbose_name='Ativo', default=False)
+    em_processo = models.BooleanField(default=False)
     aprovado = models.BooleanField(default=False)
     reprovado = models.BooleanField(default=False)
     nao_compareceu = models.BooleanField(default=False, verbose_name='Não Compareceu')

@@ -436,7 +436,7 @@ class CriterioExclusaoAdmin(admin.ModelAdmin):
 class CandidatoAdmin(NestedModelAdmin):
     list_display = (
         'nome', 'rg', 'celular', 'botao_whatsapp', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro',
-        'restrito', 'stand_by', 'trabalhando', 'aprovado', 'reprovado', 'nao_compareceu', 'desistiu', 'encaminhado')
+        'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado', 'nao_compareceu', 'desistiu', 'encaminhado')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
     list_filter = ('bairro', 'escolaridade', 'ano_semestre', 'periodo', 'restrito', 'stand_by', 'trabalhando',
                    'criterio_exclusao__criterio', 'instituicao_ensino__razao_social')
@@ -551,6 +551,7 @@ class CandidatoAdmin(NestedModelAdmin):
                 fields.remove('restrito')
                 fields.remove('stand_by')
                 fields.remove('trabalhando')
+                fields.remove('em_processo')
                 fields.remove('aprovado')
                 fields.remove('reprovado')
                 fields.remove('nao_compareceu')
