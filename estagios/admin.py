@@ -19,10 +19,10 @@ import os
 from django.conf import settings
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.utils import simpleSplit
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.utils.translation import gettext_lazy as _
+from django_admin_listfilter_dropdown.filters import DropdownFilter, ChoiceDropdownFilter
 
 admin.site.unregister(User)
 
@@ -438,8 +438,9 @@ class CandidatoAdmin(NestedModelAdmin):
         'nome', 'rg', 'celular', 'botao_whatsapp', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro',
         'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado', 'nao_compareceu', 'desistiu', 'encaminhado')
     search_fields = ('nome', 'bairro', 'cpf', 'rg')
-    list_filter = ('bairro', 'escolaridade', 'ano_semestre', 'periodo', 'restrito', 'stand_by', 'trabalhando',
-                   'criterio_exclusao__criterio', 'instituicao_ensino__razao_social')
+    list_filter = (
+        ('bairro', DropdownFilter), ('escolaridade', ChoiceDropdownFilter), ('ano_semestre', DropdownFilter), ('periodo', ChoiceDropdownFilter),
+        'restrito', 'stand_by', 'trabalhando', 'em_processo')
     actions = ['exportar_para_excel']
     autocomplete_fields = ['instituicao_ensino']
     list_per_page = 20

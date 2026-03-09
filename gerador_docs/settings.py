@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'estagios',
     'django_filters',
     'drf_yasg',
+    'django_admin_listfilter_dropdown',
 ]
 
 MIDDLEWARE = [
