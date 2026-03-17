@@ -437,7 +437,7 @@ class CandidatoAdmin(NestedModelAdmin):
     list_display = (
         'nome', 'rg', 'celular', 'botao_whatsapp', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro',
         'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado', 'nao_compareceu', 'desistiu', 'encaminhado')
-    search_fields = ('nome', 'bairro', 'cpf', 'rg')
+    search_fields = ('nome', 'bairro', 'cpf', 'rg', 'celular', 'celular2')
     list_filter = (
         ('bairro', DropdownFilter), ('escolaridade', ChoiceDropdownFilter), ('ano_semestre', DropdownFilter), ('periodo', ChoiceDropdownFilter),
         'restrito', 'stand_by', 'trabalhando', 'em_processo')
