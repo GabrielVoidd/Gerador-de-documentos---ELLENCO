@@ -888,3 +888,14 @@ class RegistroContatoEmpresa(models.Model):
 
     def __str__(self):
         return f'{self.nome} nos contatou através de {self.contato} no dia {self.data}'
+
+
+class Chamados(models.Model):
+    nome = models.CharField(max_length=200)
+    nome_empresa = models.CharField(max_length=200)
+    email = models.EmailField()
+    numero = models.CharField(max_length=11, verbose_name='Telefone para contato')
+    numero2 = models.CharField(max_length=11, verbose_name='Segundo telefone para contato', null=True, blank=True)
+    observacoes = models.TextField(verbose_name='Observações')
+    data_contato = models.DateField()
+    data_criacao = models.DateTimeField(auto_now_add=True)

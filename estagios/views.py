@@ -18,7 +18,7 @@ from weasyprint import HTML
 from django.shortcuts import render
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
     TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, ContratoAceite, \
-    RegistroContatoEmpresa
+    RegistroContatoEmpresa, Chamados
 from .serializers import (
     InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
     ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
@@ -624,3 +624,7 @@ class ContratoAceiteViewSet(viewsets.ModelViewSet):
 class RegistroContatoEmpresaViewSet(viewsets.ModelViewSet):
     queryset = RegistroContatoEmpresa.objects.all()
     serializer_class = RegistroContatoEmpresaSerializer
+
+
+class ChamadosViewSet(viewsets.ModelViewSet):
+    queryset = Chamados.objects.all()

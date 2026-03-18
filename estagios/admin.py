@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
     MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, CriterioExclusao, ContratoAceite, \
-    DetalhesContratoAceite, RegistroContatoEmpresa
+    DetalhesContratoAceite, RegistroContatoEmpresa, Chamados
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 import string, openpyxl
 from django.http import HttpResponse
@@ -754,3 +754,9 @@ class RegistroContatoEmpresaAdmin(admin.ModelAdmin):
     list_display = ('nome', 'contato', 'data')
     list_filter = ('nome',)
     search_fields = ('nome',)
+
+
+@admin.register(Chamados)
+class ChamadosAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'nome_empresa', 'numero')
+    search_fields = ('nome', 'nome_empresa', 'numero', 'numero2')
