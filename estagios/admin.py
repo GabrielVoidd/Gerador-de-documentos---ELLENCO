@@ -584,6 +584,27 @@ class CandidatoAdmin(NestedModelAdmin):
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
 
+    def get_form(self, request, obj=None, **kwargs):
+        # Pega o formulário padrão gerado pelo Django
+        form = super().get_form(request, obj, **kwargs)
+
+        # LISTA COM TODOS OS CAMPOS QUE TERÃO ESSA REGRA
+        # (Lembre de checar se no seu banco é 'celular_2' ou 'celular2')
+        campos_condicionais = ['celular2', 'rede_social']
+
+        for campo in campos_condicionais:
+            if campo in form.base_fields:
+                if obj is None:
+                    # OBJ IS NONE: Significa que é um cadastro NOVO.
+                    # Colocamos o asterisco e travamos o salvamento se estiver vazio.
+                    form.base_fields[campo].required = True
+                else:
+                    # OBJ EXISTE: Significa que estão editando um candidato antigo.
+                    # Deixamos opcional para não impedir a edição.
+                    form.base_fields[campo].required = False
+
+        return form
+
 
 @admin.register(TipoEvento)
 class TipoEventoAdmin(admin.ModelAdmin):
