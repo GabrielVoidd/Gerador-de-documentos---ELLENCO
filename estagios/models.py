@@ -906,5 +906,9 @@ class Chamados(models.Model):
         verbose_name='Anexar contrato assinado', null=True, blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Chamado'
+        verbose_name_plural = 'Chamados'
+
     def __str__(self):
         return f'{self.nome} pela empresa {self.nome_empresa}'
