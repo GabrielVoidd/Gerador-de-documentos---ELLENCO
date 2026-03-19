@@ -758,5 +758,8 @@ class RegistroContatoEmpresaAdmin(admin.ModelAdmin):
 
 @admin.register(Chamados)
 class ChamadosAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'nome_empresa', 'numero')
-    search_fields = ('nome', 'nome_empresa', 'numero', 'numero2')
+    list_display = ('nome', 'nome_empresa', 'numero', 'contrato_assinado')
+    search_fields = ('nome', 'nome_empresa', 'numero', 'numero2', 'cnpj')
+
+    class Media:
+        js = ('js/admin_custom.js',)

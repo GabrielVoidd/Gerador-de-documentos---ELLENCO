@@ -59,6 +59,13 @@ window.addEventListener("load", function() {
                 $row.css('background-color', '#9b59b6');
                 $row.find('td, th').css('color', '#ffffff');
             }
+
+            // Chamados
+            // --- 1. Assinado (Verde) ---
+            else if ($row.find('.field-contrato_assinado img[src*="icon-yes"]').length > 0) {
+                $row.css('background-color', '#bdffc7');
+                $row.find('td, th').css('color', '#2ad444');
+            }
         });
     })(django.jQuery);
 });

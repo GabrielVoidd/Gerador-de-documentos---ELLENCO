@@ -892,10 +892,19 @@ class RegistroContatoEmpresa(models.Model):
 
 class Chamados(models.Model):
     nome = models.CharField(max_length=200)
+    cnpj = models.CharField(max_length=18)
     nome_empresa = models.CharField(max_length=200)
     email = models.EmailField()
     numero = models.CharField(max_length=11, verbose_name='Telefone para contato')
     numero2 = models.CharField(max_length=11, verbose_name='Segundo telefone para contato', null=True, blank=True)
     observacoes = models.TextField(verbose_name='Observações')
     data_contato = models.DateField()
+    proposta_enviada = models.BooleanField(default=False)
+    contrato_assinado = models.BooleanField(default=False)
+    contrato = models.FileField(
+        upload_to='contratos_empresas/assinados/%Y%/%m/%d/',
+        verbose_name='Anexar contrato assinado', null=True, blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.nome} pela empresa {self.nome_empresa}'
