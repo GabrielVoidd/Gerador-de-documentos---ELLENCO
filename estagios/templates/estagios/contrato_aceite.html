@@ -108,7 +108,7 @@
         .conditions-title {
             text-align: left;
             font-weight: bold;
-            font-size: 9pt;
+            font-size: 10pt;
             /* border: 1px solid black; -> REMOVIDO */
             /* border-bottom: none; -> REMOVIDO */
             /* padding: 2px; -> REMOVIDO */
@@ -131,7 +131,7 @@
         }*/
 
         .clause {
-            font-size: 9pt;
+            font-size: 10pt;
             text-align: justify;
             margin-top: 12px; /* ESPAÇAMENTO AUMENTADO */
         }
@@ -245,46 +245,33 @@
         </div>
     {% endif %}
 
-    <div style="page-break-before: always;">
-
-        <div class="clause">
-            <strong>Para que produza seus devidos efeitos legais e comerciais, as partes firmam o presente instrumento.</strong>
-        </div>
-
-        <div class="signature-date">
-            GUARULHOS, {{ contrato_aceite.data_cadastro|date:"d \\d\\e F \\d\\e Y" }}
-        </div>
-
-        <br>
-
-        <table>
-            <tr>
-                <td style="width: 50%; padding: 45px 25px;">
-                    <div class="signature-block">
-                        <div class="signature-line"></div>
-                        <div>Ellenco Estágios e Treinamentos Ltda. ME</div>
-                        <div>CNPJ: 27.063.179/0001-82</div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-
-        <div class="clause" style="margin-left: 25px;">De Acordo:</div>
-
-        <br><br>
-
-        <table>
-            <tr>
-                <td style="width: 50%; padding: 45px 25px;">
-                    <div class="signature-block">
-                        <div class="signature-line"></div>
-                        <div>{% firstof contrato_aceite.parte_concedente.nome contrato_aceite.parte_concedente.razao_social %}</div>
-                        <div>CNPJ: {{ contrato_aceite.parte_concedente.cnpj }}</div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-
+    <div class="clause">
+        <strong>Para que produza seus devidos efeitos legais e comerciais, as partes firmam o presente instrumento.</strong>
     </div>
+
+    <div class="signature-date">
+        GUARULHOS, {{ contrato_aceite.data_cadastro|date:"d \\d\\e F \\d\\e Y" }}
+    </div>
+
+    <br>
+
+    <table>
+        <tr>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>Ellenco Estágios e Treinamentos Ltda. ME</div>
+                    <div>CNPJ: 27.063.179/0001-82</div>
+                </div>
+            </td>
+            <td style="width: 50%; padding: 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{% firstof contrato_aceite.parte_concedente.nome contrato_aceite.parte_concedente.razao_social %}</div>
+                    <div>CNPJ: {{ contrato_aceite.parte_concedente.cnpj }}</div>
+                </div>
+            </td>
+        </tr>
+   </table>
 </body>
 </html>
