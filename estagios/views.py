@@ -603,12 +603,12 @@ class ContratoAceiteViewSet(viewsets.ModelViewSet):
     def gerar_contrato_aceite(self, request, pk=None):
         contrato_aceite = self.get_object()
 
-        agencia_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'agencia.png')
-        agencia_path = 'file:///' + agencia_path_raw.replace('\\', '/')
+        logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
+        logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
 
         # Renderiza o template HTML com o contexto do cadastro
         html_string = render_to_string('estagios/contrato_aceite.html',
-                                       {'contrato_aceite': contrato_aceite, 'agencia_path': agencia_path})
+                                       {'contrato_aceite': contrato_aceite, 'logo_path': logo_path})
 
         # Gera o PDF
         pdf_file = HTML(string=html_string).write_pdf()

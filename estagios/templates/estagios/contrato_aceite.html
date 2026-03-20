@@ -45,6 +45,9 @@
             text-align: center;
             font-size: 9pt;
             font-weight: bold;
+            padding: 20px;
+            font-size: 18pt;
+            margin-left: 7%;
         }
 
         /* --- ESTILO MODIFICADO --- */
@@ -168,16 +171,23 @@
     </style>
 </head>
 <body>
-    <div class="header-main-title">Contrato de R&S - Aceite</div>
-
-    <img src="{{ agencia_path }}" alt="Logo da Empresa" style="display: block; margin-left: auto; margin-right: auto;
-        width: 70%; margin-bottom: 20px; margin-top: 20px;">
+    <table style="margin-bottom: 10px;">
+        <tr>
+            <td style="width: 25%;" class="header-logo">
+                <img src="{{ logo_path }}" alt="Logo da Empresa" style="max-width: 100%; height: auto;">
+            </td>
+            <td style="width: 50%;">
+                <!--<div class="header-main-title">TCE - Termo de COMPROMISSO de ESTÁGIO.</div>-->
+                <div class="header-subtitle">Aceite - Recrutamento e Seleção</div>
+            </td>
+        </tr>
+    </table>
 
     <div class="clause">{% firstof contrato_aceite.parte_concedente.razao_social contrato_aceite.parte_concedente.nome %}</div>
 
     <div class="clause">Conforme Proposta enviada, segue aceite para contratação de vagas.</div>
 
-    <div class="clause">Foi solicitado, o recrutamento de:</div>
+    <div class="clause">Foi solicitado o recrutamento de:</div>
 
     {% for item in contrato_aceite.detalhes.all %}
         <div class="clause">
@@ -187,20 +197,24 @@
         <div class="clause">Nenhuma vaga cadastrada para essa empresa</div>
     {% endfor %}
 
-    <div class="clause">Obs: Nessa proposta destaca-se apenas função e salário, posteriormente após o aceite da
-        mesma será solicitado a descrição do cargo pelo setor de recrutamento.
+    <div class="clause">Obs: Nesta etapa, constam apenas a função e o salário. Após a aprovação da proposta, o setor de
+        Recrutamento solicitará a descrição detalhada do cargo.
     </div>
 
     <div class="conditions-title">1.0 - Dos Honorários Profissionais e da Forma de Pagamento</div>
 
-    <div class="clause">Para a execução do trabalho, serão cobrados o valor da remuneração do candidato a ser
-        contratado. A emissão da Nota Fiscal será emitida no ato do início das atividades do candidato na empresa. O
+    <div class="clause">Para a execução do trabalho, será cobrado o valor da remuneração do candidato a ser
+        contratado. A Nota Fiscal será emitida no ato do início das atividades do candidato na empresa. O
         pagamento deverá ser efetuado através de Depósito ou Boleto Bancário da seguinte forma:
     </div>
 
-    <div class="clause">Opção 1 – (50%) Com Reposição Condição <strong>10/30 da emissão da Nota Fiscal</strong>.</div>
+    {% if contrato_aceite.plano == 'P' %}
+        <div class="clause">Opção 1 – (50%) Com Reposição Condição <strong>10/30 da emissão da Nota Fiscal</strong>.</div>
 
-    <div class="clause">Opção 2 – (30%) Sem Reposição Condição <strong>10 dias da emissão da Nota Fiscal</strong>.</div>
+    {% elif contrato_aceite.plano == 'S' %}
+        <div class="clause">Opção 2 – (30%) Sem Reposição Condição <strong>10 dias da emissão da Nota Fiscal</strong>.</div>
+
+    {% endif %}
 
     <div class="clause">1.2 Se o valor acordado com o profissional contratado for diferente do valor inicial
         mencionado nesta proposta, a diferença deverá ser paga junto com a <strong>1° parcela</strong>.
@@ -220,53 +234,57 @@
     {% if contrato_aceite.plano == 'P' %}
         <div class="conditions-title">Plano Selecionado: PLUS</div>
 
-        <div class="clause">CONTRATAÇÃO 50% (cinquenta por cento) do valor da remuneração do candidato a ser contratado,
-            COM REPOSIÇÃO em até 30 dias conforme aviso antecipado.
+        <div class="clause">CONTRATAÇÃO 50% (cinquenta por cento) do valor da primeira remuneração nominal mensal do
+            candidato a ser contratado, COM REPOSIÇÃO em até 30 dias conforme aviso antecipado.
         </div>
     {% elif contrato_aceite.plano == 'S' %}
         <div class="conditions-title">Plano Selecionado: SÊNIOR</div>
 
-        <div class="clause">CONTRATAÇÃO 30% (trinta por cento) do valor da remuneração do candidato a ser contratado,
-            sem reposição.
+        <div class="clause">CONTRATAÇÃO 30% (trinta por cento) do valor da primeira remuneração nominal mensal do
+            candidato a ser contratado, sem reposição.
         </div>
     {% endif %}
 
-    <div class="clause">Sendo o que tínhamos para o momento, colocamo-nos a inteira disposição para quaisquer
-        esclarecimentos julgados necessários.
+    <div style="page-break-before: always;">
+
+        <div class="clause">
+            <strong>Para que produza seus devidos efeitos legais e comerciais, as partes firmam o presente instrumento.</strong>
+        </div>
+
+        <div class="signature-date">
+            GUARULHOS, {{ contrato_aceite.data_cadastro|date:"d \\d\\e F \\d\\e Y" }}
+        </div>
+
+        <br>
+
+        <table>
+            <tr>
+                <td style="width: 50%; padding: 45px 25px;">
+                    <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div>Ellenco Estágios e Treinamentos Ltda. ME</div>
+                        <div>CNPJ: 27.063.179/0001-82</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="clause" style="margin-left: 25px;">De Acordo:</div>
+
+        <br><br>
+
+        <table>
+            <tr>
+                <td style="width: 50%; padding: 45px 25px;">
+                    <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div>{% firstof contrato_aceite.parte_concedente.nome contrato_aceite.parte_concedente.razao_social %}</div>
+                        <div>CNPJ: {{ contrato_aceite.parte_concedente.cnpj }}</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
     </div>
-
-    <div class="signature-date">
-        GUARULHOS, {{ contrato_aceite.data_cadastro|date:"d \\d\\e F \\d\\e Y" }}
-    </div>
-
-    <br>
-
-    <table>
-        <tr>
-            <td style="width: 50%; padding: 45px 25px;">
-                <div class="signature-block">
-                    <div class="signature-line"></div>
-                    <div>Ellenco Estágios e Treinamentos Ltda. ME</div>
-                    <div>CNPJ: 27.063.179/0001-82</div>
-                </div>
-            </td>
-        </tr>
-    </table>
-
-    <div class="clause" style="margin-left: 25px;">De Acordo:</div>
-
-    <br><br>
-
-    <table>
-        <tr>
-            <td style="width: 50%; padding: 45px 25px;">
-                <div class="signature-block">
-                    <div class="signature-line"></div>
-                    <div>{% firstof contrato_aceite.parte_concedente.nome contrato_aceite.parte_concedente.razao_social %}</div>
-                    <div>CNPJ: {{ contrato_aceite.parte_concedente.cnpj }}</div>
-                </div>
-            </td>
-        </tr>
-    </table>
 </body>
 </html>
