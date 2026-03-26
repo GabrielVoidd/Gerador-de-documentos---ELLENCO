@@ -1,3 +1,4 @@
+from admin_auto_filters.filters import AutocompleteFilter
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
@@ -22,7 +23,7 @@ from reportlab.lib.pagesizes import A4
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.utils.translation import gettext_lazy as _
-from django_admin_listfilter_dropdown.filters import DropdownFilter, ChoiceDropdownFilter
+from django_admin_listfilter_dropdown.filters import DropdownFilter, ChoiceDropdownFilter, RelatedDropdownFilter
 
 admin.site.unregister(User)
 
@@ -432,15 +433,37 @@ class CriterioExclusaoAdmin(admin.ModelAdmin):
     list_filter = ('criterio',)
 
 
+class SexoFiltroInteligente(admin.SimpleListFilter):
+    title = 'Sexo'
+    parameter_name = 'sexo'
+
+    def lookups(self, request, model_admin):
+        return(
+            ('Masculino', 'MASCULINO'),
+            ('Feminino', 'FEMININO'),
+        )
+
+    def queryset(self, request, queryset):
+        # Aqui acontece a mágica: se ele clicar, filtramos ignorando maiúsculas/minúsculas (__iexact)
+        if self.value() == 'masculino':
+            return queryset.filter(sexo__iexact='masculino')
+        if self.value() == 'feminino':
+            return queryset.filter(sexo__iexact='feminino')
+        return queryset
+
+
+class InstituicaoEnsinoPesquisa(AutocompleteFilter):
+    title = 'Instituição de Ensino'
+    field_name = 'instituicao_ensino'
+
+
 @admin.register(Candidato)
 class CandidatoAdmin(NestedModelAdmin):
     list_display = (
         'nome', 'rg', 'celular', 'botao_whatsapp', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro',
         'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado', 'nao_compareceu', 'desistiu', 'encaminhado')
     search_fields = ('nome', 'bairro', 'cpf', 'rg', 'celular', 'celular2')
-    list_filter = (
-        ('bairro', DropdownFilter), ('escolaridade', ChoiceDropdownFilter), ('ano_semestre', DropdownFilter), ('periodo', ChoiceDropdownFilter),
-        'restrito', 'stand_by', 'trabalhando', 'em_processo')
+    list_filter = (SexoFiltroInteligente, ('bairro', DropdownFilter), ('escolaridade', ChoiceDropdownFilter), ('ano_semestre', DropdownFilter), ('periodo', ChoiceDropdownFilter), InstituicaoEnsinoPesquisa, 'restrito', 'stand_by', 'trabalhando', 'em_processo')
     actions = ['exportar_para_excel']
     autocomplete_fields = ['instituicao_ensino']
     list_per_page = 20
