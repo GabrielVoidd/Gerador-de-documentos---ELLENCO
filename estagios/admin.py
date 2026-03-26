@@ -445,9 +445,9 @@ class SexoFiltroInteligente(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         # Aqui acontece a mágica: se ele clicar, filtramos ignorando maiúsculas/minúsculas (__iexact)
-        if self.value() == 'masculino':
+        if self.value() == 'Masculino':
             return queryset.filter(sexo__iexact='masculino')
-        if self.value() == 'feminino':
+        if self.value() == 'Feminino':
             return queryset.filter(sexo__iexact='feminino')
         return queryset
 
