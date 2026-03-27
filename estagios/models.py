@@ -150,6 +150,7 @@ class Candidato(models.Model):
         ENSINO_MEDIO_COMPLETO = 'EMC', 'Ensino Médio Completo'
         ENSINO_MEDIO_TECNICO = 'EMT', 'Ensino Médio Técnico'
         ENSINO_SUPERIOR_INCOMPLETO = 'ESI', 'Ensino Superior Incompleto'
+        ENSINO_SUPERIOR_CURSANDO = 'ESC', 'Ensino Superior Cursando'
         ENSINO_SUPERIOR = 'ES', 'Ensino Superior'
         EDUCACAO_JOVEM_ADULTO = 'EJA', 'Educação de Jovens e Adultos'
 
