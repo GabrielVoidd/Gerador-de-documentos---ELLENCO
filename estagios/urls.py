@@ -1,10 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from django.contrib.auth import views as auth_views
 from .views import (
     InstituicaoEnsinoViewSet, ParteConcedenteViewSet, EstagiarioViewSet, ContratoViewSet, RescisaoViewSet,
     AgenteIntegracaoViewSet, CandidatoViewSet, TipoEventoViewSet, LancamentoViewSet, ReciboViewSet, get_contrato_data,
     ReciboRescisaoViewSet, ContratoSocialViewSet, AditivoViewSet, CriterioExclusaoViewSet, ContratoAceiteViewSet,
-    RegistroContatoEmpresaViewSet
+    RegistroContatoEmpresaViewSet, CandidatoCreateView, CandidatoSucessoView
 )
 
 router = DefaultRouter()
@@ -26,6 +27,9 @@ router.register(r'contratos-aceite', ContratoAceiteViewSet, basename='contrato-a
 router.register(r'registros-contato-empresas', RegistroContatoEmpresaViewSet, basename='registro-contato-empresa')
 
 urlpatterns = [
+    path('login-candidato/', auth_views.LoginView.as_view(template_name='estagios/login_candidato.html'), name='login_candidato'),
+    path('candidato/novo/', CandidatoCreateView.as_view(), name='candidato_novo'),
+    path('candidato/sucesso/', CandidatoSucessoView.as_view(), name='candidato_sucesso'),
     path('', include(router.urls)),
     path('get-contrato-data/<int:contrato_id>/', get_contrato_data, name='get_contrato_data'),
 ]

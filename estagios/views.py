@@ -1,13 +1,14 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.conf import settings
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView, TemplateView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .forms import ContratoForm
+from .forms import CandidatoForm
 import os
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
@@ -219,22 +220,6 @@ class ContratoDetailView(DetailView):
     model = Contrato
     template_name = 'estagios/contrato_detail.html'
     context_object_name = 'contrato'
-
-
-class ContratoCreateView(SuccessMessageMixin, CreateView):
-    model = Contrato
-    form_class = ContratoForm
-    template_name = 'estagios/contrato_form.html'
-    success_url = reverse_lazy('contrato_lista') # Redireciona para a lista depois da criação
-    success_message = 'Contrato criado com sucesso.'
-
-
-class ContratoUpdateView(SuccessMessageMixin, UpdateView):
-    model = Contrato
-    form_class = ContratoForm
-    template_name = 'estagios/contrato_form.html'
-    success_url = reverse_lazy('contrato_lista')
-    success_message = 'Contrato atualizado com sucesso.'
 
 
 class ContratoDeleteView(SuccessMessageMixin, DeleteView):
@@ -628,3 +613,15 @@ class RegistroContatoEmpresaViewSet(viewsets.ModelViewSet):
 
 class ChamadosViewSet(viewsets.ModelViewSet):
     queryset = Chamados.objects.all()
+
+
+class CandidatoCreateView(LoginRequiredMixin, CreateView):
+    model = Candidato
+    form_class = CandidatoForm
+    template_name = 'estagios/candidato_form.html'
+    success_url = reverse_lazy('candidato_sucesso')
+    success_message = 'Seu cadastro foi realizado com sucesso!'
+
+class CandidatoSucessoView(TemplateView):
+    # Uma tela simples de "Obrigado" para ele não ficar perdido após salvar
+    template_name = 'estagios/candidato_sucesso.html'
