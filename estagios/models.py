@@ -10,8 +10,6 @@ import re
 from unicodedata import normalize
 
 
-# null para o banco, blank para forms e admin
-
 class InstituicaoEnsino(models.Model):
     razao_social = models.CharField(max_length=250)
     cnpj = models.CharField(max_length=18, unique=True)
@@ -916,3 +914,73 @@ class Chamados(models.Model):
 
     def __str__(self):
         return f'{self.nome} pela empresa {self.nome_empresa}'
+
+
+class Vaga(models.Model):
+    class StatusVaga(models.TextChoices):
+        ABERTA = 'A', 'Aberta'
+        FECHADA = 'F', 'Fechada'
+        CANCELADA = 'C', 'Cancelada'
+        SUSPENSA = 'S', 'Suspensa'
+        REABERTA = 'R', 'Reaberta'  # Mantive os status exatos da sua imagem do dashboard!
+
+    class TipoVaga(models.TextChoices):
+        ESTAGIO = 'E', 'Estágio'
+        CLT = 'C', 'CLT'
+        PJ = 'P', 'PJ'
+        JOVEM_APRENDIZ = 'J', 'Jovem Aprendiz'
+
+    # A vaga sempre pertence a uma empresa (Parte Concedente)
+    empresa = models.ForeignKey(ParteConcedente, on_delete=models.CASCADE, related_name='vagas')
+
+    titulo = models.CharField(max_length=200, verbose_name='Título da Vaga')
+    descricao = models.TextField(verbose_name='Descrição das Atividades')
+    requisitos = models.TextField(verbose_name='Requisitos da Vaga', null=True, blank=True)
+    tipo_vaga = models.CharField(max_length=1, choices=TipoVaga.choices, default=TipoVaga.ESTAGIO)
+    status = models.CharField(max_length=1, choices=StatusVaga.choices, default=StatusVaga.ABERTA)
+    quantidade_vagas = models.PositiveIntegerField(default=1)
+
+    salario_bolsa = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True,
+                                        verbose_name='Salário / Bolsa Auxílio')
+    beneficios = models.TextField(null=True, blank=True)
+    horario = models.CharField(max_length=150, null=True, blank=True)
+    local_trabalho = models.CharField(max_length=200, null=True, blank=True,
+                                      help_text='Ex: Híbrido, Remoto, ou Endereço físico')
+
+    data_abertura = models.DateField(auto_now_add=True)
+    data_fechamento = models.DateField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Vaga'
+        verbose_name_plural = 'Vagas'
+
+    def __str__(self):
+        return f'{self.titulo} - {self.empresa.razao_social}'
+
+
+class Candidatura(models.Model):
+    """
+    Essa classe é a 'ponte' invisível. Ela liga o Candidato à Vaga sem que a gente
+    precise mexer na estrutura original do Candidato.
+    """
+
+    class StatusCandidatura(models.TextChoices):
+        NOVA = 'N', 'Nova'
+        EM_ANALISE = 'A', 'Em Análise'
+        ENTREVISTA = 'E', 'Entrevista'
+        APROVADA = 'AP', 'Aprovada'
+        REPROVADA = 'R', 'Reprovada'
+
+    vaga = models.ForeignKey(Vaga, on_delete=models.CASCADE, related_name='candidaturas')
+    candidato = models.ForeignKey(Candidato, on_delete=models.CASCADE, related_name='minhas_candidaturas')
+    data_candidatura = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=2, choices=StatusCandidatura.choices, default=StatusCandidatura.NOVA)
+
+    class Meta:
+        verbose_name = 'Candidatura'
+        verbose_name_plural = 'Candidaturas'
+        # Isso impede que o mesmo candidato se inscreva duas vezes na mesma vaga:
+        unique_together = ('vaga', 'candidato')
+
+    def __str__(self):
+        return f'{self.candidato.nome} -> {self.vaga.titulo}'

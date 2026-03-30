@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_admin_listfilter_dropdown',
     'admin_auto_filters',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
