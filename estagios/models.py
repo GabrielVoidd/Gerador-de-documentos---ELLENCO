@@ -333,6 +333,15 @@ class Candidato(models.Model):
                     (hoje.month, hoje.day) < (self.data_nascimento.month, self.data_nascimento.day))
 
     @property
+    def link_whatsapp(self):
+        if not self.celular:
+            return '#'
+        apenas_numeros = re.sub(r'\D', '', str(self.celular))
+        if not apenas_numeros.startswith('55'):
+            apenas_numeros = f'55{apenas_numeros}'
+        return f'https://wa.me/{apenas_numeros}'
+
+    @property
     def filho_detalhes_formatado(self):
         if not self.filhos_detalhes:
             return 'Nenhuma observação'

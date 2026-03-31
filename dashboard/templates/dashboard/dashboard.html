@@ -4,38 +4,42 @@
 {% block content %}
 
 <div class="row g-4 mb-2">
-    <div class="col-xl-3 col-md-6">
-        <div class="card shadow-sm h-100 tweezer-card-primary">
+
+    <a href="{% url 'vaga_nova' %}" class="col-xl-3 col-md-6 text-decoration-none">
+        <div class="card shadow-sm h-100 tweezer-card-primary card-hover">
             <div class="card-body d-flex align-items-center">
                 <i class="fas fa-briefcase fa-3x text-primary me-3"></i>
                 <h5 class="card-title text-primary mb-0">Anunciar Vaga</h5>
             </div>
         </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card shadow-sm h-100 tweezer-card-primary">
+    </a>
+
+    <a href="{% url 'buscar_candidatos' %}" class="col-xl-3 col-md-6 text-decoration-none">
+        <div class="card shadow-sm h-100 tweezer-card-primary card-hover">
             <div class="card-body d-flex align-items-center">
-                <i class="fas fa-users fa-3x text-primary me-3"></i>
+                <i class="fas fa-search fa-3x text-primary me-3"></i>
                 <h5 class="card-title text-primary mb-0">Buscar Candidato</h5>
             </div>
         </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card shadow-sm h-100 tweezer-card-primary">
+    </a>
+
+    <a href="{% url 'candidato_novo' %}" target="_blank" class="col-xl-3 col-md-6 text-decoration-none">
+        <div class="card shadow-sm h-100 tweezer-card-primary card-hover">
             <div class="card-body d-flex align-items-center">
                 <i class="fas fa-user-plus fa-3x text-primary me-3"></i>
                 <h5 class="card-title text-primary mb-0">Novo Candidato</h5>
             </div>
         </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card shadow-sm h-100 tweezer-card-primary">
+    </a>
+
+    <a href="#" class="col-xl-3 col-md-6 text-decoration-none">
+        <div class="card shadow-sm h-100 tweezer-card-primary card-hover">
             <div class="card-body d-flex align-items-center">
-                <i class="fas fa-desktop fa-3x text-primary me-3"></i>
+                <i class="fas fa-building fa-3x text-primary me-3"></i>
                 <h5 class="card-title text-primary mb-0">Novo Cliente</h5>
             </div>
         </div>
-    </div>
+    </a>
 </div>
 
 <div class="row g-4 mt-2 mb-3">
@@ -125,16 +129,17 @@
     .card-header h6 { font-weight: 600; }
     .card-subtitle { font-weight: 500; font-size: 0.85rem; }
     .card-number { font-weight: 700; color: #212529; }
+    .card-hover:hover { transform: scale(1.02); transition: 0.2s; }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Carrega os dados JSON passados da view
+    // Carrega os dados reais vindos do Python
     const dadosVagas = {{ grafico_vagas_dados_json|safe }};
     const dadosCandidatos = {{ grafico_candidatos_dados_json|safe }};
 
-    // Configuração do Gráfico de Vagas (Barra)
+    // Configuração do Gráfico de Vagas (Barras)
     const ctxVagas = document.getElementById('graficoVagas');
     new Chart(ctxVagas, {
         type: 'bar',
@@ -144,27 +149,19 @@
                 label: 'Vagas',
                 data: dadosVagas.vagas,
                 borderWidth: 1,
-                // Aproximações de cores da imagem
                 backgroundColor: ['#7bc0e3', '#e1e3e5', '#33bd99', '#f3d673', '#e85a69']
             }]
         },
         options: {
             scales: {
-                y: {
-                    beginAtZero: true,
-                    // Tenta aproximar a escala da imagem (313, 291...)
-                    ticks: { color: '#9e9e9e', stepSize: 50 },
-                    grid: { color: '#f1f1f1' }
-                },
+                y: { beginAtZero: true, ticks: { color: '#9e9e9e', stepSize: 1 }, grid: { color: '#f1f1f1' } },
                 x: { ticks: { color: '#9e9e9e' }, grid: { display: false } }
             },
-            plugins: {
-                legend: { display: false } // Esconde a legenda padrão
-            }
+            plugins: { legend: { display: false } }
         }
     });
 
-    // Configuração do Gráfico de Candidatos (Linha)
+    // Configuração do Gráfico de Candidatos (Linhas)
     const ctxCandidatos = document.getElementById('graficoCandidatos');
     new Chart(ctxCandidatos, {
         type: 'line',
@@ -175,32 +172,25 @@
                 data: dadosCandidatos.novos_candidatos,
                 borderColor: '#e85a69', // Rosa
                 backgroundColor: '#e85a69',
-                tension: 0.4, // Curvatura da linha
+                tension: 0.4,
                 fill: false,
-                pointRadius: 1 // Pontos pequenos na linha
+                pointRadius: 3
             }, {
                 label: 'Candidaturas',
                 data: dadosCandidatos.candidaturas,
-                borderColor: '#0d6efd', // Azul Bootstrap
+                borderColor: '#0d6efd', // Azul
                 backgroundColor: '#0d6efd',
                 tension: 0.4,
                 fill: false,
-                pointRadius: 1
+                pointRadius: 3
             }]
         },
         options: {
             scales: {
-                y: {
-                    beginAtZero: true,
-                    // Tenta aproximar a escala (670, 624...)
-                    ticks: { color: '#9e9e9e', stepSize: 100 },
-                    grid: { color: '#f1f1f1' }
-                },
+                y: { beginAtZero: true, ticks: { color: '#9e9e9e', stepSize: 1 }, grid: { color: '#f1f1f1' } },
                 x: { ticks: { color: '#9e9e9e' }, grid: { display: false } }
             },
-            plugins: {
-                legend: { display: false } // Esconde a legenda padrão (já criamos uma personalizada)
-            }
+            plugins: { legend: { display: false } }
         }
     });
 </script>

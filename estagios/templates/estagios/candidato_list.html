@@ -1,0 +1,146 @@
+{% extends 'dashboard/base_dashboard.html' %} {% block content %}
+<div class="row">
+    <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-filter text-primary me-2"></i> Filtros</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{% url 'buscar_candidatos' %}">
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Buscar por nome, CPF, etc.</label>
+                        <input type="text" name="q" class="form-control" value="{{ request.GET.q }}" placeholder="Digite aqui...">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Bairro</label>
+                        <input type="text" name="bairro" class="form-control" value="{{ request.GET.bairro }}" placeholder="Ex: Centro, Bonsucesso...">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Escolaridade</label>
+                        <select name="escolaridade" class="form-select">
+                            <option value="">Todas</option>
+                            {% for sigla, nome in escolaridades %}
+                                <option value="{{ sigla }}" {% if request.GET.escolaridade == sigla %}selected{% endif %}>{{ nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Status do Candidato</label>
+                        <select name="status" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="em_processo" {% if request.GET.status == 'em_processo' %}selected{% endif %}>Em Processo</option>
+                            <option value="aprovado" {% if request.GET.status == 'aprovado' %}selected{% endif %}>Aprovado</option>
+                            <option value="trabalhando" {% if request.GET.status == 'trabalhando' %}selected{% endif %}>Trabalhando (Ativo)</option>
+                            <option value="restrito" {% if request.GET.status == 'restrito' %}selected{% endif %}>Restrito</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mb-2">Aplicar Filtros</button>
+                    <a href="{% url 'buscar_candidatos' %}" class="btn btn-outline-secondary w-100">Limpar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0">Lista de Candidatos</h5>
+                <a href="{% url 'exportar_candidatos_excel' %}?{{ filtros_url }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-file-excel me-1"></i> Exportar Excel
+                </a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Contato</th>
+                            <th>Instituição / Escolaridade</th>
+                            <th>Status</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in candidatos %}
+                        <tr>
+                            <td>
+                                <strong>{{ c.nome }}</strong><br>
+                                <small class="text-muted">CPF: {{ c.cpf|default:"-" }}</small>
+                            </td>
+                            <td>
+                                {{ c.celular }}<br>
+                                <a href="{{ c.link_whatsapp }}" target="_blank" class="badge bg-success text-decoration-none p-2 mt-1">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </a>
+                            </td>
+                            <td>
+                                {{ c.instituicao_ensino.razao_social|default:"Não informada"|truncatechars:30 }}<br>
+                                <small class="text-muted">{{ c.get_escolaridade_display }}</small>
+                            </td>
+                            <td>
+                                {% if c.trabalhando %}
+                                    <span class="badge bg-primary">Trabalhando</span>
+                                {% elif c.aprovado %}
+                                    <span class="badge bg-success">Aprovado</span>
+                                {% elif c.encaminhado %}
+                                    <span class="badge bg-info text-dark">Encaminhado</span>
+                                {% elif c.em_processo %}
+                                    <span class="badge bg-warning text-dark">Em Processo</span>
+                                {% elif c.stand_by %}
+                                    <span class="badge bg-secondary">Stand-by</span>
+                                {% elif c.reprovado %}
+                                    <span class="badge bg-danger">Reprovado</span>
+                                {% elif c.nao_compareceu %}
+                                    <span class="badge bg-dark">Não Compareceu</span>
+                                {% elif c.desistiu %}
+                                    <span class="badge bg-dark">Desistiu</span>
+                                {% elif c.restrito %}
+                                    <span class="badge bg-danger">Restrito</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Cadastrado</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'candidato-gerar-cadastro' pk=c.id %}" target="_blank" class="btn btn-sm btn-outline-danger" title="Ficha PDF">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                                <a href="{% url 'perfil_candidato' pk=c.id %}" class="btn btn-sm btn-outline-primary" title="Ver Perfil">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">Nenhum candidato encontrado com estes filtros.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if is_paginated %}
+            <div class="card-footer bg-white">
+                <ul class="pagination justify-content-center mb-0 mt-2">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?{{ filtros_url }}&page={{ page_obj.previous_page_number }}">Anterior</a></li>
+                    {% endif %}
+                    
+                    <li class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?{{ filtros_url }}&page={{ page_obj.next_page_number }}">Próxima</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

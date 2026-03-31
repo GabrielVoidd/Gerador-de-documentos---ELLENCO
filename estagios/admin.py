@@ -5,7 +5,7 @@ from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
     MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, CriterioExclusao, ContratoAceite, \
-    DetalhesContratoAceite, RegistroContatoEmpresa, Chamados
+    DetalhesContratoAceite, RegistroContatoEmpresa, Chamados, Vaga, Candidatura
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 import string, openpyxl
 from django.http import HttpResponse
@@ -785,3 +785,24 @@ class ChamadosAdmin(admin.ModelAdmin):
 
     class Media:
         js = ('js/admin_custom.js',)
+
+
+@admin.register(Vaga)
+class VagaAdmin(admin.ModelAdmin):
+    # O que aparece na tabela principal
+    list_display = ('titulo', 'empresa', 'status', 'tipo_vaga', 'data_abertura')
+    # Filtros laterais (lembra daquela biblioteca que arrumamos? Pode usar aqui depois!)
+    list_filter = ('status', 'tipo_vaga', 'empresa')
+    # Barra de pesquisa
+    search_fields = ('titulo', 'empresa__razao_social')
+
+
+@admin.register(Candidatura)
+class CandidaturaAdmin(admin.ModelAdmin):
+    list_display = ('candidato', 'vaga', 'status', 'data_candidatura')
+    list_filter = ('status',)
+    search_fields = ('candidato__nome', 'vaga__titulo')
+
+    # Como a base de candidatos é gigante, isso aqui evita que o painel trave ao tentar carregar todos os nomes na
+    # hora de cadastrar uma candidatura
+    autocomplete_fields = ['candidato', 'vaga']

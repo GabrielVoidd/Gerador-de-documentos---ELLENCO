@@ -1,14 +1,17 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.http import JsonResponse
 from django.conf import settings
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView, TemplateView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.messages.views import SuccessMessageMixin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .forms import CandidatoForm
+from .forms import CandidatoForm, CandidatoStatusForm, VagaForm
 import os
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
@@ -19,7 +22,7 @@ from weasyprint import HTML
 from django.shortcuts import render
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
     TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, ContratoAceite, \
-    RegistroContatoEmpresa, Chamados
+    RegistroContatoEmpresa, Chamados, Vaga
 from .serializers import (
     InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
     ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
@@ -29,6 +32,13 @@ from .serializers import (
 )
 from django.db import transaction
 import openpyxl
+
+
+# Função auxiliar que define quem manda na página
+def is_recrutamento(user):
+    if not user.is_authenticated:
+        return False
+    return user.is_superuser or user.groups.filter(name='Recrutamento').exists()
 
 
 class InstituicaoEnsinoViewSet(viewsets.ModelViewSet):
@@ -625,3 +635,135 @@ class CandidatoCreateView(LoginRequiredMixin, CreateView):
 class CandidatoSucessoView(TemplateView):
     # Uma tela simples de "Obrigado" para ele não ficar perdido após salvar
     template_name = 'estagios/candidato_sucesso.html'
+
+
+# Adicione o UserPassesTestMixin aqui (sempre antes da ListView)
+class CandidatoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Candidato
+    template_name = 'estagios/candidato_list.html'
+    context_object_name = 'candidatos'
+    paginate_by = 20
+
+    # O Django roda isso antes de abrir a página
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+    # (Opcional) Se quiser que dê uma tela de erro 403 ao invés de jogar pro login:
+    def handle_no_permission(self):
+        raise PermissionDenied("Você não tem permissão para acessar a base de candidatos.")
+
+    def get_queryset(self):
+        # select_related deixa a busca mais rápida (evita o problema N+1)
+        queryset = Candidato.objects.select_related('instituicao_ensino').all().order_by('-data_cadastro')
+
+        # 1. BARRA DE PESQUISA (q)
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(
+                Q(nome__icontains=q) |
+                Q(cpf__icontains=q) |
+                Q(rg__icontains=q) |
+                Q(celular__icontains=q) |
+                Q(bairro__icontains=q)
+            )
+
+        # 2. FILTROS LATERAIS (Dropdowns e Checkboxes)
+        bairro = self.request.GET.get('bairro')
+        if bairro:
+            queryset = queryset.filter(bairro__icontains=bairro)
+
+        escolaridade = self.request.GET.get('escolaridade')
+        if escolaridade:
+            queryset = queryset.filter(escolaridade=escolaridade)
+
+        status = self.request.GET.get('status')
+        if status:
+            # Filtra pelos booleanos do seu banco dinamicamente
+            if status == 'restrito':
+                queryset = queryset.filter(restrito=True)
+            elif status == 'em_processo':
+                queryset = queryset.filter(em_processo=True)
+            elif status == 'aprovado':
+                queryset = queryset.filter(aprovado=True)
+            elif status == 'trabalhando':
+                queryset = queryset.filter(trabalhando=True)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Passamos os choices para o template montar os selects automaticamente
+        context['escolaridades'] = Candidato.Escolaridades.choices
+        # Mantemos os filtros na URL para a paginação não perder a busca ao mudar de página
+        context['filtros_url'] = self.request.GET.urlencode()
+        return context
+
+
+# VIEW PARA EXPORTAR EXCEL (Ajustada com o caminho correto do banco)
+@user_passes_test(is_recrutamento)
+def exportar_candidatos_excel(request):
+    # Pega os mesmos parâmetros da URL para exportar só o que foi filtrado
+    q = request.GET.get('q')
+    queryset = Candidato.objects.select_related('instituicao_ensino', 'estagiario__contrato__parte_concedente').all()
+
+    if q:
+        queryset = queryset.filter(Q(nome__icontains=q) | Q(cpf__icontains=q))
+
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = 'Candidatos'
+
+    # Cabeçalhos
+    headers = ['Nome', 'CPF', 'Celular', 'Email', 'Instituição de Ensino', 'Status', 'Empresa (Contrato)']
+    sheet.append(headers)
+
+    for c in queryset:
+        # Puxa a empresa verificando se o candidato virou estagiário e tem contrato
+        empresa = ''
+        if hasattr(c, 'estagiario') and hasattr(c.estagiario, 'contrato'):
+            empresa = c.estagiario.contrato.parte_concedente.razao_social
+
+        # Define um status legível
+        status_atual = 'Cadastrado'
+        if c.trabalhando:
+            status_atual = 'Trabalhando'
+        elif c.em_processo:
+            status_atual = 'Em Processo'
+
+        sheet.append([
+            c.nome, c.cpf, c.celular, c.email,
+            c.instituicao_ensino.razao_social if c.instituicao_ensino else '',
+            status_atual, empresa
+        ])
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="Candidatos_Filtrados.xlsx"'
+    workbook.save(response)
+    return response
+
+
+class CandidatoPerfilView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Candidato
+    form_class = CandidatoStatusForm
+    template_name = 'estagios/candidato_perfil.html'
+    context_object_name = 'candidato'
+
+    # Mantemos a mesma segurança da tela de busca!
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+    def get_success_url(self):
+        # Depois de salvar, recarrega a mesma página do perfil para a pessoa ver que salvou
+        return reverse('perfil_candidato', kwargs={'pk': self.object.pk})
+
+
+class VagaCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Vaga
+    form_class = VagaForm
+    template_name = 'estagios/vaga_form.html'
+
+    # Se der tudo certo, joga a pessoa de volta pro Dashboard
+    success_url = reverse_lazy('dashboard_home')
+
+    def test_func(self):
+        return is_recrutamento(self.request.user)

@@ -1,0 +1,103 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-7 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i> Perfil do Candidato</h5>
+                <a href="{% url 'buscar_candidatos' %}" class="btn btn-sm btn-light text-primary">Voltar</a>
+            </div>
+            <div class="card-body">
+                <h3 class="text-primary">{{ candidato.nome }}</h3>
+                <p class="text-muted mb-4">
+                    <i class="fas fa-map-marker-alt me-1"></i> {{ candidato.bairro }}, {{ candidato.cidade }} - {{ candidato.estado }}<br>
+                    <i class="fas fa-birthday-cake me-1"></i> {{ candidato.idade }} anos
+                </p>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong class="text-secondary">Contato:</strong>
+                        <p class="mb-1">{{ candidato.celular }}</p>
+                        <p>{{ candidato.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong class="text-secondary">Documentos:</strong>
+                        <p class="mb-1">CPF: {{ candidato.cpf|default:"-" }}</p>
+                        <p>RG: {{ candidato.rg|default:"-" }}</p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <strong class="text-secondary">Escolaridade:</strong>
+                        <p class="mb-1">{{ candidato.get_escolaridade_display }}</p>
+                        <p class="mb-0 text-muted">{{ candidato.instituicao_ensino.razao_social|default:"Nenhuma instituição informada" }}</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 gap-2 d-flex">
+                    <a href="{{ candidato.link_whatsapp }}" target="_blank" class="btn btn-success">
+                        <i class="fab fa-whatsapp me-1"></i> Chamar no WhatsApp
+                    </a>
+                    <a href="{% url 'candidato-gerar-cadastro' pk=candidato.id %}" target="_blank" class="btn btn-outline-danger">
+                        <i class="fas fa-file-pdf me-1"></i> Gerar Ficha
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5 mb-4">
+        <div class="card shadow-sm h-100 border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i> Gestão de R&S</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Observações (Visível apenas para equipe):</label>
+                        {{ form.observacoes }}
+                    </div>
+
+                    <label class="form-label fw-bold mt-2">Status do Processo:</label>
+                    <div class="row ps-2">
+                        <div class="col-6">
+                            {% for field in form %}
+                                {% if field.name != 'observacoes' and forloop.counter <= 6 %}
+                                    <div class="form-check mb-2">
+                                        {{ field }}
+                                        <label class="form-check-label text-muted" for="{{ field.id_for_label }}">
+                                            {{ field.label }}
+                                        </label>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="col-6">
+                            {% for field in form %}
+                                {% if field.name != 'observacoes' and forloop.counter > 6 %}
+                                    <div class="form-check mb-2">
+                                        {{ field }}
+                                        <label class="form-check-label text-muted" for="{{ field.id_for_label }}">
+                                            {{ field.label }}
+                                        </label>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i> Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

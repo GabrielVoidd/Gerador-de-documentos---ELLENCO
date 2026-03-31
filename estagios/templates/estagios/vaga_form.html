@@ -1,0 +1,81 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="fas fa-bullhorn me-2"></i> Anunciar Nova Vaga</h5>
+            </div>
+            
+            <div class="card-body p-4 p-md-5">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Empresa Cliente</label>
+                            {{ form.empresa }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Título da Vaga</label>
+                            {{ form.titulo }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Tipo de Vaga</label>
+                            {{ form.tipo_vaga }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Quantidade</label>
+                            {{ form.quantidade_vagas }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Salário / Bolsa (R$)</label>
+                            {{ form.salario_bolsa }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Horário</label>
+                            {{ form.horario }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Local de Trabalho</label>
+                            {{ form.local_trabalho }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Descrição das Atividades</label>
+                        {{ form.descricao }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Requisitos Obrigatórios</label>
+                        {{ form.requisitos }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Benefícios</label>
+                        {{ form.beneficios }}
+                    </div>
+
+                    <hr>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'dashboard_home' %}" class="btn btn-light px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-primary px-5">
+                            <i class="fas fa-save me-2"></i> Publicar Vaga
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
