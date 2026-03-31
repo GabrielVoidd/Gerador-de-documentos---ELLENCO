@@ -1,17 +1,19 @@
-from datetime import date
+from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.conf import settings
+from django.utils import timezone
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView, TemplateView
 from django.urls import reverse_lazy, reverse
 from django.contrib.messages.views import SuccessMessageMixin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .forms import CandidatoForm, CandidatoStatusForm, VagaForm, ParteConcedenteForm, CandidaturaForm
+from .forms import CandidatoForm, CandidatoStatusForm, VagaForm, ParteConcedenteForm, CandidaturaForm, VagaEditForm, \
+    CandidaturaUpdateForm
 import os
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
@@ -861,7 +863,7 @@ class VagaDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
 class VagaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Vaga
-    form_class = VagaForm
+    form_class = VagaEditForm
     template_name = 'estagios/vaga_form.html'
 
     def test_func(self):
@@ -870,3 +872,138 @@ class VagaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def get_success_url(self):
         # Depois de salvar a edição, devolve a recrutadora pra tela de detalhes
         return reverse('vaga_detalhe', kwargs={'pk': self.object.pk})
+
+
+class RelatorioRSView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'estagios/relatorios_rs.html'
+
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # 1. KPI Rápido
+        context['total_vagas'] = Vaga.objects.count()
+        context['vagas_abertas'] = Vaga.objects.filter(status='A').count()
+        context['vagas_fechadas'] = Vaga.objects.filter(status='F').count()
+
+        # 2. Dados para o Gráfico de Perdas
+        perdas = Candidato.objects.aggregate(
+            reprovados=Count('id', filter=Q(reprovado=True)),
+            desistentes=Count('id', filter=Q(desistiu=True)),
+            nao_compareceu=Count('id', filter=Q(nao_compareceu=True))
+        )
+
+        # Dicionário puro, sem json.dumps()
+        context['grafico_perdas_json'] = {
+            'labels': ['Reprovados', 'Desistiram', 'Não Compareceram'],
+            'data': [perdas['reprovados'] or 0, perdas['desistentes'] or 0, perdas['nao_compareceu'] or 0]
+        }
+
+        # 3. Dados para o Gráfico de Funil
+        status_candidaturas = Candidatura.objects.values('status').annotate(total=Count('id'))
+
+        labels_funil = []
+        data_funil = []
+        mapa_status = dict(Candidatura._meta.get_field('status').choices)
+
+        for item in status_candidaturas:
+            labels_funil.append(mapa_status.get(item['status'], item['status']))
+            data_funil.append(item['total'])
+
+        # Dicionário puro, sem json.dumps()
+        context['grafico_funil_json'] = {
+            'labels': labels_funil,
+            'data': data_funil
+        }
+
+        return context
+
+
+class CandidaturaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Candidatura
+    form_class = CandidaturaUpdateForm
+    template_name = 'estagios/candidatura_form.html'
+
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Passa o candidato para a tela para manter o nome dele lá em cima
+        context['candidato'] = self.object.candidato
+        return context
+
+    def get_success_url(self):
+        # Depois de salvar, devolve pro perfil do candidato
+        return reverse('perfil_candidato', kwargs={'pk': self.object.candidato.pk})
+
+
+class RelatorioBIView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'estagios/relatorios_bi.html'
+
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # 1. Top Clientes (Empresas com mais vagas cadastradas)
+        top_clientes = Vaga.objects.values('empresa__razao_social').annotate(total=Count('id')).order_by('-total')[:5]
+        context['top_clientes_json'] = {
+            'labels': [item['empresa__razao_social'] for item in top_clientes],
+            'data': [item['total'] for item in top_clientes]
+        }
+
+        # 2. Top Instituições de Ensino (Fornecedoras de Candidatos)
+        top_instituicoes = Candidato.objects.values('instituicao_ensino__razao_social').annotate(total=Count('id')).exclude(instituicao_ensino__isnull=True).order_by('-total')[:5]
+        context['top_inst_json'] = {
+            'labels': [item['instituicao_ensino__razao_social'] for item in top_instituicoes],
+            'data': [item['total'] for item in top_instituicoes]
+        }
+
+        # 3. Top Bairros (Mapa de calor demográfico)
+        top_bairros = Candidato.objects.values('bairro').annotate(total=Count('id')).exclude(bairro='').order_by('-total')[:5]
+        context['top_bairros_json'] = {
+            'labels': [item['bairro'] for item in top_bairros],
+            'data': [item['total'] for item in top_bairros]
+        }
+
+        return context
+
+
+class RelatorioContratosView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'estagios/relatorios_contratos.html'
+
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        hoje = timezone.now().date()
+        daqui_30_dias = hoje + timedelta(days=30)
+
+        try:
+            from .models import Contrato  # Agora sabemos que o nome é esse mesmo!
+
+            # Contratos Ativos: Não foram rescindidos (data_rescisao é nula)
+            contratos_ativos = Contrato.objects.filter(data_rescisao__isnull=True)
+
+            context['total_ativos'] = contratos_ativos.count()
+
+            # Filtra os que vencem nos próximos 30 dias usando a data_termino_prevista
+            context['vencendo_30_dias'] = contratos_ativos.filter(
+                data_termino_prevista__gte=hoje,
+                data_termino_prevista__lte=daqui_30_dias
+            ).select_related('estagiario', 'parte_concedente').order_by('data_termino_prevista')
+
+            context['total_vencendo'] = context['vencendo_30_dias'].count()
+
+        except ImportError:
+            context['aviso_model'] = True
+            context['total_ativos'] = 0
+            context['total_vencendo'] = 0
+            context['vencendo_30_dias'] = []
+
+        return context

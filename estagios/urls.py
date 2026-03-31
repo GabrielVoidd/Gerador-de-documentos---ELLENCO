@@ -7,7 +7,8 @@ from .views import (
     ReciboRescisaoViewSet, ContratoSocialViewSet, AditivoViewSet, CriterioExclusaoViewSet, ContratoAceiteViewSet,
     RegistroContatoEmpresaViewSet, CandidatoCreateView, CandidatoSucessoView, CandidatoListView,
     exportar_candidatos_excel, CandidatoPerfilView, VagaCreateView, ParteConcedenteCreateView, VagaListView,
-    CandidaturaCreateView, VagaDetailView, VagaUpdateView
+    CandidaturaCreateView, VagaDetailView, VagaUpdateView, RelatorioRSView, CandidaturaUpdateView, RelatorioBIView,
+    RelatorioContratosView
 )
 
 router = DefaultRouter()
@@ -43,4 +44,8 @@ urlpatterns = [
     path('candidato/<int:pk>/vincular-vaga/', CandidaturaCreateView.as_view(), name='vincular_vaga'),
     path('vagas/<int:pk>/', VagaDetailView.as_view(), name='vaga_detalhe'),
     path('vagas/<int:pk>/editar/', VagaUpdateView.as_view(), name='vaga_editar'),
+    path('relatorios/recrutamento/', RelatorioRSView.as_view(), name='relatorio_rs'),
+    path('candidatura/<int:pk>/editar/', CandidaturaUpdateView.as_view(), name='candidatura_editar'),
+    path('relatorios/inteligencia/', RelatorioBIView.as_view(), name='relatorio_bi'),
+    path('relatorios/contratos/', RelatorioContratosView.as_view(), name='relatorio_contratos'),
 ]

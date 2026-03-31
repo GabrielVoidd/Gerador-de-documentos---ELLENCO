@@ -67,6 +67,10 @@
                                     {% elif item.status == 'AP' %} <span class="badge bg-success">Aprovado</span>
                                     {% elif item.status == 'R' %} <span class="badge bg-danger">Reprovado</span>
                                     {% endif %}
+
+                                    <a href="{% url 'candidatura_editar' item.id %}" class="btn btn-sm btn-link text-primary ms-2 p-0" title="Mudar de Fase">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 </td>
                                 <td class="text-end pe-4">
                                     <a href="{{ item.candidato.link_whatsapp }}" target="_blank" class="btn btn-sm btn-outline-success" title="WhatsApp">

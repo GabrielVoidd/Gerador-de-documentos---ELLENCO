@@ -74,6 +74,18 @@ class VagaForm(forms.ModelForm):
         }
 
 
+class VagaEditForm(VagaForm):
+    class Meta(VagaForm.Meta):
+        # Pega todos os campos antigos e soma o campo 'status'
+        fields = VagaForm.Meta.fields + ['status']
+
+        # Copia o visual dos campos antigos
+        widgets = VagaForm.Meta.widgets
+
+        # Adiciona o visual para o dropdown de status com destaque
+        widgets['status'] = forms.Select(attrs={'class': 'form-select border-warning fw-bold'})
+
+
 class ParteConcedenteForm(forms.ModelForm):
     class Meta:
         model = ParteConcedente
@@ -117,3 +129,13 @@ class CandidaturaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # O PULO DO GATO: Filtra o campo para mostrar APENAS vagas Abertas ('A')
         self.fields['vaga'].queryset = Vaga.objects.filter(status='A').order_by('-data_abertura')
+
+
+class CandidaturaUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Candidatura
+        # Tira o campo 'vaga', deixa só o 'status' para edição
+        fields = ['status']
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-select border-warning fw-bold'}),
+        }

@@ -31,13 +31,68 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link active" href="{% url 'dashboard_home' %}"><i class="fas fa-home me-1"></i> Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-edit me-1"></i> Cadastros</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-folder me-1"></i> Processos</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-search me-1"></i> Consultas</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-chart-line me-1"></i> Relatórios</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-cog me-1"></i> Gerenciamento</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-question-circle me-1"></i> Ajuda</a></li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard_home' %}active border-bottom border-primary border-2{% endif %}" href="{% url 'dashboard_home' %}">
+                        <i class="fas fa-home text-primary"></i> Home
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="menuCadastros" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-edit text-secondary"></i> Cadastros
+                    </a>
+                    <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="menuCadastros">
+                        <li><a class="dropdown-item" href="{% url 'candidato_novo' %}"><i class="fas fa-user-plus me-2 text-muted"></i>Novo Candidato</a></li>
+                        <li><a class="dropdown-item" href="{% url 'cliente_novo' %}"><i class="fas fa-building me-2 text-muted"></i>Nova Empresa (Cliente)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'vaga_nova' %}"><i class="fas fa-bullhorn me-2 text-muted"></i>Anunciar Vaga</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="menuProcessos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-folder text-secondary"></i> Processos
+                    </a>
+                    <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="menuProcessos">
+                        <li><a class="dropdown-item" href="{% url 'lista_vagas' %}"><i class="fas fa-briefcase me-2 text-muted"></i>Gestão de Vagas</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-contract me-2 text-muted"></i>Gerar Contratos (Em breve)</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="menuConsultas" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-search text-secondary"></i> Consultas
+                    </a>
+                    <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="menuConsultas">
+                        <li><a class="dropdown-item" href="{% url 'buscar_candidatos' %}"><i class="fas fa-users me-2 text-muted"></i>Base de Candidatos</a></li>
+                        <li><a class="dropdown-item" href="{% url 'lista_vagas' %}"><i class="fas fa-list me-2 text-muted"></i>Consultar Vagas</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="menuRelatorios" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-chart-line text-secondary"></i> Relatórios
+                        </a>
+                        <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="menuRelatorios">
+                            <li><a class="dropdown-item" href="{% url 'relatorio_rs' %}"><i class="fas fa-filter me-2 text-muted"></i>Recrutamento (Funil)</a></li>
+                            <li><a class="dropdown-item" href="{% url 'relatorio_contratos' %}"><i class="fas fa-file-signature me-2 text-primary"></i>Contratos e Renovações</a></li>
+                            <li><a class="dropdown-item" href="{% url 'relatorio_bi' %}"><i class="fas fa-lightbulb me-2 text-warning"></i>Inteligência de Negócio</a></li>                        </ul>
+                    </li>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/" target="_blank">
+                        <i class="fas fa-cog text-secondary"></i> Gerenciamento
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-question-circle text-secondary"></i> Ajuda
+                    </a>
+                </li>
             </ul>
             <div class="d-flex align-items-center">
                 <a href="#" class="nav-link position-relative me-3 p-0">

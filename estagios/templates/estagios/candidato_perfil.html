@@ -52,6 +52,10 @@
                                     {% elif candidatura.status == 'AP' %} <span class="badge bg-success">Aprovado</span>
                                     {% elif candidatura.status == 'R' %} <span class="badge bg-danger">Reprovado</span>
                                     {% endif %}
+
+                                    <a href="{% url 'candidatura_editar' candidatura.id %}" class="btn btn-sm btn-link text-primary ms-1 p-0" title="Atualizar Status">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 </div>
                             </li>
                         {% empty %}

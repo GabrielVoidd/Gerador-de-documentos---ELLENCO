@@ -1,0 +1,121 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="text-primary"><i class="fas fa-lightbulb me-2"></i> Inteligência Comercial (BI)</h4>
+    <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+        <i class="fas fa-print me-1"></i> Imprimir PDF
+    </button>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 text-success"><i class="fas fa-building me-2"></i> Top 5 Clientes (Volume de Vagas)</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoClientes" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 text-primary"><i class="fas fa-university me-2"></i> Top 5 Instituições de Ensino</h6>
+            </div>
+            <div class="card-body d-flex justify-content-center">
+                <canvas id="graficoInst" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 text-info"><i class="fas fa-map-marker-alt me-2"></i> Regiões mais fortes (Candidatos)</h6>
+            </div>
+            <div class="card-body d-flex justify-content-center">
+                <canvas id="graficoBairros" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ top_clientes_json|json_script:"clientes-data" }}
+{{ top_inst_json|json_script:"inst-data" }}
+{{ top_bairros_json|json_script:"bairros-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    
+    const clientesData = JSON.parse(document.getElementById('clientes-data').textContent);
+    const instData = JSON.parse(document.getElementById('inst-data').textContent);
+    const bairrosData = JSON.parse(document.getElementById('bairros-data').textContent);
+
+    // 1. Gráfico de Clientes (Barras Horizontais)
+    new Chart(document.getElementById('graficoClientes'), {
+        type: 'bar',
+        data: {
+            labels: clientesData.labels,
+            datasets: [{
+                label: 'Total de Vagas',
+                data: clientesData.data,
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: { 
+            indexAxis: 'y', // Isso deita as barras!
+            responsive: true, 
+            maintainAspectRatio: false 
+        }
+    });
+
+    // 2. Gráfico de Instituições (Polar Area)
+    new Chart(document.getElementById('graficoInst'), {
+        type: 'polarArea',
+        data: {
+            labels: instData.labels,
+            datasets: [{
+                data: instData.data,
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // 3. Gráfico de Bairros (Doughnut)
+    new Chart(document.getElementById('graficoBairros'), {
+        type: 'doughnut',
+        data: {
+            labels: bairrosData.labels,
+            datasets: [{
+                data: bairrosData.data,
+                backgroundColor: [
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+});
+</script>
+{% endblock %}
