@@ -24,14 +24,14 @@
 
 <nav class="navbar navbar-expand-lg tweezer-navbar py-2 px-3">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="{% url 'dashboard_home' %}">
             <img src="{% static 'images/LOGO.jpg' %}" alt="Ellenco Estágios"> </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link active" href="#"><i class="fas fa-home me-1"></i> Home</a></li>
+                <li class="nav-item"><a class="nav-link active" href="{% url 'dashboard_home' %}"><i class="fas fa-home me-1"></i> Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-edit me-1"></i> Cadastros</a></li>
                 <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-folder me-1"></i> Processos</a></li>
                 <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-search me-1"></i> Consultas</a></li>

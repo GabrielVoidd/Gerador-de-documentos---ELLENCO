@@ -30,6 +30,38 @@
 
                 <hr>
 
+                <div class="mt-4 border-top pt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong class="text-secondary"><i class="fas fa-briefcase me-1"></i> Processos Seletivos</strong>
+                        <a href="{% url 'vincular_vaga' candidato.id %}" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-plus"></i> Vincular a Vaga
+                        </a>
+                    </div>
+
+                    <ul class="list-group list-group-flush">
+                        {% for candidatura in candidato.minhas_candidaturas.all %}
+                            <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">{{ candidatura.vaga.titulo }}</h6>
+                                    <small class="text-muted">{{ candidatura.vaga.empresa.razao_social }}</small>
+                                </div>
+                                <div>
+                                    {% if candidatura.status == 'N' %} <span class="badge bg-secondary">Nova</span>
+                                    {% elif candidatura.status == 'A' %} <span class="badge bg-warning text-dark">Em Análise</span>
+                                    {% elif candidatura.status == 'E' %} <span class="badge bg-info text-dark">Entrevista</span>
+                                    {% elif candidatura.status == 'AP' %} <span class="badge bg-success">Aprovado</span>
+                                    {% elif candidatura.status == 'R' %} <span class="badge bg-danger">Reprovado</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% empty %}
+                            <div class="text-muted small text-center bg-light p-3 rounded">
+                                Nenhum vínculo ativo com vagas no momento.
+                            </div>
+                        {% endfor %}
+                    </ul>
+                </div>
+
                 <div class="row mb-3">
                     <div class="col-12">
                         <strong class="text-secondary">Escolaridade:</strong>

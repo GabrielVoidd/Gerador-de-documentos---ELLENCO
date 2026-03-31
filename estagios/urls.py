@@ -6,7 +6,8 @@ from .views import (
     AgenteIntegracaoViewSet, CandidatoViewSet, TipoEventoViewSet, LancamentoViewSet, ReciboViewSet, get_contrato_data,
     ReciboRescisaoViewSet, ContratoSocialViewSet, AditivoViewSet, CriterioExclusaoViewSet, ContratoAceiteViewSet,
     RegistroContatoEmpresaViewSet, CandidatoCreateView, CandidatoSucessoView, CandidatoListView,
-    exportar_candidatos_excel, CandidatoPerfilView, VagaCreateView
+    exportar_candidatos_excel, CandidatoPerfilView, VagaCreateView, ParteConcedenteCreateView, VagaListView,
+    CandidaturaCreateView, VagaDetailView, VagaUpdateView
 )
 
 router = DefaultRouter()
@@ -37,4 +38,9 @@ urlpatterns = [
     path('exportar-candidatos/', exportar_candidatos_excel, name='exportar_candidatos_excel'),
     path('candidato/<int:pk>/perfil/', CandidatoPerfilView.as_view(), name='perfil_candidato'),
     path('vagas/nova/', VagaCreateView.as_view(), name='vaga_nova'),
+    path('cliente/novo/', ParteConcedenteCreateView.as_view(), name='cliente_novo'),
+    path('vagas/', VagaListView.as_view(), name='lista_vagas'),
+    path('candidato/<int:pk>/vincular-vaga/', CandidaturaCreateView.as_view(), name='vincular_vaga'),
+    path('vagas/<int:pk>/', VagaDetailView.as_view(), name='vaga_detalhe'),
+    path('vagas/<int:pk>/editar/', VagaUpdateView.as_view(), name='vaga_editar'),
 ]

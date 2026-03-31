@@ -11,7 +11,7 @@ from django.urls import reverse_lazy, reverse
 from django.contrib.messages.views import SuccessMessageMixin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .forms import CandidatoForm, CandidatoStatusForm, VagaForm
+from .forms import CandidatoForm, CandidatoStatusForm, VagaForm, ParteConcedenteForm, CandidaturaForm
 import os
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
@@ -19,10 +19,10 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
     TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, ContratoAceite, \
-    RegistroContatoEmpresa, Chamados, Vaga
+    RegistroContatoEmpresa, Chamados, Vaga, Candidatura
 from .serializers import (
     InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
     ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
@@ -748,7 +748,7 @@ class CandidatoPerfilView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'estagios/candidato_perfil.html'
     context_object_name = 'candidato'
 
-    # Mantemos a mesma segurança da tela de busca!
+    # Mesma segurança da tela de busca!
     def test_func(self):
         return is_recrutamento(self.request.user)
 
@@ -767,3 +767,106 @@ class VagaCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def test_func(self):
         return is_recrutamento(self.request.user)
+
+
+class ParteConcedenteCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = ParteConcedente
+    form_class = ParteConcedenteForm
+    template_name = 'estagios/parte_concedente_form.html'
+
+    success_url = reverse_lazy('dashboard_home')
+
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+
+class VagaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Vaga
+    template_name = 'estagios/vaga_list.html'
+    context_object_name = 'vagas'
+    paginate_by = 15
+
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+    def get_queryset(self):
+        # select_related deixa a consulta ao banco mais rápida puxando a empresa junto
+        queryset = Vaga.objects.select_related('empresa').all().order_by('-data_abertura')
+
+        # 1. Filtro de Texto (Título da Vaga ou Nome da Empresa)
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(
+                Q(titulo__icontains=q) |
+                Q(empresa__razao_social__icontains=q) |
+                Q(empresa__nome__icontains=q)
+            )
+
+        # 2. Filtro de Status
+        status = self.request.GET.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Passa as opções de status para montar o Select do filtro dinamicamente
+        context['status_choices'] = Vaga.StatusVaga.choices
+        context['filtros_url'] = self.request.GET.urlencode()
+        return context
+
+
+class CandidaturaCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Candidatura
+    form_class = CandidaturaForm
+    template_name = 'estagios/candidatura_form.html'
+
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+    def form_valid(self, form):
+        # Pega o ID do candidato que veio na URL e já vincula automaticamente
+        candidato = get_object_or_404(Candidato, pk=self.kwargs['pk'])
+        form.instance.candidato = candidato
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        # Passa o nome do candidato para a tela para a recrutadora saber quem ela está vinculando
+        context = super().get_context_data(**kwargs)
+        context['candidato'] = get_object_or_404(Candidato, pk=self.kwargs['pk'])
+        return context
+
+    def get_success_url(self):
+        # Se der certo, devolve a recrutadora direto para o perfil dele!
+        return reverse('perfil_candidato', kwargs={'pk': self.kwargs['pk']})
+
+
+class VagaDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Vaga
+    template_name = 'estagios/vaga_detail.html'
+    context_object_name = 'vaga'
+
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Troca do .candidatura_set por uma busca direta
+        context['candidatos_vinculados'] = Candidatura.objects.filter(
+            vaga=self.object
+        ).select_related('candidato').order_by('status')
+        return context
+
+
+class VagaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Vaga
+    form_class = VagaForm
+    template_name = 'estagios/vaga_form.html'
+
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+    def get_success_url(self):
+        # Depois de salvar a edição, devolve a recrutadora pra tela de detalhes
+        return reverse('vaga_detalhe', kwargs={'pk': self.object.pk})
