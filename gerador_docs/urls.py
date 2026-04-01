@@ -28,6 +28,7 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path('', include('estagios.web_urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 # Em produção, o seu servidor web deve ser configurado para servir os arquivos da pasta MEDIA_ROOT.

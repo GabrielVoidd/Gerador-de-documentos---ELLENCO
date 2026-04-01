@@ -13,7 +13,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .forms import CandidatoForm, CandidatoStatusForm, VagaForm, ParteConcedenteForm, CandidaturaForm, VagaEditForm, \
-    CandidaturaUpdateForm
+    CandidaturaUpdateForm, CandidatoDocumentosForm, ArquivosFormSet, EmpresasFormSet
 import os
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
@@ -1007,3 +1007,43 @@ class RelatorioContratosView(LoginRequiredMixin, UserPassesTestMixin, TemplateVi
             context['vencendo_30_dias'] = []
 
         return context
+
+
+class CandidatoDocumentosUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Candidato
+    form_class = CandidatoDocumentosForm
+    template_name = 'estagios/candidato_documentos_form.html'
+
+    def test_func(self):
+        return is_recrutamento(self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            # Se clicou em Salvar, popula os inlines com os dados enviados
+            context['arquivos_formset'] = ArquivosFormSet(self.request.POST, self.request.FILES, instance=self.object)
+            context['empresas_formset'] = EmpresasFormSet(self.request.POST, instance=self.object)
+        else:
+            # Se só abriu a página, gera inlines em branco (ou com dados existentes)
+            context['arquivos_formset'] = ArquivosFormSet(instance=self.object)
+            context['empresas_formset'] = EmpresasFormSet(instance=self.object)
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        arquivos_formset = context['arquivos_formset']
+        empresas_formset = context['empresas_formset']
+
+        # Só salva se TUDO estiver preenchido corretamente
+        if arquivos_formset.is_valid() and empresas_formset.is_valid():
+            self.object = form.save()
+            arquivos_formset.instance = self.object
+            arquivos_formset.save()
+            empresas_formset.instance = self.object
+            empresas_formset.save()
+            return super().form_valid(form)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('perfil_candidato', kwargs={'pk': self.object.pk})

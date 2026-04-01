@@ -96,9 +96,10 @@
         <div class="card shadow-sm">
             <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 text-dark">Informativo Geral de Vagas</h6>
-                <select class="form-select form-select-sm w-auto">
-                    <option>15 dias</option>
-                    <option>30 dias</option>
+                <select class="form-select form-select-sm border-secondary fw-bold text-secondary w-auto shadow-sm" onchange="atualizarFiltroURL('dias_vagas', this.value)">
+                    <option value="15" {% if request.GET.dias == '15' or not request.GET.dias %}selected{% endif %}>Últimos 15 dias</option>
+                    <option value="30" {% if request.GET.dias == '30' %}selected{% endif %}>Últimos 30 dias</option>
+                    <option value="7" {% if request.GET.dias == '7' %}selected{% endif %}>Últimos 7 dias</option>
                 </select>
             </div>
             <div class="card-body pt-0">
@@ -110,9 +111,10 @@
         <div class="card shadow-sm">
             <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 text-dark">Informativo Geral de Candidatos / Candidaturas</h6>
-                <select class="form-select form-select-sm w-auto">
-                    <option>15 dias</option>
-                    <option>30 dias</option>
+                <select class="form-select form-select-sm border-secondary fw-bold text-secondary w-auto shadow-sm" onchange="atualizarFiltroURL('dias_candidatos', this.value)">
+                    <option value="7" {% if dias_candidatos == 7 %}selected{% endif %}>Últimos 7 dias</option>
+                    <option value="15" {% if dias_candidatos == 15 %}selected{% endif %}>Últimos 15 dias</option>
+                    <option value="30" {% if dias_candidatos == 30 %}selected{% endif %}>Últimos 30 dias</option>
                 </select>
             </div>
             <div class="card-body pt-0">
@@ -137,6 +139,17 @@
 
 {% block extra_js %}
 <script>
+    // --- FUNÇÃO PARA ATUALIZAR A URL SEM RECARREGAR O OUTRO FILTRO ---
+    function atualizarFiltroURL(parametro, valor) {
+        // Pega a URL atual inteira (ex: ?dias_vagas=15)
+        const urlParams = new URLSearchParams(window.location.search);
+        // Atualiza SÓ o parâmetro que mudou (mantendo os outros intactos)
+        urlParams.set(parametro, valor);
+        // Recarrega a página com a URL nova combinada
+        window.location.search = urlParams.toString();
+    }
+
+    // --- CARREGAMENTO DOS GRÁFICOS ---
     // Carrega os dados reais vindos do Python
     const dadosVagas = {{ grafico_vagas_dados_json|safe }};
     const dadosCandidatos = {{ grafico_candidatos_dados_json|safe }};

@@ -28,6 +28,14 @@
                     </div>
                 </div>
 
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <strong class="text-secondary">Escolaridade:</strong>
+                        <p class="mb-1">{{ candidato.get_escolaridade_display }}</p>
+                        <p class="mb-0 text-muted">{{ candidato.instituicao_ensino.razao_social|default:"Nenhuma instituição informada" }}</p>
+                    </div>
+                </div>
+
                 <hr>
 
                 <div class="mt-4 border-top pt-4">
@@ -66,14 +74,6 @@
                     </ul>
                 </div>
 
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <strong class="text-secondary">Escolaridade:</strong>
-                        <p class="mb-1">{{ candidato.get_escolaridade_display }}</p>
-                        <p class="mb-0 text-muted">{{ candidato.instituicao_ensino.razao_social|default:"Nenhuma instituição informada" }}</p>
-                    </div>
-                </div>
-
                 <div class="mt-4 gap-2 d-flex">
                     <a href="{{ candidato.link_whatsapp }}" target="_blank" class="btn btn-success">
                         <i class="fab fa-whatsapp me-1"></i> Chamar no WhatsApp
@@ -87,14 +87,15 @@
     </div>
 
     <div class="col-lg-5 mb-4">
-        <div class="card shadow-sm h-100 border-warning">
+
+        <div class="card shadow-sm border-warning mb-4">
             <div class="card-header bg-warning text-dark">
                 <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i> Gestão de R&S</h5>
             </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
-                    
+
                     <div class="mb-3">
                         <label class="form-label fw-bold">Observações (Visível apenas para equipe):</label>
                         {{ form.observacoes }}
@@ -134,6 +135,67 @@
                 </form>
             </div>
         </div>
+
+        <div class="card shadow-sm border-0 border-start border-info border-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 text-info fw-bold"><i class="fas fa-folder-open me-2"></i> Arquivos do Candidato</h6>
+                <a href="{% url 'candidato_documentos' candidato.id %}" class="btn btn-sm btn-outline-info">
+                    <i class="fas fa-upload me-1"></i> Enviar Arquivos
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <span class="d-block text-muted small mb-1">Currículo</span>
+                        {% if candidato.anexar_curriculo %}
+                            <a href="{{ candidato.anexar_curriculo.url }}" target="_blank" class="btn btn-sm btn-light border w-100 text-start text-primary">
+                                <i class="fas fa-file-pdf text-danger me-2"></i> Acessar Arquivo
+                            </a>
+                        {% else %}
+                            <button class="btn btn-sm btn-light border w-100 text-start text-muted" disabled>Pendente</button>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <span class="d-block text-muted small mb-1">RG</span>
+                        {% if candidato.anexar_rg %}
+                            <a href="{{ candidato.anexar_rg.url }}" target="_blank" class="btn btn-sm btn-light border w-100 text-start text-primary">
+                                <i class="fas fa-id-card text-primary me-2"></i> Acessar Arquivo
+                            </a>
+                        {% else %}
+                            <button class="btn btn-sm btn-light border w-100 text-start text-muted" disabled>Pendente</button>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <span class="d-block text-muted small mb-1">CPF</span>
+                        {% if candidato.anexar_cpf %}
+                            <a href="{{ candidato.anexar_cpf.url }}" target="_blank" class="btn btn-sm btn-light border w-100 text-start text-primary">
+                                <i class="fas fa-id-card text-primary me-2"></i> Acessar Arquivo
+                            </a>
+                        {% else %}
+                            <button class="btn btn-sm btn-light border w-100 text-start text-muted" disabled>Pendente</button>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <span class="d-block text-muted small mb-1">Declaração Escolar</span>
+                        {% if candidato.anexar_declaracao %}
+                            <a href="{{ candidato.anexar_declaracao.url }}" target="_blank" class="btn btn-sm btn-light border w-100 text-start text-primary">
+                                <i class="fas fa-file-alt text-secondary me-2"></i> Acessar Arquivo
+                            </a>
+                        {% else %}
+                            <button class="btn btn-sm btn-light border w-100 text-start text-muted" disabled>Pendente</button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if candidato.arquivos.exists or candidato.empresas.exists %}
+                <hr>
+                <div class="text-center">
+                    <small class="text-muted"><i class="fas fa-info-circle me-1"></i> Este candidato possui histórico de entrevistas/empresas anexado. Clique em <b>"Enviar Arquivos"</b> para visualizar tudo.</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

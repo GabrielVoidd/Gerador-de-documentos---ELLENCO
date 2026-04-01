@@ -442,6 +442,7 @@ class Empresa(models.Model):
     candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='empresas')
     nome = models.CharField(max_length=120, null=True, blank=True)
     observacoes = models.TextField(null=True, blank=True)
+    arquivo = models.FileField(upload_to='empresas/documentos/', null=True, blank=True)  # O NOVO CAMPO
 
     def __str__(self):
         return self.nome

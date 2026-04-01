@@ -1,0 +1,166 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-11">
+        <div class="card shadow border-0 mt-4 mb-5">
+            <div class="card-header bg-dark text-white py-3">
+                <h5 class="mb-0"><i class="fas fa-file-upload me-2"></i> Central de Documentos: {{ candidato.nome }}</h5>
+            </div>
+            <div class="card-body p-4">
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">1. Documentos Principais (Fixos)</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-bold text-primary"><i class="fas fa-file-pdf me-1"></i> Currículo</label>
+                            {{ form.anexar_curriculo }}
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3"><label class="form-label fw-bold small">RG</label>{{ form.anexar_rg }}</div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-bold small">CPF</label>{{ form.anexar_cpf }}</div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-bold small">Reservista</label>{{ form.anexar_reservista }}</div>
+                        <div class="col-md-6 mb-3"><label class="form-label fw-bold small">Carteira de Trabalho</label>{{ form.anexar_carteira_trabalho }}</div>
+                        <div class="col-md-6 mb-3"><label class="form-label fw-bold small">Declaração Escolar</label>{{ form.anexar_declaracao }}</div>
+                    </div>
+
+                    <h6 class="text-info fw-bold border-bottom pb-2 mb-3 mt-4">2. Folhas de Entrevista (Arquivos Extras)</h6>
+                    {{ arquivos_formset.management_form }}
+                    <div id="arquivos-container">
+                        {% for form_arq in arquivos_formset %}
+                            <div class="row align-items-center mb-2 arquivo-row">
+                                {{ form_arq.id }}
+                                <div class="col-md-9">{{ form_arq.arquivo }}</div>
+                                <div class="col-md-3 text-end">
+                                    {% if form_arq.instance.pk %}
+                                        <div class="form-check text-danger fw-bold">
+                                            {{ form_arq.DELETE }} <label class="form-check-label small">Excluir?</label>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div id="empty-arquivo-form" class="d-none">
+                        <div class="row align-items-center mb-2 arquivo-row">
+                            {{ arquivos_formset.empty_form.id }}
+                            <div class="col-md-9">{{ arquivos_formset.empty_form.arquivo }}</div>
+                            <div class="col-md-3"></div>
+                        </div>
+                    </div>
+                    <button type="button" id="add-arquivo" class="btn btn-sm btn-outline-info mb-4"><i class="fas fa-plus me-1"></i> Adicionar Folha</button>
+
+
+                    <h6 class="text-success fw-bold border-bottom pb-2 mb-3 mt-4">3. Histórico de Empresas / Encaminhamentos</h6>
+                    {{ empresas_formset.management_form }}
+
+                    <div id="empresas-container">
+                        {% for form_emp in empresas_formset %}
+                            <div class="row align-items-start mb-3 p-3 bg-light rounded border empresa-row">
+                                {{ form_emp.id }}
+                                <div class="col-md-3">
+                                    <label class="small fw-bold">Empresa:</label>
+                                    {{ form_emp.nome }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="small fw-bold">Observações:</label>
+                                    {{ form_emp.observacoes }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="small fw-bold">Anexo Documento:</label>
+                                    {{ form_emp.arquivo }}
+                                    {% if form_emp.instance.arquivo %}
+                                        <div class="mt-1">
+                                            <a href="{{ form_emp.instance.arquivo.url }}" target="_blank" class="badge bg-info text-decoration-none">
+                                                <i class="fas fa-external-link-alt"></i> Ver arquivo atual
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    {% if form_emp.instance.pk %}
+                                        <div class="form-check text-danger fw-bold mt-4">
+                                            {{ form_emp.DELETE }} <label class="form-check-label small">Excluir?</label>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div id="empty-empresa-form" class="d-none">
+                        <div class="row align-items-start mb-3 p-3 bg-light rounded border empresa-row">
+                            {{ empresas_formset.empty_form.id }}
+                            <div class="col-md-3">
+                                <label class="small fw-bold">Empresa:</label>
+                                {{ empresas_formset.empty_form.nome }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small fw-bold">Observações:</label>
+                                {{ empresas_formset.empty_form.observacoes }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="small fw-bold">Anexo Documento:</label>
+                                {{ empresas_formset.empty_form.arquivo }}
+                            </div>
+                            <div class="col-md-2"></div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="add-empresa" class="btn btn-sm btn-outline-success mb-4">
+                        <i class="fas fa-plus me-1"></i> Adicionar nova empresa no histórico
+                    </button>
+
+
+                    <hr class="my-4">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'perfil_candidato' candidato.id %}" class="btn btn-light px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-dark px-5 shadow">
+                            <i class="fas fa-save me-2"></i> Salvar Todas as Alterações
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Função genérica para adicionar formulários em formsets
+    function addFormsetRow(btnId, containerId, emptyFormId, totalFormsId, prefix) {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const totalForms = document.getElementById(totalFormsId);
+                const formIdx = totalForms.value;
+                const container = document.getElementById(containerId);
+                const emptyForm = document.getElementById(emptyFormId).innerHTML;
+
+                // Substitui o __prefix__ pelo índice atual
+                const compiledForm = emptyForm.replace(/__prefix__/g, formIdx);
+
+                container.insertAdjacentHTML('beforeend', compiledForm);
+                totalForms.value = parseInt(formIdx) + 1;
+            });
+        }
+    }
+
+    // Ativa para Seção 2 (Arquivos)
+    addFormsetRow('add-arquivo', 'arquivos-container', 'empty-arquivo-form', 'id_arquivos-TOTAL_FORMS', 'arquivos');
+
+    // Ativa para Seção 3 (Empresas)
+    addFormsetRow('add-empresa', 'empresas-container', 'empty-empresa-form', 'id_empresas-TOTAL_FORMS', 'empresas');
+
+});
+</script>
+{% endblock %}

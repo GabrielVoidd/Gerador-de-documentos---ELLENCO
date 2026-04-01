@@ -1,5 +1,7 @@
 from django import forms
-from .models import Candidato, Vaga, ParteConcedente, Candidatura
+from django.forms.models import inlineformset_factory
+
+from .models import Candidato, Vaga, ParteConcedente, Candidatura, Empresa, Arquivos
 
 
 class CandidatoForm(forms.ModelForm):
@@ -139,3 +141,51 @@ class CandidaturaUpdateForm(forms.ModelForm):
         widgets = {
             'status': forms.Select(attrs={'class': 'form-select border-warning fw-bold'}),
         }
+
+
+# 1. O formulário principal (que salva os 6 documentos fixos do Candidato)
+class CandidatoDocumentosForm(forms.ModelForm):
+    class Meta:
+        model = Candidato
+        fields = [
+            'anexar_curriculo', 'anexar_rg', 'anexar_cpf',
+            'anexar_carteira_trabalho', 'anexar_declaracao', 'anexar_reservista'
+        ]
+        widgets = {
+            'anexar_curriculo': forms.FileInput(attrs={'class': 'form-control'}),
+            'anexar_rg': forms.FileInput(attrs={'class': 'form-control'}),
+            'anexar_cpf': forms.FileInput(attrs={'class': 'form-control'}),
+            'anexar_carteira_trabalho': forms.FileInput(attrs={'class': 'form-control'}),
+            'anexar_declaracao': forms.FileInput(attrs={'class': 'form-control'}),
+            'anexar_reservista': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+
+# 2. O "Inline" das Folhas de Entrevista (Tabela: Arquivos)
+# Ele liga o "Candidato" (Pai) com os "Arquivos" (Filho)
+ArquivosFormSet = inlineformset_factory(
+    Candidato,   # Modelo Pai
+    Arquivos,    # Modelo Filho
+    fields=['arquivo'],
+    extra=1,     # Cria 1 linha vazia por padrão na tela
+    can_delete=True,
+    widgets={
+        'arquivo': forms.FileInput(attrs={'class': 'form-control form-control-sm'})
+    }
+)
+
+
+# 3. O "Inline" do Histórico de Empresas (Tabela: Empresa)
+# Ele liga o "Candidato" (Pai) com as "Empresas" (Filho)
+EmpresasFormSet = inlineformset_factory(
+    Candidato,   # Modelo Pai
+    Empresa,     # Modelo Filho
+    fields=['nome', 'observacoes', 'arquivo'],
+    extra=1,     # Cria 1 linha vazia por padrão na tela
+    can_delete=True,
+    widgets={
+        'nome': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Nome da Empresa'}),
+        'observacoes': forms.Textarea(attrs={'class': 'form-control form-control-sm', 'rows': 1, 'placeholder': 'Observações da entrevista...'}),
+        'arquivo': forms.FileInput(attrs={'class': 'form-control form-control-sm'}),
+    }
+)
