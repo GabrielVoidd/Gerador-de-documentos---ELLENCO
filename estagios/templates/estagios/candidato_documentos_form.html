@@ -13,27 +13,71 @@
                     {% csrf_token %}
 
                     <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">1. Documentos Principais (Fixos)</h6>
+
                     <div class="row mb-3">
                         <div class="col-md-12 mb-3">
                             <label class="form-label fw-bold text-primary"><i class="fas fa-file-pdf me-1"></i> Currículo</label>
                             {{ form.anexar_curriculo }}
+                            {% if candidato.anexar_curriculo %}
+                                <div class="mt-1 small"><a href="{{ candidato.anexar_curriculo.url }}" target="_blank" class="btn btn-xs btn-link p-0 text-success"><i class="fas fa-download"></i> Baixar Currículo Atual</a></div>
+                            {% endif %}
                         </div>
                     </div>
+
                     <div class="row mb-4">
-                        <div class="col-md-4 mb-3"><label class="form-label fw-bold small">RG</label>{{ form.anexar_rg }}</div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-bold small">CPF</label>{{ form.anexar_cpf }}</div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-bold small">Reservista</label>{{ form.anexar_reservista }}</div>
-                        <div class="col-md-6 mb-3"><label class="form-label fw-bold small">Carteira de Trabalho</label>{{ form.anexar_carteira_trabalho }}</div>
-                        <div class="col-md-6 mb-3"><label class="form-label fw-bold small">Declaração Escolar</label>{{ form.anexar_declaracao }}</div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold small">RG</label>
+                            {{ form.anexar_rg }}
+                            {% if candidato.anexar_rg %}
+                                <div class="mt-1 small"><a href="{{ candidato.anexar_rg.url }}" target="_blank" class="text-success"><i class="fas fa-eye"></i> Ver RG salvo</a></div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold small">CPF</label>
+                            {{ form.anexar_cpf }}
+                            {% if candidato.anexar_cpf %}
+                                <div class="mt-1 small"><a href="{{ candidato.anexar_cpf.url }}" target="_blank" class="text-success"><i class="fas fa-eye"></i> Ver CPF salvo</a></div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold small">Reservista</label>
+                            {{ form.anexar_reservista }}
+                            {% if candidato.anexar_reservista %}
+                                <div class="mt-1 small"><a href="{{ candidato.anexar_reservista.url }}" target="_blank" class="text-success"><i class="fas fa-eye"></i> Ver Reservista</a></div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold small">Carteira de Trabalho</label>
+                            {{ form.anexar_carteira_trabalho }}
+                            {% if candidato.anexar_carteira_trabalho %}
+                                <div class="mt-1 small"><a href="{{ candidato.anexar_carteira_trabalho.url }}" target="_blank" class="text-success"><i class="fas fa-download"></i> Baixar CTPS</a></div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold small">Declaração Escolar</label>
+                            {{ form.anexar_declaracao }}
+                            {% if candidato.anexar_declaracao %}
+                                <div class="mt-1 small"><a href="{{ candidato.anexar_declaracao.url }}" target="_blank" class="text-success"><i class="fas fa-eye"></i> Ver Declaração</a></div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <h6 class="text-info fw-bold border-bottom pb-2 mb-3 mt-4">2. Folhas de Entrevista (Arquivos Extras)</h6>
                     {{ arquivos_formset.management_form }}
                     <div id="arquivos-container">
                         {% for form_arq in arquivos_formset %}
-                            <div class="row align-items-center mb-2 arquivo-row">
+                            <div class="row align-items-center mb-3 arquivo-row border-bottom pb-2">
                                 {{ form_arq.id }}
-                                <div class="col-md-9">{{ form_arq.arquivo }}</div>
+                                <div class="col-md-7">
+                                    {{ form_arq.arquivo }}
+                                    {% if form_arq.instance.arquivo %}
+                                        <div class="mt-1 small">
+                                            <a href="{{ form_arq.instance.arquivo.url }}" target="_blank" class="text-info fw-bold">
+                                                <i class="fas fa-file-download"></i> {{ form_arq.instance.arquivo.name|truncatechars:30 }}
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
                                 <div class="col-md-3 text-end">
                                     {% if form_arq.instance.pk %}
                                         <div class="form-check text-danger fw-bold">
@@ -66,17 +110,17 @@
                                     <label class="small fw-bold">Empresa:</label>
                                     {{ form_emp.nome }}
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="small fw-bold">Observações:</label>
                                     {{ form_emp.observacoes }}
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="small fw-bold">Anexo Documento:</label>
+                                <div class="col-md-4">
+                                    <label class="small fw-bold">Documento/Carta:</label>
                                     {{ form_emp.arquivo }}
                                     {% if form_emp.instance.arquivo %}
-                                        <div class="mt-1">
-                                            <a href="{{ form_emp.instance.arquivo.url }}" target="_blank" class="badge bg-info text-decoration-none">
-                                                <i class="fas fa-external-link-alt"></i> Ver arquivo atual
+                                        <div class="mt-1 small">
+                                            <a href="{{ form_emp.instance.arquivo.url }}" target="_blank" class="text-success fw-bold">
+                                                <i class="fas fa-external-link-alt"></i> Baixar Documento
                                             </a>
                                         </div>
                                     {% endif %}
@@ -99,12 +143,12 @@
                                 <label class="small fw-bold">Empresa:</label>
                                 {{ empresas_formset.empty_form.nome }}
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="small fw-bold">Observações:</label>
                                 {{ empresas_formset.empty_form.observacoes }}
                             </div>
-                            <div class="col-md-3">
-                                <label class="small fw-bold">Anexo Documento:</label>
+                            <div class="col-md-4">
+                                <label class="small fw-bold">Documento/Carta:</label>
                                 {{ empresas_formset.empty_form.arquivo }}
                             </div>
                             <div class="col-md-2"></div>
@@ -135,8 +179,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Função genérica para adicionar formulários em formsets
-    function addFormsetRow(btnId, containerId, emptyFormId, totalFormsId, prefix) {
+    function addFormsetRow(btnId, containerId, emptyFormId, totalFormsId) {
         const btn = document.getElementById(btnId);
         if (btn) {
             btn.addEventListener('click', function(e) {
@@ -145,22 +188,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formIdx = totalForms.value;
                 const container = document.getElementById(containerId);
                 const emptyForm = document.getElementById(emptyFormId).innerHTML;
-
-                // Substitui o __prefix__ pelo índice atual
                 const compiledForm = emptyForm.replace(/__prefix__/g, formIdx);
-
                 container.insertAdjacentHTML('beforeend', compiledForm);
                 totalForms.value = parseInt(formIdx) + 1;
             });
         }
     }
 
-    // Ativa para Seção 2 (Arquivos)
-    addFormsetRow('add-arquivo', 'arquivos-container', 'empty-arquivo-form', 'id_arquivos-TOTAL_FORMS', 'arquivos');
-
-    // Ativa para Seção 3 (Empresas)
-    addFormsetRow('add-empresa', 'empresas-container', 'empty-empresa-form', 'id_empresas-TOTAL_FORMS', 'empresas');
-
+    addFormsetRow('add-arquivo', 'arquivos-container', 'empty-arquivo-form', 'id_arquivos-TOTAL_FORMS');
+    addFormsetRow('add-empresa', 'empresas-container', 'empty-empresa-form', 'id_empresas-TOTAL_FORMS');
 });
 </script>
 {% endblock %}
