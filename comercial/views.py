@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import CreateView
@@ -20,12 +21,19 @@ class ParteConcedenteCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateV
         print("ERROS DO FORMULÁRIO:", form.errors)
         return super().form_invalid(form)
 
-# 2. O Dashboard básico
-def dashboard_comercial(request):
-    # Empresas que já fecharam (Clientes)
-    clientes = ParteConcedente.objects.all().order_by('-id')[:5]
 
-    # Chamados que ainda NÃO assinaram contrato (Leads ativos)
+def dashboard_comercial(request):
+    query = request.GET.get('q')
+
+    if query:
+        # Se houver pesquisa, traz todos os resultados correspondentes
+        clientes = ParteConcedente.objects.filter(
+            Q(razao_social__icontains=query) | Q(cnpj__icontains=query)
+        ).order_by('-id')
+    else:
+        # Se não houver pesquisa, mantém os últimos 5 para o dashboard ficar organizado
+        clientes = ParteConcedente.objects.all().order_by('-id')[:5]
+
     chamados_pendentes = Chamados.objects.filter(contrato_assinado=False).order_by('-data_contato')
 
     context = {
@@ -33,6 +41,7 @@ def dashboard_comercial(request):
         'chamados_pendentes': chamados_pendentes,
         'total_clientes': ParteConcedente.objects.count(),
         'total_chamados': chamados_pendentes.count(),
+        'query': query,
     }
     return render(request, 'comercial/dashboard.html', context)
 
