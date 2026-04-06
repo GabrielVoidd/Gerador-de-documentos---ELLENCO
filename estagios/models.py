@@ -547,6 +547,13 @@ class ContratoAceite(models.Model):
     parte_concedente = models.ForeignKey(ParteConcedente, on_delete=models.PROTECT)
     plano = models.CharField(max_length=1, choices=Planos.choices)
     data_cadastro = models.DateField(auto_now_add=True)
+    empresa_nome_documento = models.CharField(max_length=255, blank=True, null=True,
+                                              help_text="Nome que aparecerá no PDF")
+    empresa_cnpj_documento = models.CharField(max_length=20, blank=True, null=True,
+                                              help_text="CNPJ que aparecerá no PDF")
+    observacoes_adicionais = models.TextField(blank=True, null=True)
+    taxa_honorarios = models.CharField(max_length=100, blank=True, null=True, help_text="Ex: 50% (cinquenta por cento)")
+
 
     class Meta:
         verbose_name = 'Contrato R&S - Aceite'

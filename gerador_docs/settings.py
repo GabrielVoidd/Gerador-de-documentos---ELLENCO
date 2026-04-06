@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django_admin_listfilter_dropdown',
     'admin_auto_filters',
     'dashboard',
+    'comercial',
 ]
 
 MIDDLEWARE = [

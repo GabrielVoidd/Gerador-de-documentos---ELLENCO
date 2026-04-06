@@ -1,0 +1,85 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold"><i class="fas fa-building me-2"></i> Cadastrar Nova Empresa (Cliente)</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>Ops! Verifique os erros abaixo:</strong>
+                                {{ form.errors }}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold small">Razão Social</label>
+                                {{ form.razao_social }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold small">CNPJ</label>
+                                {{ form.cnpj }}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold small">Telefone</label>
+                                {{ form.telefone }}
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label fw-bold small">E-mail para Faturamento/Contato</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label fw-bold small">Ramo de atividade</label>
+                                {{ form.ramo_atividade }}
+                            </div>
+
+                            <hr class="my-3">
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold small">CEP</label>
+                                {{ form.cep }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold small">Endereço Completo</label>
+                                {{ form.endereco }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold small">Bairro</label>
+                                {{ form.bairro }}
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label fw-bold small">Cidade</label>
+                                {{ form.cidade }}
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label fw-bold small">Estado (UF)</label>
+                                {{ form.estado }}
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label fw-bold small">Representante Legal</label>
+                                {{ form.representante_legal }}
+                            </div>
+                        </div>
+
+                        <div class="mt-4 d-flex justify-content-end gap-2">
+                            <a href="{% url 'dashboard_comercial' %}" class="btn btn-light border">Cancelar</a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save me-2"></i> Salvar Empresa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -16,7 +16,7 @@
         body {
             font-family: 'Times New Roman', Times, serif;
             font-size: 10.5pt;
-            line-height: 1.3; /* Aumentado para melhor legibilidade */
+            line-height: 1.3;
         }
 
         table {
@@ -50,124 +50,33 @@
             margin-left: 7%;
         }
 
-        /* --- ESTILO MODIFICADO --- */
-        .contract-box {
-            /* border: 1px solid black; -> REMOVIDO */
-            text-align: center;
-        }
-        .contract-box-title {
-            font-size: 8pt;
-            font-weight: bold;
-            /* border-bottom: 1px solid black; -> REMOVIDO */
-            padding: 1px;
-        }
-        .contract-box-content {
-            font-size: 10pt;
-            font-weight: bold;
-            padding: 2px;
-        }
+        .contract-box { text-align: center; }
+        .contract-box-title { font-size: 8pt; font-weight: bold; padding: 1px; }
+        .contract-box-content { font-size: 10pt; font-weight: bold; padding: 2px; }
 
-        .centered-text {
-            text-align: center;
-            font-size: 9pt;
-            margin: 10px 0;
-        }
+        .centered-text { text-align: center; font-size: 9pt; margin: 10px 0; }
+        .section-title { font-weight: bold; font-size: 9pt; text-transform: uppercase; margin-top: 10px; margin-bottom: 2px; }
 
-        .section-title {
-            font-weight: bold;
-            font-size: 9pt;
-            text-transform: uppercase;
-            margin-top: 10px;
-            margin-bottom: 2px;
-        }
+        .info-table { width: 100%; border-collapse: collapse; border-bottom: 1px solid black; margin-bottom: 20px; }
+        .info-table td { font-size: 9pt; font-weight: bold; text-transform: uppercase; padding: 2px 0; width: 50%; }
+        .info-table strong { font-weight: normal; text-transform: none; }
 
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            border-bottom: 1px solid black;
-            margin-bottom: 20px; /* ESPAÇAMENTO AUMENTADO */
-        }
+        .lowercase { text-transform: none !important; }
 
-        .info-table td {
-            font-size: 9pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            padding: 2px 0;
-            width: 50%;
-        }
+        .conditions-title { text-align: left; font-weight: bold; font-size: 10pt; margin-top: 25px; }
+        .conditions-content { text-align: left; font-size: 9pt; margin-top: 5px; }
+        .conditions-content.centered { text-align: left; }
 
-        .info-table strong {
-            font-weight: normal;
-            text-transform: none;
-        }
+        .clause { font-size: 10pt; text-align: justify; margin-top: 12px; }
 
-        .lowercase {
-            text-transform: none !important;
-        }
+        .signature-date { text-align: center; margin-top: 40px; margin-bottom: 30px; font-size: 10pt; }
 
-        .conditions-title {
-            text-align: left;
-            font-weight: bold;
-            font-size: 10pt;
-            /* border: 1px solid black; -> REMOVIDO */
-            /* border-bottom: none; -> REMOVIDO */
-            /* padding: 2px; -> REMOVIDO */
-            margin-top: 25px; /* ESPAÇAMENTO AUMENTADO */
-        }
-        .conditions-content {
-            text-align: left; /* Alinhamento padrão para o conteúdo */
-            font-size: 9pt;
-            /* border: 1px solid black; -> REMOVIDO */
-            /* padding: 3px; -> REMOVIDO */
-            margin-top: 5px;
-        }
+        .signature-block { text-align: left; font-size: 9pt; }
+        .signature-line { border-top: 1px solid black; margin: 0 0 2px 0; width: 70%; }
+        .signature-stamp { font-size: 8pt; }
 
-        /* Estilos específicos para conteúdo que deve ser centralizado ou negrito */
-        .conditions-content.centered {
-             text-align: left;
-        }
-        /*.conditions-content.bold {
-            font-weight: bold;
-        }*/
-
-        .clause {
-            font-size: 10pt;
-            text-align: justify;
-            margin-top: 12px; /* ESPAÇAMENTO AUMENTADO */
-        }
-
-        .signature-date {
-            text-align: center;
-            margin-top: 40px; /* ESPAÇAMENTO AUMENTADO */
-            margin-bottom: 30px;
-            font-size: 10pt;
-        }
-
-        .signature-block {
-            text-align: left;
-            font-size: 9pt;
-        }
-        .signature-line {
-            border-top: 1px solid black;
-            margin: 0 0 2px 0;
-            width: 70%;
-        }
-        .signature-stamp {
-            font-size: 8pt;
-        }
-
-        .clausula-item {
-            display: flex; /* O segredo: coloca letra e texto lado a lado */
-            align-items: flex-start; /* Alinha ambos no topo */
-            margin-bottom: 10px;
-            font-family: sans-serif; /* Sua fonte aqui */
-        }
-
-        .item-texto {
-            flex: 1; /* Ocupa todo o espaço restante */
-            text-align: justify; /* Opcional: igual documentos legais */
-        }
-        /* --- FIM DAS MODIFICAÇÕES DE ESTILO --- */
+        .clausula-item { display: flex; align-items: flex-start; margin-bottom: 10px; font-family: sans-serif; }
+        .item-texto { flex: 1; text-align: justify; }
     </style>
 </head>
 <body>
@@ -177,13 +86,12 @@
                 <img src="{{ logo_path }}" alt="Logo da Empresa" style="max-width: 100%; height: auto;">
             </td>
             <td style="width: 50%;">
-                <!--<div class="header-main-title">TCE - Termo de COMPROMISSO de ESTÁGIO.</div>-->
                 <div class="header-subtitle">Aceite - Recrutamento e Seleção</div>
             </td>
         </tr>
     </table>
 
-    <div class="clause">{% firstof contrato_aceite.parte_concedente.razao_social contrato_aceite.parte_concedente.nome %}</div>
+    <div class="clause">{{ contrato_aceite.empresa_nome_documento }}</div>
 
     <div class="clause">Conforme Proposta enviada, segue aceite para contratação de vagas.</div>
 
@@ -209,11 +117,9 @@
     </div>
 
     {% if contrato_aceite.plano == 'P' %}
-        <div class="clause">Opção 1 – (50%) Com Reposição Condição <strong>10/30 da emissão da Nota Fiscal</strong>.</div>
-
+        <div class="clause">Opção 1 – ({{ contrato_aceite.taxa_honorarios|default:"50%" }}) Com Reposição Condição <strong>10/30 da emissão da Nota Fiscal</strong>.</div>
     {% elif contrato_aceite.plano == 'S' %}
-        <div class="clause">Opção 2 – (30%) Sem Reposição Condição <strong>10 dias da emissão da Nota Fiscal</strong>.</div>
-
+        <div class="clause">Opção 2 – ({{ contrato_aceite.taxa_honorarios|default:"30%" }}) Sem Reposição Condição <strong>10 dias da emissão da Nota Fiscal</strong>.</div>
     {% endif %}
 
     <div class="clause">1.2 Se o valor acordado com o profissional contratado for diferente do valor inicial
@@ -233,14 +139,12 @@
 
     {% if contrato_aceite.plano == 'P' %}
         <div class="conditions-title">Plano Selecionado: PLUS</div>
-
-        <div class="clause">CONTRATAÇÃO 50% (cinquenta por cento) do valor da primeira remuneração nominal mensal do
+        <div class="clause">CONTRATAÇÃO {{ contrato_aceite.taxa_honorarios|default:"50% (cinquenta por cento)" }} do valor da primeira remuneração nominal mensal do
             candidato a ser contratado, COM REPOSIÇÃO em até 30 dias conforme aviso antecipado.
         </div>
     {% elif contrato_aceite.plano == 'S' %}
         <div class="conditions-title">Plano Selecionado: SÊNIOR</div>
-
-        <div class="clause">CONTRATAÇÃO 30% (trinta por cento) do valor da primeira remuneração nominal mensal do
+        <div class="clause">CONTRATAÇÃO {{ contrato_aceite.taxa_honorarios|default:"30% (trinta por cento)" }} do valor da primeira remuneração nominal mensal do
             candidato a ser contratado, sem reposição.
         </div>
     {% endif %}
@@ -267,8 +171,8 @@
             <td style="width: 50%; padding: 45px 25px;">
                 <div class="signature-block">
                     <div class="signature-line"></div>
-                    <div>{% firstof contrato_aceite.parte_concedente.nome contrato_aceite.parte_concedente.razao_social %}</div>
-                    <div>CNPJ: {{ contrato_aceite.parte_concedente.cnpj }}</div>
+                    <div>{{ contrato_aceite.empresa_nome_documento }}</div>
+                    <div>CNPJ: {{ contrato_aceite.empresa_cnpj_documento }}</div>
                 </div>
             </td>
         </tr>

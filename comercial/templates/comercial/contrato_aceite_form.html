@@ -1,0 +1,130 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <form method="post">
+        {% csrf_token %}
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-success text-white py-3">
+                        <h6 class="m-0 font-weight-bold">Gerar Aceite de R&S - {{ empresa.razao_social }}</h6>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="fw-bold small">Nome da Empresa no PDF</label>
+                                {{ form.empresa_nome_documento }}
+                                <small class="text-muted d-block mt-1">Pode ser alterado sem afetar o cadastro principal.</small>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="fw-bold small">CNPJ no PDF</label>
+                                {{ form.empresa_cnpj_documento }}
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="fw-bold small">Plano</label>
+                                {{ form.plano }}
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="fw-bold small text-danger">Taxa (%)</label>
+                                {{ form.taxa_honorarios }}
+                            </div>
+                        </div>
+
+                        <h6 class="text-success fw-bold border-bottom pb-2">Vagas Solicitadas</h6>
+                        {{ vagas_formset.management_form }}
+
+                        <div id="vagas-container">
+                            {% for v_form in vagas_formset %}
+                                <div class="row g-2 mb-2 vaga-row align-items-end">
+                                    {{ v_form.id }} <div class="col-md-2">
+                                        <label class="small">Quantidade</label>
+                                        {{ v_form.quantidade }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="small">Cargo / Nome da Vaga</label>
+                                        {{ v_form.vaga }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="small">Salário (R$)</label>
+                                        {{ v_form.salario }}
+                                    </div>
+                                    <div class="col-md-1 text-center pb-2">
+                                        {% if v_form.instance.pk %}
+                                            <div class="form-check">
+                                                {{ v_form.DELETE }}
+                                                <label class="form-check-label text-danger small" title="Apagar vaga">Excluir</label>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div id="empty-vaga-form" class="d-none">
+                            <div class="row g-2 mb-2 vaga-row align-items-end">
+                                {{ vagas_formset.empty_form.id }}
+                                <div class="col-md-2">
+                                    <label class="small">Quantidade</label>
+                                    {{ vagas_formset.empty_form.quantidade }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="small">Cargo / Nome da Vaga</label>
+                                    {{ vagas_formset.empty_form.vaga }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="small">Salário (R$)</label>
+                                    {{ vagas_formset.empty_form.salario }}
+                                </div>
+                                <div class="col-md-1"></div>
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-vaga" class="btn btn-sm btn-outline-success mt-3">
+                            <i class="fas fa-plus me-1"></i> Adicionar Outra Vaga
+                        </button>
+
+                        <div class="mt-4 border-top pt-3 text-end">
+                            <a href="{% url 'perfil_empresa' empresa.id %}" class="btn btn-light border px-4">Cancelar</a>
+                            <button type="submit" class="btn btn-success px-5 shadow-sm">
+                                <i class="fas fa-save me-2"></i> Salvar e Retornar
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addVagaBtn = document.getElementById('add-vaga');
+
+    if (addVagaBtn) {
+        addVagaBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Aqui ele procura o input oculto TOTAL_FORMS do formset (cujo related_name é 'detalhes')
+            let totalForms = document.getElementById('id_detalhes-TOTAL_FORMS');
+            let formIdx = totalForms.value;
+
+            let container = document.getElementById('vagas-container');
+            let emptyForm = document.getElementById('empty-vaga-form').innerHTML;
+
+            // Substitui o __prefix__ pelo número correto da nova linha
+            let compiledForm = emptyForm.replace(/__prefix__/g, formIdx);
+
+            container.insertAdjacentHTML('beforeend', compiledForm);
+
+            // Atualiza o total de formulários no Django
+            totalForms.value = parseInt(formIdx) + 1;
+        });
+    }
+});
+</script>
+{% endblock %}

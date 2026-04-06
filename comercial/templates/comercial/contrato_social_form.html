@@ -1,0 +1,57 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-dark text-white">
+                    <h6 class="m-0 font-weight-bold">Novo Contrato Social: {{ empresa.razao_social }}</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <h6 class="text-primary fw-bold border-bottom pb-2">Proprietários / Sócios</h6>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Nome do Dono</label>{{ form.nome_dono }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">CPF do Dono</label>{{ form.documentos_dono }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Nome do Sócio</label>{{ form.nome_socio }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">CPF do Sócio</label>{{ form.documentos_socio }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <h6 class="text-primary fw-bold border-bottom pb-2">Responsáveis Operacionais</h6>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">Responsável RH</label>{{ form.nome_resp_rh }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">Telefone RH (Só números)</label>{{ form.numero_resp_rh }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">Email RH</label>{{ form.email_resp_rh }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="small fw-bold">Responsável pelo Estágio</label>{{ form.nome_resp_estagio }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                            <a href="{% url 'perfil_empresa' empresa.id %}" class="btn btn-light border">Cancelar</a>
+                            <button type="submit" class="btn btn-success px-5">Salvar e Gerar Contrato</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
