@@ -10,11 +10,48 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-chart-pie me-2"></i> Funil de Leads</h6>
+                </div>
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    <div style="position: relative; height:250px; width:100%">
+                        <canvas id="funilChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="row h-100 g-4">
+                <div class="col-sm-6">
+                    <div class="card shadow h-100 bg-primary text-white text-center py-4 border-0">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">Empresas na Base</h5>
+                            <h2 class="display-4 fw-bold mb-0">{{ total_clientes }}</h2>
+                            <i class="fas fa-building fa-2x mt-3 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card shadow h-100 bg-success text-white text-center py-4 border-0">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">Taxa de Conversão</h5>
+                            <h2 class="display-4 fw-bold mb-0">{{ taxa_conversao }}%</h2>
+                            <small class="d-block mt-2">Leads que viraram clientes</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-lg-6">
             <div class="card shadow mb-4 border-start border-warning border-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-warning"><i class="fas fa-headset me-2"></i> Chamados Pendentes ({{ total_chamados }})</h6>
+                    <h6 class="m-0 font-weight-bold text-warning"><i class="fas fa-headset me-2"></i> Últimos Chamados</h6>
                 </div>
                 <div class="card-body">
                     <div class="list-group list-group-flush">
@@ -26,8 +63,10 @@
                                         <small class="text-muted">{{ chamado.nome }} | {{ chamado.numero }}</small>
                                     </div>
                                     <div class="text-end">
-                                        {% if chamado.proposta_enviada %}
-                                            <span class="badge bg-info text-dark">Proposta Enviada</span>
+                                        {% if chamado.contrato_assinado %}
+                                            <span class="badge bg-success shadow-sm">Contrato Assinado</span>
+                                        {% elif chamado.proposta_enviada %}
+                                            <span class="badge bg-info text-dark shadow-sm">Proposta Enviada</span>
                                         {% else %}
                                             <span class="badge bg-light text-muted border">Aguardando Proposta</span>
                                         {% endif %}
@@ -35,7 +74,7 @@
                                 </div>
                             </a>
                         {% empty %}
-                            <p class="text-muted small text-center my-3">Nenhum chamado pendente no momento.</p>
+                            <p class="text-muted small text-center my-3">Nenhum chamado registrado no momento.</p>
                         {% endfor %}
                     </div>
                 </div>
@@ -106,4 +145,49 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Pega o elemento canvas onde o gráfico será renderizado
+        var ctx = document.getElementById('funilChart');
+
+        if (ctx) {
+            var funilChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    // Os rótulos de cada fatia
+                    labels: ['Aguardando Proposta', 'Proposta Enviada', 'Contrato Assinado'],
+                    datasets: [{
+                        // Puxa os números diretamente das variáveis do Django passadas pela view
+                        data: [
+                            {{ chart_aguardando|default:0 }},
+                            {{ chart_propostas|default:0 }},
+                            {{ chart_assinados|default:0 }}
+                        ],
+                        backgroundColor: [
+                            '#e2e3e5', // Cinza para aguardando
+                            '#0dcaf0', // Azul claro (info) para proposta
+                            '#198754'  // Verde (success) para assinado
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    },
+                    cutout: '65%', // Deixa o buraco no meio do gráfico para estilo Doughnut
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

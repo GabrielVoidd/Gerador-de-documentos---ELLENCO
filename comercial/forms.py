@@ -1,6 +1,6 @@
 from django.forms.models import inlineformset_factory
 
-from estagios.models import ParteConcedente, ContratoSocial, ContratoAceite, DetalhesContratoAceite, Chamados
+from estagios.models import ParteConcedente, ContratoSocial, ContratoAceite, DetalhesContratoAceite, Chamados, Aditivo
 from django import forms
 
 
@@ -112,3 +112,14 @@ class ChamadoUpdateForm(forms.ModelForm):
             # Aplica classe de checkbox do Bootstrap para os booleanos
             if field_name in ['proposta_enviada', 'contrato_assinado']:
                 field.widget.attrs['class'] = 'form-check-input'
+
+
+class AditivoForm(forms.ModelForm):
+    class Meta:
+        model = Aditivo
+        exclude = ['parte_concedente']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'

@@ -39,26 +39,34 @@
             <div class="card shadow mb-4">
                 <div class="card-header py-3 bg-dark text-white d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold"><i class="fas fa-file-contract me-2"></i> Gestão de Contratos</h6>
-                        <div>
-                            <a href="{% url 'novo_contrato_social' empresa.id %}" class="btn btn-sm btn-outline-light me-1">
-                                <i class="fas fa-plus"></i> Novo Contrato Social
-                            </a>
-                            <a href="{% url 'novo_contrato_aceite' empresa.id %}" class="btn btn-sm btn-success">
-                                <i class="fas fa-plus"></i> Novo Aceite (R&S)
-                            </a>
-                        </div>
+                    <div>
+                        <a href="{% url 'novo_contrato_social' empresa.id %}" class="btn btn-sm btn-outline-light me-1">
+                            <i class="fas fa-plus"></i> Novo Contrato Social
+                        </a>
+                        <a href="{% url 'novo_contrato_aceite' empresa.id %}" class="btn btn-sm btn-success me-1">
+                            <i class="fas fa-plus"></i> Novo Aceite (R&S)
+                        </a>
+                        <a href="{% url 'novo_aditivo' empresa.id %}" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-plus"></i> Novo Aditivo
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
+
                     <ul class="nav nav-tabs mb-3" id="contratoTab" role="tablist">
                         <li class="nav-item">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sociais">Contratos Sociais</button>
+                            <button class="nav-link active fw-bold text-secondary" data-bs-toggle="tab" data-bs-target="#sociais">Contratos Sociais</button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#aceites">Contratos R&S</button>
+                            <button class="nav-link fw-bold text-secondary" data-bs-toggle="tab" data-bs-target="#aceites">Contratos R&S</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link fw-bold text-secondary" data-bs-toggle="tab" data-bs-target="#aditivos">Aditivos</button>
                         </li>
                     </ul>
 
                     <div class="tab-content" id="contratoTabContent">
+
                         <div class="tab-pane fade show active" id="sociais">
                             <div class="list-group">
                                 {% for cs in contratos_sociais %}
@@ -71,21 +79,8 @@
                                             <i class="fas fa-file-pdf me-1"></i> Gerar PDF
                                         </a>
                                     </div>
-                                    {% for ad in aditivos %}
-                                        {% if ad.contrato_social_id == cs.id %}
-                                        <div class="list-group-item d-flex justify-content-between align-items-center ps-5 border-start border-4 border-info">
-                                            <div class="small">
-                                                <i class="fas fa-plus-circle text-info me-2"></i>
-                                                Aditivo - {{ ad.data_cadastro|date:"d/m/Y" }}
-                                            </div>
-                                            <a href="{% url 'aditivo-gerar-aditivo' pk=ad.pk %}" target="_blank" class="btn btn-sm btn-link text-info fw-bold">
-                                                <i class="fas fa-file-pdf me-1"></i> Gerar Aditivo
-                                            </a>
-                                        </div>
-                                        {% endif %}
-                                    {% endfor %}
                                 {% empty %}
-                                    <p class="text-muted small">Nenhum contrato social registrado.</p>
+                                    <p class="text-muted small p-2 mb-0">Nenhum contrato social registrado.</p>
                                 {% endfor %}
                             </div>
                         </div>
@@ -95,27 +90,47 @@
                                 {% for ca in contratos_aceite %}
                                     <div class="list-group-item d-flex justify-content-between align-items-center">
                                         <div>
-                                            <i class="fas fa-check-circle text-success me-2"></i>
-                                            <strong>Plano {{ ca.get_plano_display }}</strong> - {{ ca.data_cadastro|date:"d/m/Y" }}
+                                            <div>
+                                                <i class="fas fa-check-circle text-success me-2"></i>
+                                                <strong>Plano {{ ca.get_plano_display }}</strong> - {{ ca.data_cadastro|date:"d/m/Y" }}
+                                            </div>
+                                            <div class="small text-muted mt-2 ps-4">
+                                                <ul class="mb-0">
+                                                    {% for detalhe in ca.detalhes.all %}
+                                                        <li>{{ detalhe.quantidade }} vaga(s) de <strong>{{ detalhe.vaga }}</strong> - R$ {{ detalhe.salario }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
                                         </div>
-                                        <div class="small text-muted mt-2 ps-4">
-                                            <ul class="mb-0">
-                                                {% for detalhe in ca.detalhes.all %}
-                                                    <li>{{ detalhe.quantidade }} vaga(s) de <strong>{{ detalhe.vaga }}</strong> - R$ {{ detalhe.salario }}</li>
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                        <a href="{% url 'contrato-aceite-gerar-contrato-aceite' pk=ca.pk %}" target="_blank" class="btn btn-sm btn-outline-success shadow-sm">
+                                        <a href="{% url 'contrato-aceite-gerar-contrato-aceite' pk=ca.pk %}" target="_blank" class="btn btn-sm btn-outline-success shadow-sm align-self-start mt-2">
                                             <i class="fas fa-file-pdf me-1"></i> Gerar Aceite
                                         </a>
                                     </div>
                                 {% empty %}
-                                    <p class="text-muted small">Nenhum contrato de aceite registrado.</p>
+                                    <p class="text-muted small p-2 mb-0">Nenhum contrato de aceite registrado.</p>
                                 {% endfor %}
                             </div>
                         </div>
-                    </div>
-                </div>
+
+                        <div class="tab-pane fade" id="aditivos">
+                            <div class="list-group">
+                                {% for ad in aditivos %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="fas fa-file-signature text-info me-2"></i>
+                                            <strong>Aditivo</strong> - Criado em {{ ad.data_cadastro|date:"d/m/Y" }}
+                                        </div>
+                                        <a href="{% url 'aditivo-gerar-aditivo' pk=ad.pk %}" target="_blank" class="btn btn-sm btn-outline-info shadow-sm">
+                                            <i class="fas fa-file-pdf me-1"></i> Gerar PDF
+                                        </a>
+                                    </div>
+                                {% empty %}
+                                    <p class="text-muted small p-2 mb-0">Nenhum aditivo registrado.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    </div> </div>
             </div>
         </div>
     </div>

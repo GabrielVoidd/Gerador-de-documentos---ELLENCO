@@ -9,4 +9,7 @@ urlpatterns = [
     path('empresa/<int:pk>/novo-aceite/', views.ContratoAceiteCreateView.as_view(), name='novo_contrato_aceite'),
     path('chamado/novo/', views.ChamadoCreateView.as_view(), name='novo_chamado'),
     path('chamado/<int:pk>/', views.ChamadoUpdateView.as_view(), name='detalhes_chamado'),
+    path('empresa/<int:pk>/novo-aditivo/', views.AditivoCreateView.as_view(), name='novo_aditivo'),
+    path('chamados/', views.ChamadoListView.as_view(), name='lista_chamados'),
+    path('empresas/', views.EmpresaListView.as_view(), name='lista_empresas'),
 ]

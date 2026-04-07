@@ -1,0 +1,83 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0 text-gray-800">Todos os Leads (Chamados)</h2>
+        <a href="{% url 'novo_chamado' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Novo Lead</a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-light d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Listagem de Chamados</h6>
+            
+            <form method="get" class="d-flex gap-2">
+                <select name="status" class="form-select form-select-sm" style="width: 150px;">
+                    <option value="">Todos os Status</option>
+                    <option value="pendente" {% if status == 'pendente' %}selected{% endif %}>Pendentes</option>
+                    <option value="assinado" {% if status == 'assinado' %}selected{% endif %}>Assinados</option>
+                </select>
+                <div class="input-group input-group-sm" style="width: 250px;">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar empresa, contato..." value="{{ query }}">
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="border-0">Empresa</th>
+                            <th class="border-0">Contato</th>
+                            <th class="border-0">Data</th>
+                            <th class="border-0 text-center">Status</th>
+                            <th class="border-0 text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for chamado in chamados %}
+                            <tr>
+                                <td class="align-middle fw-bold">{{ chamado.nome_empresa }}</td>
+                                <td class="align-middle">{{ chamado.nome }} <br><small class="text-muted">{{ chamado.numero }}</small></td>
+                                <td class="align-middle">{{ chamado.data_contato|date:"d/m/Y" }}</td>
+                                <td class="align-middle text-center">
+                                    {% if chamado.contrato_assinado %}
+                                        <span class="badge bg-success">Assinado</span>
+                                    {% elif chamado.proposta_enviada %}
+                                        <span class="badge bg-info text-dark">Proposta Enviada</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-muted border">Pendente</span>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle text-end">
+                                    <a href="{% url 'detalhes_chamado' chamado.id %}" class="btn btn-sm btn-outline-primary">Gerenciar</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="text-center py-4">Nenhum chamado encontrado.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if is_paginated %}
+            <div class="card-footer bg-white border-top">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?q={{ query }}&status={{ status }}&page={{ page_obj.previous_page_number }}">Anterior</a></li>
+                        {% endif %}
+                        <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?q={{ query }}&status={{ status }}&page={{ page_obj.next_page_number }}">Próxima</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

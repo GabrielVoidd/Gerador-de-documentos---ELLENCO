@@ -86,6 +86,17 @@
                                 <i class="fas fa-save me-2"></i> Atualizar Lead
                             </button>
                         </div>
+
+                        {% if object.contrato_assinado %}
+                        <hr class="my-4">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'parte_concedente_add' %}?chamado={{ object.id }}" class="btn btn-success fw-bold shadow-sm">
+                                <i class="fas fa-magic me-2"></i> Converter em Cliente
+                            </a>
+                            <small class="text-muted text-center mt-1">Copia os dados para uma nova empresa.</small>
+                        </div>
+                        {% endif %}
+
                     </div>
                 </div>
             </div>

@@ -1,11 +1,11 @@
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView
 from django.urls import reverse_lazy
 from estagios.models import ParteConcedente, Chamados, Aditivo, ContratoAceite, ContratoSocial
 from .forms import ParteConcedenteForm, ContratoSocialForm, DetalhesAceiteFormSet, ContratoAceiteForm, ChamadoForm, \
-    ChamadoUpdateForm
+    ChamadoUpdateForm, AditivoForm
 
 
 # 1. A tela de cadastro de nova empresa
@@ -22,27 +22,56 @@ class ParteConcedenteCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateV
         print("ERROS DO FORMULÁRIO:", form.errors)
         return super().form_invalid(form)
 
+    def get_initial(self):
+        initial = super().get_initial()
+        chamado_id = self.request.GET.get('chamado')  # Pega o ID da URL
+
+        if chamado_id:
+            chamado = get_object_or_404(Chamados, pk=chamado_id)
+            # Mapeia os dados do Chamado para os campos da Parte Concedente
+            initial['razao_social'] = chamado.nome_empresa
+            initial['cnpj'] = chamado.cnpj
+            initial['email'] = chamado.email
+            initial['telefone'] = chamado.numero
+            initial['representante_legal'] = chamado.nome
+
+        return initial
+
 
 def dashboard_comercial(request):
     query = request.GET.get('q')
 
     if query:
-        # Se houver pesquisa, traz todos os resultados correspondentes
-        clientes = ParteConcedente.objects.filter(
-            Q(razao_social__icontains=query) | Q(cnpj__icontains=query)
-        ).order_by('-id')
+        clientes = ParteConcedente.objects.filter(Q(razao_social__icontains=query) | Q(cnpj__icontains=query)).order_by(
+            '-id')
+        chamados = Chamados.objects.filter(
+            Q(nome_empresa__icontains=query) | Q(cnpj__icontains=query) | Q(nome__icontains=query)).order_by(
+            '-data_contato')
     else:
-        # Se não houver pesquisa, mantém os últimos 5 para o dashboard ficar organizado
         clientes = ParteConcedente.objects.all().order_by('-id')[:5]
+        chamados = Chamados.objects.all().order_by('contrato_assinado', '-data_contato')[:8]
 
-    chamados_pendentes = Chamados.objects.filter(contrato_assinado=False).order_by('-data_contato')
+    # --- DADOS PARA O GRÁFICO DO FUNIL ---
+    qtd_aguardando = Chamados.objects.filter(proposta_enviada=False, contrato_assinado=False).count()
+    qtd_propostas = Chamados.objects.filter(proposta_enviada=True, contrato_assinado=False).count()
+    qtd_assinados = Chamados.objects.filter(contrato_assinado=True).count()
+    taxa_conversao = 0
+    total_leads = Chamados.objects.count()
+    if total_leads > 0:
+        taxa_conversao = int((qtd_assinados / total_leads) * 100)
 
     context = {
         'ultimos_clientes': clientes,
-        'chamados_pendentes': chamados_pendentes,
+        'chamados_pendentes': chamados,
         'total_clientes': ParteConcedente.objects.count(),
-        'total_chamados': chamados_pendentes.count(),
+        'total_chamados': Chamados.objects.filter(contrato_assinado=False).count(),
         'query': query,
+
+        # Variáveis do Gráfico
+        'chart_aguardando': qtd_aguardando,
+        'chart_propostas': qtd_propostas,
+        'chart_assinados': qtd_assinados,
+        'taxa_conversao': taxa_conversao,
     }
     return render(request, 'comercial/dashboard.html', context)
 
@@ -148,3 +177,79 @@ class ChamadoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+
+
+class AditivoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Aditivo
+    form_class = AditivoForm
+    template_name = 'comercial/aditivo_form.html'
+
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+
+    def form_valid(self, form):
+        form.instance.parte_concedente_id = self.kwargs.get('pk')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('perfil_empresa', kwargs={'pk': self.kwargs.get('pk')})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['empresa'] = get_object_or_404(ParteConcedente, pk=self.kwargs.get('pk'))
+        return context
+
+
+class ChamadoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Chamados
+    template_name = 'comercial/chamado_list.html'
+    context_object_name = 'chamados'
+    paginate_by = 15  # Mostra 15 por página
+
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+
+    def get_queryset(self):
+        queryset = Chamados.objects.all().order_by('-data_contato')
+        q = self.request.GET.get('q')
+        status = self.request.GET.get('status')
+
+        if q:
+            queryset = queryset.filter(Q(nome_empresa__icontains=q) | Q(cnpj__icontains=q) | Q(nome__icontains=q))
+
+        if status == 'pendente':
+            queryset = queryset.filter(contrato_assinado=False)
+        elif status == 'assinado':
+            queryset = queryset.filter(contrato_assinado=True)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '')
+        context['status'] = self.request.GET.get('status', '')
+        return context
+
+
+class EmpresaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = ParteConcedente
+    template_name = 'comercial/empresa_list.html'
+    context_object_name = 'empresas'
+    paginate_by = 15
+
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+
+    def get_queryset(self):
+        queryset = ParteConcedente.objects.all().order_by('razao_social')
+        q = self.request.GET.get('q')
+
+        if q:
+            queryset = queryset.filter(Q(razao_social__icontains=q) | Q(cnpj__icontains=q))
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '')
+        return context
