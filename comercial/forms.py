@@ -1,6 +1,6 @@
 from django.forms.models import inlineformset_factory
 
-from estagios.models import ParteConcedente, ContratoSocial, ContratoAceite, DetalhesContratoAceite
+from estagios.models import ParteConcedente, ContratoSocial, ContratoAceite, DetalhesContratoAceite, Chamados
 from django import forms
 
 
@@ -70,3 +70,45 @@ DetalhesAceiteFormSet = inlineformset_factory(
         'salario': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
     }
 )
+
+
+class ChamadoForm(forms.ModelForm):
+    class Meta:
+        model = Chamados
+        fields = [
+            'nome_empresa', 'cnpj', 'nome', 'email',
+            'numero', 'numero2', 'data_contato', 'observacoes'
+        ]
+        widgets = {
+            'data_contato': forms.DateInput(attrs={'type': 'date'}),
+            'observacoes': forms.Textarea(attrs={'rows': 3}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+
+
+class ChamadoUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Chamados
+        fields = [
+            'nome_empresa', 'cnpj', 'nome', 'email',
+            'numero', 'numero2', 'data_contato', 'observacoes',
+            'proposta_enviada', 'contrato_assinado', 'contrato'
+        ]
+        widgets = {
+            'data_contato': forms.DateInput(attrs={'type': 'date'}),
+            'observacoes': forms.Textarea(attrs={'rows': 4}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            # Aplica form-control padrão para textos
+            if field_name not in ['proposta_enviada', 'contrato_assinado']:
+                field.widget.attrs['class'] = 'form-control'
+            # Aplica classe de checkbox do Bootstrap para os booleanos
+            if field_name in ['proposta_enviada', 'contrato_assinado']:
+                field.widget.attrs['class'] = 'form-check-input'

@@ -1,0 +1,95 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0 text-gray-800">Gestão do Lead: {{ object.nome_empresa }}</h2>
+        <a href="{% url 'dashboard_comercial' %}" class="btn btn-sm btn-outline-secondary">Voltar</a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 bg-light">
+                        <h6 class="m-0 font-weight-bold text-primary">Informações do Contato</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="small fw-bold">Empresa</label>{{ form.nome_empresa }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">CNPJ</label>{{ form.cnpj }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Nome do Contato</label>{{ form.nome }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">E-mail</label>{{ form.email }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Telefone Principal</label>{{ form.numero }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Telefone Secundário</label>{{ form.numero2 }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">Data do Contato</label>{{ form.data_contato }}
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="small fw-bold">Observações / Histórico</label>{{ form.observacoes }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow mb-4 border-start border-warning border-4">
+                    <div class="card-header py-3 bg-light">
+                        <h6 class="m-0 font-weight-bold text-warning">Andamento (Funil)</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-3">
+                            {{ form.proposta_enviada }}
+                            <label class="form-check-label fw-bold" for="{{ form.proposta_enviada.id_for_label }}">
+                                Proposta Enviada?
+                            </label>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-4">
+                            {{ form.contrato_assinado }}
+                            <label class="form-check-label fw-bold text-success" for="{{ form.contrato_assinado.id_for_label }}">
+                                Contrato Assinado?
+                            </label>
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-3">
+                            <label class="small fw-bold">Anexar Contrato Assinado (PDF)</label>
+                            {{ form.contrato }}
+                            
+                            {% if object.contrato %}
+                                <div class="mt-2 small">
+                                    <a href="{{ object.contrato.url }}" target="_blank" class="text-success fw-bold">
+                                        <i class="fas fa-file-pdf me-1"></i> Ver Contrato Atual
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-warning text-dark fw-bold shadow-sm">
+                                <i class="fas fa-save me-2"></i> Atualizar Lead
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

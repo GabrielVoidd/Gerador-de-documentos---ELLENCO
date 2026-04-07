@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3 mb-0 text-gray-800">Painel Comercial</h2>
         <div>
-            <a href="#" class="btn btn-outline-primary btn-sm">Novo Chamado</a>
+            <a href="{% url 'novo_chamado' %}" class="btn btn-outline-primary btn-sm">Novo Chamado</a>
             <a href="{% url 'parte_concedente_add' %}" class="btn btn-primary btn-sm ms-2">Nova Empresa</a>
         </div>
     </div>
@@ -19,10 +19,10 @@
                 <div class="card-body">
                     <div class="list-group list-group-flush">
                         {% for chamado in chamados_pendentes %}
-                            <div class="list-group-item px-0">
+                            <a href="{% url 'detalhes_chamado' chamado.id %}" class="list-group-item list-group-item-action px-3 border-start-0 border-end-0 border-top-0">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="mb-0 fw-bold">{{ chamado.nome_empresa }}</h6>
+                                        <h6 class="mb-0 fw-bold text-dark">{{ chamado.nome_empresa }}</h6>
                                         <small class="text-muted">{{ chamado.nome }} | {{ chamado.numero }}</small>
                                     </div>
                                     <div class="text-end">
@@ -33,7 +33,7 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         {% empty %}
                             <p class="text-muted small text-center my-3">Nenhum chamado pendente no momento.</p>
                         {% endfor %}

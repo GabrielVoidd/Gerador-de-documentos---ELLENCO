@@ -1,0 +1,71 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-warning text-dark">
+                    <h6 class="m-0 font-weight-bold"><i class="fas fa-headset me-2"></i> Registrar Novo Chamado (Lead)</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <h6 class="text-warning fw-bold border-bottom pb-2 mb-3 text-dark">Dados da Empresa</h6>
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="small fw-bold">Nome da Empresa</label>
+                                {{ form.nome_empresa }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">CNPJ (Opcional no 1º contato)</label>
+                                {{ form.cnpj }}
+                            </div>
+                        </div>
+
+                        <h6 class="text-warning fw-bold border-bottom pb-2 mb-3 text-dark mt-3">Dados do Contato</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Nome de quem ligou/atendeu</label>
+                                {{ form.nome }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">E-mail</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Telefone Principal</label>
+                                {{ form.numero }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Telefone Secundário (Opcional)</label>
+                                {{ form.numero2 }}
+                            </div>
+                        </div>
+
+                        <h6 class="text-warning fw-bold border-bottom pb-2 mb-3 text-dark mt-3">Andamento</h6>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">Data do Contato</label>
+                                {{ form.data_contato }}
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label class="small fw-bold">Observações (O que foi conversado?)</label>
+                                {{ form.observacoes }}
+                            </div>
+                        </div>
+
+                        <div class="mt-4 d-flex justify-content-end gap-2">
+                            <a href="{% url 'dashboard_comercial' %}" class="btn btn-light border">Cancelar</a>
+                            <button type="submit" class="btn btn-warning text-dark px-4 fw-bold">
+                                <i class="fas fa-save me-2"></i> Salvar Chamado
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,10 +1,11 @@
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
 from estagios.models import ParteConcedente, Chamados, Aditivo, ContratoAceite, ContratoSocial
-from .forms import ParteConcedenteForm, ContratoSocialForm, DetalhesAceiteFormSet, ContratoAceiteForm
+from .forms import ParteConcedenteForm, ContratoSocialForm, DetalhesAceiteFormSet, ContratoAceiteForm, ChamadoForm, \
+    ChamadoUpdateForm
 
 
 # 1. A tela de cadastro de nova empresa
@@ -127,3 +128,23 @@ class ContratoAceiteCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateVi
 
     def get_success_url(self):
         return reverse_lazy('perfil_empresa', kwargs={'pk': self.kwargs.get('pk')})
+
+
+class ChamadoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Chamados
+    form_class = ChamadoForm
+    template_name = 'comercial/chamado_form.html'
+    success_url = reverse_lazy('dashboard_comercial')
+
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+
+
+class ChamadoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Chamados
+    form_class = ChamadoUpdateForm
+    template_name = 'comercial/chamado_update.html'
+    success_url = reverse_lazy('dashboard_comercial')
+
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
