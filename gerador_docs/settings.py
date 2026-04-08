@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'admin_auto_filters',
     'dashboard',
     'comercial',
+    'adm',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,109 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0 text-gray-800">Novo Contrato de Estágio (TCE)</h2>
+        <a href="{% url 'adm_contratos_list' %}" class="btn btn-sm btn-outline-secondary">Voltar para a Lista</a>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 bg-light">
+                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-users me-2"></i> Partes Envolvidas</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="small fw-bold">Estagiário(a)</label>
+                            {{ form.estagiario }}
+                            {{ form.estagiario.errors }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold">Empresa (Parte Concedente)</label>
+                            {{ form.parte_concedente }}
+                            {{ form.parte_concedente.errors }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold">Agente Integrador</label>
+                            {{ form.agente_integrador }}
+                            {{ form.agente_integrador.errors }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 bg-light">
+                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-calendar-alt me-2"></i> Prazos e Vigência</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Data de Início</label>
+                                {{ form.data_inicio }}
+                                {{ form.data_inicio.errors }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Término Previsto</label>
+                                {{ form.data_termino_prevista }}
+                                {{ form.data_termino_prevista.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 bg-light">
+                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-briefcase me-2"></i> Detalhes do Estágio</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Setor</label>
+                                {{ form.setor }}
+                                {{ form.setor.errors }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Nome do(a) Supervisor(a)</label>
+                                {{ form.supervisor_nome }}
+                                {{ form.supervisor_nome.errors }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Valor da Bolsa (R$)</label>
+                                {{ form.valor_bolsa }}
+                                {{ form.valor_bolsa.errors }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold">Nº Apólice Seguro</label>
+                                {{ form.numero_apolice_seguro }}
+                                <small class="text-muted d-block">Padrão: 363787</small>
+                                {{ form.numero_apolice_seguro.errors }}
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="small fw-bold">Jornada de Estágio</label>
+                                {{ form.jornada_estagio }}
+                                {{ form.jornada_estagio.errors }}
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="small fw-bold">Atividades Desenvolvidas</label>
+                                {{ form.atividades }}
+                                {{ form.atividades.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4 mb-4">
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
+                        <i class="fas fa-save me-2"></i> Salvar e Gerar Contrato
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

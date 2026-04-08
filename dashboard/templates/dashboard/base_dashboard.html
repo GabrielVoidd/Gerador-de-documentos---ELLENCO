@@ -24,7 +24,7 @@
 
 <nav class="navbar navbar-expand-lg tweezer-navbar py-2 px-3">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{% if '/comercial/' in request.path %}{% url 'dashboard_comercial' %}{% else %}{% url 'dashboard_home' %}{% endif %}">
+        <a class="navbar-brand" href="{% if '/comercial/' in request.path %}{% url 'dashboard_comercial' %}{% elif '/adm/' in request.path %}{% url 'dashboard_adm' %}{% else %}{% url 'dashboard_home' %}{% endif %}">
             <img src="{% static 'images/LOGO.jpg' %}" alt="Ellenco Logo" height="40">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -50,15 +50,33 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard_home' %}">
-                            <i class="fas fa-exchange-alt text-secondary"></i> Mudar p/ Recrutamento
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'lista_chamados' %}"><i class="fas fa-list text-muted"></i> Todos os Leads</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'lista_empresas' %}"><i class="fas fa-building text-muted"></i> Todos os Clientes</a>
+                    </li>
+
+                {% elif '/adm/' in request.path %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard_adm' %}active border-bottom border-primary border-2{% endif %}" href="{% url 'dashboard_adm' %}">
+                            <i class="fas fa-chart-line text-primary"></i> Painel ADM
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="menuContratos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-file-signature text-secondary"></i> Contratos (TCE)
+                        </a>
+                        <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="menuContratos">
+                            <li><a class="dropdown-item" href="{% url 'adm_contrato_novo' %}"><i class="fas fa-plus me-2 text-muted"></i>Novo Contrato</a></li>                            <li><a class="dropdown-item" href="{% url 'adm_contratos_list' %}"><i class="fas fa-list me-2 text-muted"></i>Consultar Contratos</a></li>                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="menuFinanceiro" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-money-check-alt text-secondary"></i> Financeiro
+                        </a>
+                        <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="menuFinanceiro">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-receipt me-2 text-muted"></i>Lote de Recibos</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user-times me-2 text-muted"></i>Rescisões</a></li>
+                        </ul>
                     </li>
 
                 {% else %}
@@ -110,13 +128,18 @@
                             <li><a class="dropdown-item" href="{% url 'relatorio_bi' %}"><i class="fas fa-lightbulb me-2 text-warning"></i>Inteligência de Negócio</a></li>
                         </ul>
                     </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard_comercial' %}">
-                            <i class="fas fa-exchange-alt text-success"></i> Mudar p/ Comercial
-                        </a>
-                    </li>
                 {% endif %}
+
+                <li class="nav-item dropdown border-start ms-lg-2 ps-lg-2">
+                    <a class="nav-link dropdown-toggle fw-bold text-dark" href="#" id="menuModulos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-th me-1"></i> Módulos
+                    </a>
+                    <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="menuModulos">
+                        <li><a class="dropdown-item" href="{% url 'dashboard_home' %}"><i class="fas fa-home me-2 text-primary"></i> Recrutamento (R&S)</a></li>
+                        <li><a class="dropdown-item" href="{% url 'dashboard_comercial' %}"><i class="fas fa-chart-pie me-2 text-success"></i> Comercial</a></li>
+                        <li><a class="dropdown-item" href="{% url 'dashboard_adm' %}"><i class="fas fa-chart-line me-2 text-info"></i> Administrativo (ADM)</a></li>
+                    </ul>
+                </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="/admin/" target="_blank">

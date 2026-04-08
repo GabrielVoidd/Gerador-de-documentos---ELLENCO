@@ -665,8 +665,7 @@ class Recibo(models.Model):
         return total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     def save(self, *args, **kwargs):
-        # --- POPULANDO O SHAPSHOT ---
-        # Se os campos estiverem vazios (ao criar), copia do contrato
+        # --- 1. POPULANDO O SNAPSHOT ---
         if self.contrato and not self.valor_bolsa:
             self.estagiario_nome = self.contrato.estagiario.candidato.nome
             self.parte_concedente_nome = self.contrato.parte_concedente.razao_social
@@ -674,24 +673,45 @@ class Recibo(models.Model):
             self.data_inicio = self.contrato.data_inicio
             self.data_fim = self.contrato.data_termino_prevista
 
-        # Caso não seja especificada uma data de referência, será usado o primeiro dia do mês anterior
+        # --- 2. DATA DE REFERÊNCIA ---
         if not self.data_referencia:
             hoje = date.today()
-            primeiro_dia_mes_anterior = (hoje.replace(day=1) - relativedelta(months=1))
-            self.data_referencia = primeiro_dia_mes_anterior
+            self.data_referencia = (hoje.replace(day=1) - relativedelta(months=1))
 
-        # Cálculo automático caso os dias trabalhados não forem especificados
+        # --- 3. CORREÇÃO DO BUG: CÁLCULO PROPORCIONAL DE DIAS ---
+        # Só calcula automaticamente se o usuário não preencheu na mão
         if not self.dias_trabalhados and self.dias_referencia:
-            self.dias_trabalhados = self.dias_referencia - self.dias_falta
+            dias_contabilizados = self.dias_referencia  # Padrão: 30
 
+            if self.data_inicio and self.data_referencia:
+                mes_ref = self.data_referencia.month
+                ano_ref = self.data_referencia.year
+
+                # Cenario A: Iniciou no meio deste mês de referência
+                if self.data_inicio.month == mes_ref and self.data_inicio.year == ano_ref:
+                    # Ex: Iniciou dia 15. Trabalhou do 15 ao 30 (16 dias)
+                    dias_contabilizados = 30 - self.data_inicio.day + 1
+
+                # Cenario B: Contrato terminou no meio deste mês de referência
+                if self.data_fim and self.data_fim.month == mes_ref and self.data_fim.year == ano_ref:
+                    if self.data_inicio.month == mes_ref:
+                        # Cenário raríssimo: começou e terminou no mesmo mês
+                        dias_contabilizados = self.data_fim.day - self.data_inicio.day + 1
+                    else:
+                        dias_contabilizados = self.data_fim.day
+
+            # Trava de segurança para não passar de 30 nem ficar negativo
+            dias_contabilizados = max(0, min(30, dias_contabilizados))
+
+            # Abate as faltas
+            self.dias_trabalhados = max(0, dias_contabilizados - self.dias_falta)
+
+        # --- 4. CÁLCULO DO VALOR ---
         if not self.valor:
             if self.pk:
                 self.valor = self.valor_liquido
             else:
                 self.valor = self.valor_proporcional
-
-        # Atualiza dias_trabalhados antes de salvar
-        self.dias_trabalhados = max(0, self.dias_referencia - self.dias_falta)
 
         # Chama o metodo 'save' original para salvar no banco
         super().save(*args, **kwargs)

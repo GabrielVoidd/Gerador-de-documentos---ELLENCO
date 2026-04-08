@@ -30,6 +30,7 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('comercial/', include('comercial.urls')),
+    path('adm/', include('adm.urls')),
 ]
 
 # Em produção, o seu servidor web deve ser configurado para servir os arquivos da pasta MEDIA_ROOT.

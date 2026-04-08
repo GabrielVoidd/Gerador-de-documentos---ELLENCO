@@ -1,0 +1,88 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0 text-gray-800">Gestão de Contratos (TCE)</h2>
+        <a href="#" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Novo Contrato</a>
+    </div>
+
+    <div class="card shadow mb-4 border-start border-primary border-4">
+        <div class="card-header py-3 bg-light d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Todos os Contratos</h6>
+            
+            <form method="get" class="d-flex gap-2">
+                <select name="status" class="form-select form-select-sm" style="width: 150px;">
+                    <option value="">Todos</option>
+                    <option value="ativos" {% if status == 'ativos' %}selected{% endif %}>Ativos</option>
+                    <option value="rescindidos" {% if status == 'rescindidos' %}selected{% endif %}>Rescindidos</option>
+                    <option value="vencidos" {% if status == 'vencidos' %}selected{% endif %}>Vencidos</option>
+                </select>
+                <div class="input-group input-group-sm" style="width: 300px;">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar estagiário ou empresa..." value="{{ query }}">
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="border-0">Nº Contrato</th>
+                            <th class="border-0">Estagiário</th>
+                            <th class="border-0">Empresa</th>
+                            <th class="border-0 text-center">Vigência</th>
+                            <th class="border-0 text-center">Status</th>
+                            <th class="border-0 text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contrato in contratos %}
+                            <tr>
+                                <td class="fw-bold">{{ contrato.numero_contrato|default:"S/N" }}</td>
+                                <td>{{ contrato.estagiario.candidato.nome }}</td>
+                                <td>{{ contrato.parte_concedente.razao_social|truncatechars:30 }}</td>
+                                <td class="text-center small">
+                                    {{ contrato.data_inicio|date:"d/m/y" }} a {{ contrato.data_termino_prevista|date:"d/m/y" }}
+                                </td>
+                                <td class="text-center">
+                                    {% if contrato.data_rescisao %}
+                                        <span class="badge bg-danger">Rescindido</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Ativo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'contrato-gerar-termo-compromisso' contrato.id %}" target="_blank" class="btn btn-sm btn-outline-danger" title="Gerar PDF">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="6" class="text-center py-4">Nenhum contrato encontrado.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if is_paginated %}
+            <div class="card-footer bg-white border-top">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?q={{ query }}&status={{ status }}&page={{ page_obj.previous_page_number }}">Anterior</a></li>
+                        {% endif %}
+                        <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?q={{ query }}&status={{ status }}&page={{ page_obj.next_page_number }}">Próxima</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
