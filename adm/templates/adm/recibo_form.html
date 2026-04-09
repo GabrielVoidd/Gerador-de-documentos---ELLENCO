@@ -1,0 +1,103 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h3 mb-0 text-gray-800">Gerar Novo Recibo</h2>
+                <a href="{% url 'adm_recibos_list' %}" class="btn btn-sm btn-outline-secondary">Voltar</a>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-light">
+                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-file-invoice-dollar me-2"></i> Dados do Recibo</h6>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-success border-0 border-start border-success border-4 py-2">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label class="fw-bold mb-1">Contrato (Estagiário / Empresa)</label>
+                            {{ form.contrato }}
+                            {% if form.contrato.errors %}
+                                <div class="text-danger small mt-1">{{ form.contrato.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="fw-bold mb-1">Mês de Referência</label>
+                                {{ form.data_referencia }}
+                                <small class="text-muted d-block">Recomendado: 1º dia do mês (Ex: 01/03/2026).</small>
+                                {% if form.data_referencia.errors %}
+                                    <div class="text-danger small mt-1">{{ form.data_referencia.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold mb-1">Dias de Falta</label>
+                                {{ form.dias_falta }}
+                                <small class="text-muted d-block">O sistema calculará o desconto automaticamente.</small>
+                                {% if form.dias_falta.errors %}
+                                    <div class="text-danger small mt-1">{{ form.dias_falta.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="border-top pt-3 d-flex justify-content-end gap-2">
+                            <a href="{% url 'adm_recibos_list' %}" class="btn btn-light border px-4">Cancelar</a>
+                            <button type="submit" class="btn btn-success px-5 fw-bold shadow-sm">
+                                <i class="fas fa-cogs me-2"></i> Calcular e Gerar Recibo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#id_contrato').select2({
+            placeholder: "Pesquise por estagiário, empresa ou contrato...",
+            allowClear: true,
+            width: '100%',
+            language: {
+                noResults: function () {
+                    return "Nenhum contrato ativo encontrado";
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 0.375rem !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 36px !important;
+        color: #212529 !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px !important;
+    }
+</style>
+{% endblock %}

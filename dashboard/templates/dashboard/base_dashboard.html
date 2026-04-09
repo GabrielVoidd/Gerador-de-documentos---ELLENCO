@@ -74,9 +74,8 @@
                             <i class="fas fa-money-check-alt text-secondary"></i> Financeiro
                         </a>
                         <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="menuFinanceiro">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-receipt me-2 text-muted"></i>Lote de Recibos</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user-times me-2 text-muted"></i>Rescisões</a></li>
-                        </ul>
+                            <li><a class="dropdown-item" href="{% url 'adm_recibos_lote' %}"><i class="fas fa-receipt me-2 text-muted"></i>Lote de Recibos</a></li>
+                            <li><a class="dropdown-item" href="{% url 'adm_rescisao_nova' %}"><i class="fas fa-user-times me-2 text-muted"></i>Rescisões</a></li>                        </ul>
                     </li>
 
                 {% else %}

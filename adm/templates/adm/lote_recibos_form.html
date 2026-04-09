@@ -1,0 +1,101 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h3 mb-0 text-gray-800">Gerar Recibos em Lote</h2>
+                <a href="{% url 'adm_recibos_list' %}" class="btn btn-sm btn-outline-secondary">Voltar para Recibos</a>
+            </div>
+
+            <div class="card shadow mb-4 border-start border-success border-4">
+                <div class="card-header py-3 bg-light">
+                    <h6 class="m-0 font-weight-bold text-success"><i class="fas fa-layer-group me-2"></i> Processamento em Lote (Por Empresa)</h6>
+                </div>
+                <div class="card-body">
+                    
+                    <div class="alert alert-info border-0 border-start border-info border-4 mb-4">
+                        <i class="fas fa-info-circle me-2"></i> 
+                        <strong>Como funciona:</strong> O sistema buscará <strong>todos os estagiários com contrato ativo</strong> na empresa selecionada e gerará um recibo individual para cada um deles no mês de referência informado.
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label class="fw-bold mb-1">Empresa (Parte Concedente)</label>
+                            {{ form.parte_concedente }}
+                            {% if form.parte_concedente.errors %}
+                                <div class="text-danger small mt-1">{{ form.parte_concedente.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="fw-bold mb-1">Mês de Referência</label>
+                                {{ form.data_referencia }}
+                                <small class="text-muted d-block">Ex: 01/03/2026.</small>
+                                {% if form.data_referencia.errors %}
+                                    <div class="text-danger small mt-1">{{ form.data_referencia.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold mb-1">Faltas Padrão (Dias)</label>
+                                {{ form.dias_falta_padrao }}
+                                <small class="text-muted d-block">Aplicado a todos. Pode editar individualmente depois.</small>
+                                {% if form.dias_falta_padrao.errors %}
+                                    <div class="text-danger small mt-1">{{ form.dias_falta_padrao.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="border-top pt-3 d-flex justify-content-end gap-2">
+                            <a href="{% url 'adm_recibos_list' %}" class="btn btn-light border px-4">Cancelar</a>
+                            <button type="submit" class="btn btn-success px-5 fw-bold shadow-sm">
+                                <i class="fas fa-cogs me-2"></i> Processar Lote
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#id_parte_concedente').select2({
+            placeholder: "Pesquise pelo nome ou CNPJ da empresa...",
+            allowClear: true,
+            width: '100%',
+            language: {
+                noResults: function () {
+                    return "Nenhuma empresa encontrada";
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 0.375rem !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 36px !important;
+        color: #212529 !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px !important;
+    }
+</style>
+{% endblock %}

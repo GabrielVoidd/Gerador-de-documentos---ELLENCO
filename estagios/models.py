@@ -213,7 +213,7 @@ class Candidato(models.Model):
     anexar_rg = models.FileField(
         verbose_name='Anexar RG',
         upload_to='documentos_candidatos/rg/%Y%/%m/%d/', null=True, blank=True)
-    cpf = models.CharField(max_length=14, unique=True, blank=True, verbose_name='CPF', help_text='Somente números')
+    cpf = models.CharField(max_length=14, unique=True, blank=True, null=True, verbose_name='CPF', help_text='Somente números')
     anexar_cpf = models.FileField(
         verbose_name='Anexar CPF',
         upload_to='documentos_candidatos/cpf/%Y%/%m/%d/', null=True, blank=True)
@@ -396,6 +396,9 @@ class Candidato(models.Model):
         return self.email_responsavel_legal2
 
     def save(self, *args, **kwargs):
+        if not self.cpf:
+            self.cpf = None
+
         if self.nome:
             texto= self.nome.upper()
             # NFKD separa a letra do acento, e o encode remove o acento solto
