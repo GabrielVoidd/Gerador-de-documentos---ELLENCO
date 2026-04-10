@@ -6,6 +6,14 @@ from django.urls import reverse_lazy
 from estagios.models import ParteConcedente, Chamados, Aditivo, ContratoAceite, ContratoSocial
 from .forms import ParteConcedenteForm, ContratoSocialForm, DetalhesAceiteFormSet, ContratoAceiteForm, ChamadoForm, \
     ChamadoUpdateForm, AditivoForm
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import PermissionDenied
+
+
+def check_comercial(user):
+    if user.is_superuser or user.groups.filter(name='Comercial').exists():
+        return True
+    raise PermissionDenied("Você não tem permissão para acessar o Comercial.")
 
 
 class ComercialRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -43,6 +51,8 @@ class ParteConcedenteCreateView(ComercialRequiredMixin, LoginRequiredMixin, User
         return initial
 
 
+@login_required
+@user_passes_test(check_comercial)
 def dashboard_comercial(request):
     query = request.GET.get('q')
 
@@ -99,6 +109,7 @@ def perfil_empresa(request, pk):
     return render(request, 'comercial/perfil_empresa.html', context)
 
 
+@user_passes_test(check_comercial)
 class ContratoSocialCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ContratoSocial
     form_class = ContratoSocialForm
@@ -123,6 +134,7 @@ class ContratoSocialCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserP
         return context
 
 
+@user_passes_test(check_comercial)
 class ContratoAceiteCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ContratoAceite
     form_class = ContratoAceiteForm
@@ -164,6 +176,7 @@ class ContratoAceiteCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserP
         return reverse_lazy('perfil_empresa', kwargs={'pk': self.kwargs.get('pk')})
 
 
+@user_passes_test(check_comercial)
 class ChamadoCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Chamados
     form_class = ChamadoForm
@@ -184,6 +197,7 @@ class ChamadoUpdateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTe
         return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
 
 
+@user_passes_test(check_comercial)
 class AditivoCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Aditivo
     form_class = AditivoForm
@@ -205,6 +219,7 @@ class AditivoCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTe
         return context
 
 
+@user_passes_test(check_comercial)
 class ChamadoListView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Chamados
     template_name = 'comercial/chamado_list.html'
@@ -236,6 +251,7 @@ class ChamadoListView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTest
         return context
 
 
+@user_passes_test(check_comercial)
 class EmpresaListView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = ParteConcedente
     template_name = 'comercial/empresa_list.html'

@@ -1,12 +1,20 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from datetime import date, timedelta
 import json
 from django.utils import timezone
 from estagios.models import Candidato, Chamados, Vaga, Candidatura
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import PermissionDenied
+
+
+def check_rs(user):
+    if user.is_superuser or user.groups.filter(name='Recrutamento').exists():
+        return True
+    raise PermissionDenied("Você não tem permissão para acessar o Recrutamento.")
 
 
 @login_required
+@user_passes_test(check_rs)
 def dashboard(request):
     hoje = timezone.now().date()
     trinta_dias_atras = hoje - timedelta(days=30)

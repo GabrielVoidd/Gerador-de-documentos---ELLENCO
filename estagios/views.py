@@ -1,8 +1,6 @@
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
-from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.exceptions import PermissionDenied
 from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.conf import settings
@@ -34,6 +32,14 @@ from .serializers import (
 )
 from django.db import transaction
 import openpyxl
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import PermissionDenied
+
+
+def check_rs(user):
+    if user.is_superuser or user.groups.filter(name='Recrutamento').exists():
+        return True
+    raise PermissionDenied("Você não tem permissão para acessar o Recrutamento.")
 
 
 # Função auxiliar que define quem manda na página
@@ -652,6 +658,7 @@ class ChamadosViewSet(viewsets.ModelViewSet):
     queryset = Chamados.objects.all()
 
 
+@user_passes_test(check_rs)
 class CandidatoCreateView(LoginRequiredMixin, CreateView):
     model = Candidato
     form_class = CandidatoForm
@@ -664,7 +671,7 @@ class CandidatoSucessoView(TemplateView):
     template_name = 'estagios/candidato_sucesso.html'
 
 
-# Adicione o UserPassesTestMixin aqui (sempre antes da ListView)
+@user_passes_test(check_rs)
 class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Candidato
     template_name = 'estagios/candidato_list.html'
@@ -731,7 +738,7 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
 
 
 # VIEW PARA EXPORTAR EXCEL (Ajustada com o caminho correto do banco)
-@user_passes_test(is_recrutamento)
+@user_passes_test(check_rs)
 def exportar_candidatos_excel(request):
     # Pega os mesmos parâmetros da URL para exportar só o que foi filtrado
     q = request.GET.get('q')
@@ -788,6 +795,7 @@ class CandidatoPerfilView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPas
         return reverse('perfil_candidato', kwargs={'pk': self.object.pk})
 
 
+@user_passes_test(check_rs)
 class VagaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Vaga
     form_class = VagaForm
@@ -800,6 +808,7 @@ class VagaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTe
         return is_recrutamento(self.request.user)
 
 
+@user_passes_test(check_rs)
 class ParteConcedenteCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ParteConcedente
     form_class = ParteConcedenteForm
@@ -811,6 +820,7 @@ class ParteConcedenteCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, U
         return is_recrutamento(self.request.user)
 
 
+@user_passes_test(check_rs)
 class VagaListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Vaga
     template_name = 'estagios/vaga_list.html'
@@ -848,6 +858,7 @@ class VagaListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTest
         return context
 
 
+@user_passes_test(check_rs)
 class CandidaturaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Candidatura
     form_class = CandidaturaForm

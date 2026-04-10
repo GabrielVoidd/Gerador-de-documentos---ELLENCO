@@ -6,15 +6,17 @@ from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic import ListView, CreateView
 from adm.forms import ContratoForm, RescisaoForm, ReciboForm, CandidatoExpressoForm, LoteRecibosForm
 from estagios.models import Contrato, Recibo, Rescisao, TipoEvento, Lancamento, Candidato, Estagiario
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import PermissionDenied
 
 
-# Função de segurança (ajuste o nome do grupo conforme seu sistema)
-def is_adm(user):
-    return user.is_superuser or user.groups.filter(name='RH').exists()
+def check_adm(user):
+    if user.is_superuser or user.groups.filter(name='RH').exists():
+        return True
+    raise PermissionDenied("Você não tem permissão para acessar o Administrativo.")
 
 
 class AdmRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -23,7 +25,7 @@ class AdmRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 
 @login_required
-@user_passes_test(is_adm)
+@user_passes_test(check_adm)
 def dashboard_adm(request):
     hoje = timezone.now().date()
     inicio_mes = hoje.replace(day=1)
@@ -85,6 +87,7 @@ def dashboard_adm(request):
     return render(request, 'adm/dashboard.html', context)
 
 
+@user_passes_test(check_adm)
 class ContratoListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Contrato
     template_name = 'adm/contrato_list.html'
@@ -126,6 +129,7 @@ class ContratoListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
         return context
 
 
+@user_passes_test(check_adm)
 class ContratoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Contrato
     form_class = ContratoForm
@@ -144,6 +148,7 @@ class ContratoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMix
         return initial
 
 
+@user_passes_test(check_adm)
 class RescisaoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Rescisao
     form_class = RescisaoForm
@@ -165,6 +170,7 @@ class RescisaoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMix
         return response
 
 
+@user_passes_test(check_adm)
 class ReciboListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Recibo
     template_name = 'adm/recibo_list.html'
@@ -193,6 +199,7 @@ class ReciboListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, 
         return context
 
 
+@user_passes_test(check_adm)
 class ReciboCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Recibo
     form_class = ReciboForm
@@ -224,7 +231,7 @@ class ReciboCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
 
 
 @login_required
-@user_passes_test(is_adm)
+@user_passes_test(check_adm)
 def converter_para_contrato(request, candidato_id):
     candidato = get_object_or_404(Candidato, pk=candidato_id)
 
@@ -270,7 +277,7 @@ def cadastro_expresso(request):
 
 
 @login_required
-@user_passes_test(is_adm)
+@user_passes_test(check_adm)
 def gerar_recibos_lote(request):
     if request.method == 'POST':
         form = LoteRecibosForm(request.POST)
