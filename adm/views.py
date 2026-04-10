@@ -87,7 +87,6 @@ def dashboard_adm(request):
     return render(request, 'adm/dashboard.html', context)
 
 
-@user_passes_test(check_adm)
 class ContratoListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Contrato
     template_name = 'adm/contrato_list.html'
@@ -95,7 +94,7 @@ class ContratoListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
     paginate_by = 20
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Administrativo').exists()
+        return check_adm(self.request.user)
 
     def get_queryset(self):
         queryset = Contrato.objects.select_related(
@@ -129,7 +128,6 @@ class ContratoListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
         return context
 
 
-@user_passes_test(check_adm)
 class ContratoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Contrato
     form_class = ContratoForm
@@ -137,7 +135,7 @@ class ContratoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMix
     success_url = reverse_lazy('adm_contratos_list')
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Administrativo').exists()
+        return check_adm(self.request.user)
 
     def get_initial(self):
         initial = super().get_initial()
@@ -148,7 +146,6 @@ class ContratoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMix
         return initial
 
 
-@user_passes_test(check_adm)
 class RescisaoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Rescisao
     form_class = RescisaoForm
@@ -156,7 +153,7 @@ class RescisaoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMix
     success_url = reverse_lazy('adm_contratos_list')  # Volta para a lista de contratos
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Administrativo').exists()
+        return check_adm(self.request.user)
 
     def form_valid(self, form):
         # 1. Salva a Rescisão no banco
@@ -170,7 +167,6 @@ class RescisaoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMix
         return response
 
 
-@user_passes_test(check_adm)
 class ReciboListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Recibo
     template_name = 'adm/recibo_list.html'
@@ -178,7 +174,7 @@ class ReciboListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, 
     paginate_by = 20
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Administrativo').exists()
+        return check_adm(self.request.user)
 
     def get_queryset(self):
         queryset = Recibo.objects.select_related(
@@ -199,7 +195,6 @@ class ReciboListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, 
         return context
 
 
-@user_passes_test(check_adm)
 class ReciboCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Recibo
     form_class = ReciboForm
@@ -207,7 +202,7 @@ class ReciboCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
     success_url = reverse_lazy('adm_recibos_list')
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Administrativo').exists()
+        return check_adm(self.request.user)
 
     def form_valid(self, form):
         # 1. Salva o Recibo e roda o cálculo automático do seu model (dias trabalhados, valor_liquido)
@@ -246,6 +241,8 @@ def converter_para_contrato(request, candidato_id):
     return redirect(f"{reverse('adm_contrato_novo')}?estagiario_id={estagiario.id}")
 
 
+@login_required
+@user_passes_test(check_adm)
 def cadastro_expresso(request):
     if request.method == 'POST':
         form = CandidatoExpressoForm(request.POST, request.FILES)

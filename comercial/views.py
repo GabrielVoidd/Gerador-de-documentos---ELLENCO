@@ -29,7 +29,7 @@ class ParteConcedenteCreateView(ComercialRequiredMixin, LoginRequiredMixin, User
     success_url = reverse_lazy('dashboard_comercial')
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+        return check_comercial(self.request.user)
 
     def form_invalid(self, form):
         print("ERROS DO FORMULÁRIO:", form.errors)
@@ -91,6 +91,8 @@ def dashboard_comercial(request):
     return render(request, 'comercial/dashboard.html', context)
 
 
+@login_required
+@user_passes_test(check_comercial)
 def perfil_empresa(request, pk):
     empresa = get_object_or_404(ParteConcedente, pk=pk)
     contratos_sociais = ContratoSocial.objects.filter(parte_concedente=empresa)
@@ -109,14 +111,13 @@ def perfil_empresa(request, pk):
     return render(request, 'comercial/perfil_empresa.html', context)
 
 
-@user_passes_test(check_comercial)
 class ContratoSocialCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ContratoSocial
     form_class = ContratoSocialForm
     template_name = 'comercial/contrato_social_form.html'
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+        return check_comercial(self.request.user)
 
     def form_valid(self, form):
         # Aqui está o pulo do gato: pegamos a empresa pelo ID da URL e salvamos no contrato
@@ -134,14 +135,13 @@ class ContratoSocialCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserP
         return context
 
 
-@user_passes_test(check_comercial)
 class ContratoAceiteCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ContratoAceite
     form_class = ContratoAceiteForm
     template_name = 'comercial/contrato_aceite_form.html'
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+        return check_comercial(self.request.user)
 
     def get_initial(self):
         # Pré-preenche os campos com os dados da empresa cadastrada
@@ -176,7 +176,6 @@ class ContratoAceiteCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserP
         return reverse_lazy('perfil_empresa', kwargs={'pk': self.kwargs.get('pk')})
 
 
-@user_passes_test(check_comercial)
 class ChamadoCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Chamados
     form_class = ChamadoForm
@@ -184,7 +183,7 @@ class ChamadoCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTe
     success_url = reverse_lazy('dashboard_comercial')
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+        return check_comercial(self.request.user)
 
 
 class ChamadoUpdateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -194,17 +193,16 @@ class ChamadoUpdateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTe
     success_url = reverse_lazy('dashboard_comercial')
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+        return check_comercial(self.request.user)
 
 
-@user_passes_test(check_comercial)
 class AditivoCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Aditivo
     form_class = AditivoForm
     template_name = 'comercial/aditivo_form.html'
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+        return check_comercial(self.request.user)
 
     def form_valid(self, form):
         form.instance.parte_concedente_id = self.kwargs.get('pk')
@@ -219,7 +217,6 @@ class AditivoCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTe
         return context
 
 
-@user_passes_test(check_comercial)
 class ChamadoListView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Chamados
     template_name = 'comercial/chamado_list.html'
@@ -227,7 +224,7 @@ class ChamadoListView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTest
     paginate_by = 15  # Mostra 15 por página
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+        return check_comercial(self.request.user)
 
     def get_queryset(self):
         queryset = Chamados.objects.all().order_by('-data_contato')
@@ -251,7 +248,6 @@ class ChamadoListView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTest
         return context
 
 
-@user_passes_test(check_comercial)
 class EmpresaListView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = ParteConcedente
     template_name = 'comercial/empresa_list.html'
@@ -259,7 +255,7 @@ class EmpresaListView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTest
     paginate_by = 15
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+        return check_comercial(self.request.user)
 
     def get_queryset(self):
         queryset = ParteConcedente.objects.all().order_by('razao_social')

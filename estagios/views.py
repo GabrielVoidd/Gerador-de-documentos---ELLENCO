@@ -658,7 +658,6 @@ class ChamadosViewSet(viewsets.ModelViewSet):
     queryset = Chamados.objects.all()
 
 
-@user_passes_test(check_rs)
 class CandidatoCreateView(LoginRequiredMixin, CreateView):
     model = Candidato
     form_class = CandidatoForm
@@ -666,12 +665,12 @@ class CandidatoCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('candidato_sucesso')
     success_message = 'Seu cadastro foi realizado com sucesso!'
 
+
 class CandidatoSucessoView(TemplateView):
     # Uma tela simples de "Obrigado" para ele não ficar perdido após salvar
     template_name = 'estagios/candidato_sucesso.html'
 
 
-@user_passes_test(check_rs)
 class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Candidato
     template_name = 'estagios/candidato_list.html'
@@ -680,7 +679,7 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
 
     # O Django roda isso antes de abrir a página
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
     # (Opcional) Se quiser que dê uma tela de erro 403 ao invés de jogar pro login:
     def handle_no_permission(self):
@@ -737,7 +736,7 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
         return context
 
 
-# VIEW PARA EXPORTAR EXCEL (Ajustada com o caminho correto do banco)
+@login_required
 @user_passes_test(check_rs)
 def exportar_candidatos_excel(request):
     # Pega os mesmos parâmetros da URL para exportar só o que foi filtrado
@@ -788,14 +787,13 @@ class CandidatoPerfilView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPas
 
     # Mesma segurança da tela de busca!
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
     def get_success_url(self):
         # Depois de salvar, recarrega a mesma página do perfil para a pessoa ver que salvou
         return reverse('perfil_candidato', kwargs={'pk': self.object.pk})
 
 
-@user_passes_test(check_rs)
 class VagaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Vaga
     form_class = VagaForm
@@ -805,10 +803,9 @@ class VagaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTe
     success_url = reverse_lazy('dashboard_home')
 
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
 
-@user_passes_test(check_rs)
 class ParteConcedenteCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ParteConcedente
     form_class = ParteConcedenteForm
@@ -817,10 +814,9 @@ class ParteConcedenteCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, U
     success_url = reverse_lazy('dashboard_home')
 
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
 
-@user_passes_test(check_rs)
 class VagaListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Vaga
     template_name = 'estagios/vaga_list.html'
@@ -828,7 +824,7 @@ class VagaListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTest
     paginate_by = 15
 
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
     def get_queryset(self):
         # select_related deixa a consulta ao banco mais rápida puxando a empresa junto
@@ -858,14 +854,13 @@ class VagaListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTest
         return context
 
 
-@user_passes_test(check_rs)
 class CandidaturaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Candidatura
     form_class = CandidaturaForm
     template_name = 'estagios/candidatura_form.html'
 
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
     def form_valid(self, form):
         # Pega o ID do candidato que veio na URL e já vincula automaticamente
@@ -890,7 +885,7 @@ class VagaDetailView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTe
     context_object_name = 'vaga'
 
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -907,7 +902,7 @@ class VagaUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTe
     template_name = 'estagios/vaga_form.html'
 
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
     def get_success_url(self):
         # Depois de salvar a edição, devolve a recrutadora pra tela de detalhes
@@ -918,7 +913,7 @@ class RelatorioRSView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesT
     template_name = 'estagios/relatorios_rs.html'
 
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -967,7 +962,7 @@ class CandidaturaUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserP
     template_name = 'estagios/candidatura_form.html'
 
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -984,7 +979,7 @@ class RelatorioBIView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesT
     template_name = 'estagios/relatorios_bi.html'
 
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1017,7 +1012,7 @@ class RelatorioContratosView(RecrutamentoRequiredMixin, LoginRequiredMixin, User
     template_name = 'estagios/relatorios_contratos.html'
 
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1055,7 +1050,7 @@ class CandidatoDocumentosUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixi
     template_name = 'estagios/candidato_documentos_form.html'
 
     def test_func(self):
-        return is_recrutamento(self.request.user)
+        return check_rs(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
