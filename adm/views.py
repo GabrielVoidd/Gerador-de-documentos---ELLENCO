@@ -16,6 +16,12 @@ from estagios.models import Contrato, Recibo, Rescisao, TipoEvento, Lancamento, 
 def is_adm(user):
     return user.is_superuser or user.groups.filter(name='RH').exists()
 
+
+class AdmRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.groups.filter(name='RH').exists()
+
+
 @login_required
 @user_passes_test(is_adm)
 def dashboard_adm(request):
@@ -79,7 +85,7 @@ def dashboard_adm(request):
     return render(request, 'adm/dashboard.html', context)
 
 
-class ContratoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class ContratoListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Contrato
     template_name = 'adm/contrato_list.html'
     context_object_name = 'contratos'
@@ -120,7 +126,7 @@ class ContratoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
 
-class ContratoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class ContratoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Contrato
     form_class = ContratoForm
     template_name = 'adm/contrato_form.html'
@@ -138,7 +144,7 @@ class ContratoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return initial
 
 
-class RescisaoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class RescisaoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Rescisao
     form_class = RescisaoForm
     template_name = 'adm/rescisao_form.html'
@@ -159,7 +165,7 @@ class RescisaoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return response
 
 
-class ReciboListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class ReciboListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Recibo
     template_name = 'adm/recibo_list.html'
     context_object_name = 'recibos'
@@ -187,7 +193,7 @@ class ReciboListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
 
-class ReciboCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class ReciboCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Recibo
     form_class = ReciboForm
     template_name = 'adm/recibo_form.html'

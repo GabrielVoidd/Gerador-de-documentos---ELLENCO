@@ -6,7 +6,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
 from django.views.static import serve
-
+from estagios import views
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -31,6 +31,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('comercial/', include('comercial.urls')),
     path('adm/', include('adm.urls')),
+    path('redirecionar/', views.login_dispatcher, name='login_dispatcher'),
 ]
 
 # Em produção, o seu servidor web deve ser configurado para servir os arquivos da pasta MEDIA_ROOT.

@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q, Count
@@ -21,7 +21,7 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
     TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, ContratoAceite, \
     RegistroContatoEmpresa, Chamados, Vaga, Candidatura
@@ -41,6 +41,31 @@ def is_recrutamento(user):
     if not user.is_authenticated:
         return False
     return user.is_superuser or user.groups.filter(name='Recrutamento').exists()
+
+
+@login_required
+def login_dispatcher(request):
+    user = request.user
+
+    # Se for superuser ou do Recrutamento, vai pra Home R&S
+    if user.is_superuser or user.groups.filter(name='Recrutamento').exists():
+        return redirect('dashboard_home')
+
+    # Se for Comercial
+    elif user.groups.filter(name='Comercial').exists():
+        return redirect('dashboard_comercial')
+
+    # Se for ADM
+    elif user.groups.filter(name='RH').exists():
+        return redirect('dashboard_adm')
+
+    # Fallback (caso o usuário não tenha grupo nenhum)
+    return redirect('/admin/')
+
+
+class RecrutamentoRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.groups.filter(name='Recrutamento').exists()
 
 
 class InstituicaoEnsinoViewSet(viewsets.ModelViewSet):
@@ -640,7 +665,7 @@ class CandidatoSucessoView(TemplateView):
 
 
 # Adicione o UserPassesTestMixin aqui (sempre antes da ListView)
-class CandidatoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Candidato
     template_name = 'estagios/candidato_list.html'
     context_object_name = 'candidatos'
@@ -698,6 +723,10 @@ class CandidatoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context['escolaridades'] = Candidato.Escolaridades.choices
         # Mantemos os filtros na URL para a paginação não perder a busca ao mudar de página
         context['filtros_url'] = self.request.GET.urlencode()
+        # Busca todos os bairros preenchidos, sem repetir, em ordem alfabética
+        context['bairros'] = Candidato.objects.exclude(bairro__isnull=True).exclude(bairro='').values_list('bairro',
+                                                                                                           flat=True).distinct().order_by(
+            'bairro')
         return context
 
 
@@ -744,7 +773,7 @@ def exportar_candidatos_excel(request):
     return response
 
 
-class CandidatoPerfilView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class CandidatoPerfilView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Candidato
     form_class = CandidatoStatusForm
     template_name = 'estagios/candidato_perfil.html'
@@ -759,7 +788,7 @@ class CandidatoPerfilView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse('perfil_candidato', kwargs={'pk': self.object.pk})
 
 
-class VagaCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class VagaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Vaga
     form_class = VagaForm
     template_name = 'estagios/vaga_form.html'
@@ -771,7 +800,7 @@ class VagaCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return is_recrutamento(self.request.user)
 
 
-class ParteConcedenteCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class ParteConcedenteCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ParteConcedente
     form_class = ParteConcedenteForm
     template_name = 'estagios/parte_concedente_form.html'
@@ -782,7 +811,7 @@ class ParteConcedenteCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateV
         return is_recrutamento(self.request.user)
 
 
-class VagaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class VagaListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Vaga
     template_name = 'estagios/vaga_list.html'
     context_object_name = 'vagas'
@@ -819,7 +848,7 @@ class VagaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
 
-class CandidaturaCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class CandidaturaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Candidatura
     form_class = CandidaturaForm
     template_name = 'estagios/candidatura_form.html'
@@ -844,7 +873,7 @@ class CandidaturaCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView)
         return reverse('perfil_candidato', kwargs={'pk': self.kwargs['pk']})
 
 
-class VagaDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+class VagaDetailView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Vaga
     template_name = 'estagios/vaga_detail.html'
     context_object_name = 'vaga'
@@ -861,7 +890,7 @@ class VagaDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return context
 
 
-class VagaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class VagaUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Vaga
     form_class = VagaEditForm
     template_name = 'estagios/vaga_form.html'
@@ -874,7 +903,7 @@ class VagaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse('vaga_detalhe', kwargs={'pk': self.object.pk})
 
 
-class RelatorioRSView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class RelatorioRSView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'estagios/relatorios_rs.html'
 
     def test_func(self):
@@ -921,7 +950,7 @@ class RelatorioRSView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         return context
 
 
-class CandidaturaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class CandidaturaUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Candidatura
     form_class = CandidaturaUpdateForm
     template_name = 'estagios/candidatura_form.html'
@@ -940,7 +969,7 @@ class CandidaturaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
         return reverse('perfil_candidato', kwargs={'pk': self.object.candidato.pk})
 
 
-class RelatorioBIView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class RelatorioBIView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'estagios/relatorios_bi.html'
 
     def test_func(self):
@@ -973,7 +1002,7 @@ class RelatorioBIView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         return context
 
 
-class RelatorioContratosView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class RelatorioContratosView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'estagios/relatorios_contratos.html'
 
     def test_func(self):
@@ -1009,7 +1038,7 @@ class RelatorioContratosView(LoginRequiredMixin, UserPassesTestMixin, TemplateVi
         return context
 
 
-class CandidatoDocumentosUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class CandidatoDocumentosUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Candidato
     form_class = CandidatoDocumentosForm
     template_name = 'estagios/candidato_documentos_form.html'

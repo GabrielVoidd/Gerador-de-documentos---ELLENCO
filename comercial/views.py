@@ -8,8 +8,13 @@ from .forms import ParteConcedenteForm, ContratoSocialForm, DetalhesAceiteFormSe
     ChamadoUpdateForm, AditivoForm
 
 
+class ComercialRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
+
+
 # 1. A tela de cadastro de nova empresa
-class ParteConcedenteCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class ParteConcedenteCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ParteConcedente
     form_class = ParteConcedenteForm
     template_name = 'comercial/parte_concedente_form.html'
@@ -94,7 +99,7 @@ def perfil_empresa(request, pk):
     return render(request, 'comercial/perfil_empresa.html', context)
 
 
-class ContratoSocialCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class ContratoSocialCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ContratoSocial
     form_class = ContratoSocialForm
     template_name = 'comercial/contrato_social_form.html'
@@ -118,7 +123,7 @@ class ContratoSocialCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateVi
         return context
 
 
-class ContratoAceiteCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class ContratoAceiteCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ContratoAceite
     form_class = ContratoAceiteForm
     template_name = 'comercial/contrato_aceite_form.html'
@@ -159,7 +164,7 @@ class ContratoAceiteCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateVi
         return reverse_lazy('perfil_empresa', kwargs={'pk': self.kwargs.get('pk')})
 
 
-class ChamadoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class ChamadoCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Chamados
     form_class = ChamadoForm
     template_name = 'comercial/chamado_form.html'
@@ -169,7 +174,7 @@ class ChamadoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
 
 
-class ChamadoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class ChamadoUpdateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Chamados
     form_class = ChamadoUpdateForm
     template_name = 'comercial/chamado_update.html'
@@ -179,7 +184,7 @@ class ChamadoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return self.request.user.is_superuser or self.request.user.groups.filter(name='Comercial').exists()
 
 
-class AditivoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class AditivoCreateView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Aditivo
     form_class = AditivoForm
     template_name = 'comercial/aditivo_form.html'
@@ -200,7 +205,7 @@ class AditivoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return context
 
 
-class ChamadoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class ChamadoListView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Chamados
     template_name = 'comercial/chamado_list.html'
     context_object_name = 'chamados'
@@ -231,7 +236,7 @@ class ChamadoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
 
-class EmpresaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class EmpresaListView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = ParteConcedente
     template_name = 'comercial/empresa_list.html'
     context_object_name = 'empresas'
