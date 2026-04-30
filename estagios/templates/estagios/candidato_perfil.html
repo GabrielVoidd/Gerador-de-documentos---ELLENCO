@@ -6,6 +6,7 @@
         <div class="card shadow-sm h-100">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i> Perfil do Candidato</h5>
+                <a href="{% url 'candidato_editar' candidato.pk %}" class="btn btn-warning">Editar Dados Cadastrais</a>
                 <a href="{% url 'buscar_candidatos' %}" class="btn btn-sm btn-light text-primary">Voltar</a>
             </div>
             <div class="card-body">

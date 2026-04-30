@@ -32,6 +32,7 @@
                 
                 <div class="d-grid mt-4">
                     <a href="{% url 'vaga_editar' vaga.id %}" class="btn btn-outline-primary btn-sm mb-2"><i class="fas fa-edit me-1"></i> Editar Vaga</a>
+                    <a href="{% url 'vaga_vincular_candidato' vaga.pk %}" class="btn btn-primary">Vincular Candidato</a>
                     <a href="{% url 'lista_vagas' %}" class="btn btn-light btn-sm">Voltar para a Lista</a>
                 </div>
             </div>

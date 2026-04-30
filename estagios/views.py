@@ -11,7 +11,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .forms import CandidatoForm, CandidatoStatusForm, VagaForm, ParteConcedenteForm, CandidaturaForm, VagaEditForm, \
-    CandidaturaUpdateForm, CandidatoDocumentosForm, ArquivosFormSet, EmpresasFormSet
+    CandidaturaUpdateForm, CandidatoDocumentosForm, ArquivosFormSet, EmpresasFormSet, CandidaturaPorVagaForm
 import os
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
@@ -956,25 +956,6 @@ class RelatorioRSView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesT
         return context
 
 
-class CandidaturaUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Candidatura
-    form_class = CandidaturaUpdateForm
-    template_name = 'estagios/candidatura_form.html'
-
-    def test_func(self):
-        return check_rs(self.request.user)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Passa o candidato para a tela para manter o nome dele lá em cima
-        context['candidato'] = self.object.candidato
-        return context
-
-    def get_success_url(self):
-        # Depois de salvar, devolve pro perfil do candidato
-        return reverse('perfil_candidato', kwargs={'pk': self.object.candidato.pk})
-
-
 class RelatorioBIView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'estagios/relatorios_bi.html'
 
@@ -1082,3 +1063,77 @@ class CandidatoDocumentosUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixi
 
     def get_success_url(self):
         return reverse('perfil_candidato', kwargs={'pk': self.object.pk})
+
+
+class CandidaturaPorVagaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Candidatura
+    form_class = CandidaturaPorVagaForm
+    template_name = 'estagios/candidatura_form.html'
+
+    def test_func(self):
+        return check_rs(self.request.user)
+
+    def form_valid(self, form):
+        # Primeiro, vinculamos a vaga que veio da URL
+        vaga = get_object_or_404(Vaga, pk=self.kwargs['vaga_pk'])
+        form.instance.vaga = vaga
+
+        # Lemos o status que foi selecionado na tela
+        status_selecionado = form.instance.status
+
+        if status_selecionado == 'AP':
+            vaga.status = 'F'
+            vaga.save()
+
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Passa a vaga para o template para mostrar qual vaga está sendo trabalhada
+        context['vaga'] = get_object_or_404(Vaga, pk=self.kwargs['vaga_pk'])
+        return context
+
+    def get_success_url(self):
+        # Devolve a recrutadora para a página da Vaga
+        return reverse('vaga_detalhe', kwargs={'pk': self.kwargs['vaga_pk']})
+
+
+class CandidatoUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Candidato
+    form_class = CandidatoForm  # O mesmo form usado na criação!
+    template_name = 'estagios/candidato_form.html'
+
+    def test_func(self):
+        return check_rs(self.request.user)
+
+    def get_success_url(self):
+        # Volta pro perfil após editar
+        return reverse('perfil_candidato', kwargs={'pk': self.object.pk})
+
+
+class CandidaturaUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Candidatura
+    form_class = CandidaturaUpdateForm
+    template_name = 'estagios/candidatura_form.html'
+
+    def test_func(self):
+        return check_rs(self.request.user)
+
+    def form_valid(self, form):
+        # Lê o status exato que a pessoa acabou de selecionar na tela
+        status_selecionado = form.instance.status
+
+        if status_selecionado == 'AP':
+            vaga = form.instance.vaga
+            vaga.status = 'F'
+            vaga.save()
+
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['candidato'] = self.object.candidato
+        return context
+
+    def get_success_url(self):
+        return reverse('perfil_candidato', kwargs={'pk': self.object.candidato.pk})

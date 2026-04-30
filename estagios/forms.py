@@ -133,6 +133,18 @@ class CandidaturaForm(forms.ModelForm):
         self.fields['vaga'].queryset = Vaga.objects.filter(status='A').order_by('-data_abertura')
 
 
+class CandidaturaPorVagaForm(forms.ModelForm):
+    class Meta:
+        model = Candidatura
+        fields = ['candidato', 'status']  # Pede o candidato, ignora a vaga
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Adiciona as classes do Bootstrap para ficar bonito
+        self.fields['candidato'].widget.attrs.update({'class': 'form-select select2-candidato'})
+        self.fields['status'].widget.attrs.update({'class': 'form-select'})
+
+
 class CandidaturaUpdateForm(forms.ModelForm):
     class Meta:
         model = Candidatura

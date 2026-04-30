@@ -15,24 +15,41 @@
             </div>
             <div class="card-body p-4">
 
-                <div class="alert alert-light border border-success border-start-5 border-start-success mb-4">
-                    <strong>Candidato Selecionado:</strong> {{ candidato.nome }}
-                </div>
+                {% if candidato and not form.instance.pk %}
+                    <div class="alert alert-light border border-success border-start-5 border-start-success mb-4">
+                        <strong>Candidato Selecionado:</strong> {{ candidato.nome }}
+                    </div>
+                {% elif vaga %}
+                    <div class="alert alert-light border border-success border-start-5 border-start-success mb-4">
+                        <strong>Vaga Selecionada:</strong> {{ vaga.titulo }} - {{ vaga.empresa.razao_social }}
+                    </div>
+                {% elif form.instance.pk %}
+                    <div class="alert alert-light border border-success border-start-5 border-start-success mb-4">
+                        <strong>Candidato:</strong> {{ form.instance.candidato.nome }}
+                    </div>
+                {% endif %}
 
                 <form method="post">
                     {% csrf_token %}
 
-                    {% if form.vaga %}
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Selecione a Vaga (Somente Abertas)</label>
-                            {{ form.vaga }}
-                        </div>
-                    {% else %}
+                    {% if form.instance.pk %}
                         <div class="mb-3">
                             <label class="form-label fw-bold">Vaga Vinculada</label>
                             <input type="text" class="form-control bg-light text-muted fw-bold" value="{{ form.instance.vaga.titulo }} ({{ form.instance.vaga.empresa.razao_social }})" disabled>
                             <div class="form-text text-warning"><i class="fas fa-info-circle"></i> A vaga não pode ser alterada.</div>
                         </div>
+                    {% else %}
+                        {% if candidato %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Selecione a Vaga (Somente Abertas)</label>
+                                {{ form.vaga }}
+                            </div>
+                        {% elif vaga %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Selecione o Candidato</label>
+                                {{ form.candidato }}
+                            </div>
+                        {% endif %}
                     {% endif %}
 
                     <div class="mb-4">
@@ -42,7 +59,13 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{% url 'perfil_candidato' candidato.id %}" class="btn btn-light px-4">Cancelar</a>
+                        {% if candidato %}
+                            <a href="{% url 'perfil_candidato' candidato.id %}" class="btn btn-light px-4">Cancelar</a>
+                        {% elif vaga %}
+                            <a href="{% url 'vaga_detalhe' vaga.id %}" class="btn btn-light px-4">Cancelar</a>
+                        {% else %}
+                            <a href="javascript:history.back()" class="btn btn-light px-4">Cancelar</a>
+                        {% endif %}
                         <button type="submit" class="btn btn-success px-4">
                             {% if form.instance.pk %}
                                 <i class="fas fa-save me-2"></i> Salvar Novo Status
@@ -57,4 +80,20 @@
         </div>
     </div>
 </div>
+
+{% if vaga and not form.instance.pk %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2-candidato').select2({
+            placeholder: "Digite o nome ou CPF do candidato...",
+            allowClear: true,
+            width: '100%' // Isso impede que a barra fique exprimida no Bootstrap
+        });
+    });
+</script>
+{% endif %}
+
 {% endblock %}
