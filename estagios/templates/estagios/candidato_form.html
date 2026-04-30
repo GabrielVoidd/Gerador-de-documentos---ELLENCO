@@ -21,7 +21,12 @@
 
                         {% for field in form %}
                             <div class="mb-3">
-                                <label class="form-label fw-bold">{{ field.label }}</label>
+                                <label class="form-label fw-bold">
+                                    {{ field.label }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger" title="Este campo é obrigatório">*</span>
+                                    {% endif %}
+                                </label>
                                 {{ field }}
                                 {% if field.help_text %}
                                     <div class="form-text">{{ field.help_text }}</div>
@@ -42,7 +47,39 @@
     </div>
 </div>
 
+<!-- Mantém o form.media caso algum outro componente do Django precise dele -->
 {{ form.media }}
+
+<!-- IMPORTAÇÃO DO JQUERY E DA MÁSCARA -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Máscara para a Data de Nascimento
+        $('#id_data_nascimento').mask('00/00/0000');
+
+        // BÔNUS: Máscaras extras já configuradas (se existirem no form, já funcionam)
+        if ($('#id_cpf').length) {
+            $('#id_cpf').mask('000.000.000-00', {reverse: true});
+        }
+
+        if ($('#id_rg').length) {
+            // Máscara de RG que aceita a letra X no final
+            $('#id_rg').mask('00.000.000-A', {
+                translation: {
+                    'A': {pattern: /[0-9xX]/}
+                },
+                reverse: true
+            });
+        }
+
+        if ($('#id_celular').length || $('#id_telefone').length) {
+            $('#id_celular').mask('(00) 00000-0000');
+            $('#id_telefone').mask('(00) 00000-0000');
+        }
+    });
+</script>
 
 </body>
 </html>

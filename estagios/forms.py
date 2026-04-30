@@ -21,9 +21,23 @@ class CandidatoForm(forms.ModelForm):
             else:
                 field.widget.attrs['class'] = 'form-control'
 
+        if 'data_nascimento' in self.fields:
+            self.fields['data_nascimento'].widget.input_type = 'text'
+            self.fields['data_nascimento'].widget.attrs['placeholder'] = 'DD/MM/AAAA'
+
+        if 'celular' in self.fields:
+            self.fields['celular'].widget.attrs.update({
+                'placeholder': 'Como deve ser preenchido: 11912345678'
+            })
+
+        if 'celular2' in self.fields:
+            self.fields['celular2'].widget.attrs.update({
+                'placeholder': 'Esse número deve ser diferente do primeiro celular'
+            })
+
     class Media:
         js = ('js/admin_custom.js', 'js/jquery.mask.min.js', 'js/mascaras_admin.js', 'js/mascara_cpf_admin.js',
-              'js/mascara_rg_admin.js', 'js/viacep_admin.js')
+              'js/mascara_rg_admin.js', 'js/viacep_admin.js', 'js/mascara_nascimento.js')
 
 
 class CandidatoStatusForm(forms.ModelForm):

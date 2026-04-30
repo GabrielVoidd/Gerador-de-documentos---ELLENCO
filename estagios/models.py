@@ -224,7 +224,7 @@ class Candidato(models.Model):
     profissao_conjuge = models.CharField(max_length=200, null=True, blank=True)
     tem_filhos = models.BooleanField(help_text='Tem filhos?', default=False)
     filhos_detalhes = models.CharField(help_text='Quais as idades?', max_length=150, null=True, blank=True)
-    celular = models.CharField(max_length=11, unique=True, help_text='11911112222')
+    celular = models.CharField(max_length=11, unique=True)
     celular2 = models.CharField(max_length=11, unique=True, null=True, blank=True)
     email = models.EmailField()
     rede_social = models.CharField(max_length=100, null=True, blank=True, help_text='Escreva "Não tenho" caso não possua')

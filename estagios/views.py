@@ -34,6 +34,8 @@ from django.db import transaction
 import openpyxl
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
+from django.db.models import Sum
+from django.contrib import messages
 
 
 def check_rs(user):
@@ -920,8 +922,8 @@ class RelatorioRSView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesT
 
         # 1. KPI Rápido
         context['total_vagas'] = Vaga.objects.count()
-        context['vagas_abertas'] = Vaga.objects.filter(status='A').count()
-        context['vagas_fechadas'] = Vaga.objects.filter(status='F').count()
+        context['vagas_abertas'] = Vaga.objects.filter(status='A').aggregate(toal=Sum('quantidade_vagas'))['total'] or 0
+        context['vagas_fechadas'] = Vaga.objects.filter(status='F').aggregate(total=Sum('quantidade_vagas'))['total'] or 0
 
         # 2. Dados para o Gráfico de Perdas
         perdas = Candidato.objects.aggregate(
@@ -1137,3 +1139,26 @@ class CandidaturaUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserP
 
     def get_success_url(self):
         return reverse('perfil_candidato', kwargs={'pk': self.object.candidato.pk})
+
+
+@login_required
+def clonar_vaga(request, pk):
+    # Busca a vaga original que o usuário quer copiar
+    vaga = get_object_or_404(Vaga, pk=pk)
+
+    # MÁGICA DA CLONAGEM
+    vaga.pk = None  # Apaga o ID. É isso que diz ao Django para criar um NOVO registro!
+
+    # Ajustes finos para a nova vaga
+    vaga.status = 'A'  # Garante que a nova vaga nasça como Aberta
+    vaga.titulo = f"{vaga.titulo} (Cópia)"  # Tag visual para a recrutadora não se confundir
+
+    # Salva a nova vaga no banco de dados!
+    vaga.save()
+
+    # Mensagem de sucesso (aparece se o seu base_dashboard.html tiver o bloco de mensagens do Django)
+    messages.success(request, 'Vaga clonada com sucesso! Verifique e salve as informações abaixo.')
+
+    # Redireciona a recrutadora direto para a tela de edição da NOVA vaga.
+    # OBS: Substitua 'editar_vaga' pelo nome correto da sua URL de edição.
+    return redirect('vaga_editar', pk=vaga.pk)
