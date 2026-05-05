@@ -30,7 +30,7 @@ class ParteConcedenteForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'rh@empresa.com.br'}),
             'representante_legal': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Nome de quem assina os contratos'}),
-            'observacoes': forms.TextInput(attrs={'class': 'form-control'}),
+            'observacoes': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
         }
 
 

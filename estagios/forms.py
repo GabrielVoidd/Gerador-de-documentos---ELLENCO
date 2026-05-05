@@ -69,7 +69,7 @@ class VagaForm(forms.ModelForm):
         fields = [
             'empresa', 'titulo', 'descricao', 'requisitos',
             'tipo_vaga', 'quantidade_vagas', 'salario_bolsa',
-            'beneficios', 'horario', 'local_trabalho'
+            'beneficios', 'horario', 'local_trabalho', 'observacoes', 'sexo'
         ]
 
         # Colocando as classes do Bootstrap para ficar bonito
@@ -80,6 +80,7 @@ class VagaForm(forms.ModelForm):
             'requisitos': forms.Textarea(
                 attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Ex: Cursando 2º semestre...'}),
             'tipo_vaga': forms.Select(attrs={'class': 'form-select'}),
+            'sexo': forms.Select(attrs={'class': 'form-select'}),
             'quantidade_vagas': forms.NumberInput(attrs={'class': 'form-control'}),
             'salario_bolsa': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'}),
             'beneficios': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
@@ -87,6 +88,7 @@ class VagaForm(forms.ModelForm):
                 attrs={'class': 'form-control', 'placeholder': 'Ex: Segunda a Sexta, 09h às 16h'}),
             'local_trabalho': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Ex: Híbrido - Centro, Guarulhos'}),
+            'observacoes': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
         }
 
 

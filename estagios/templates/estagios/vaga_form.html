@@ -67,6 +67,10 @@
                             {{ form.quantidade_vagas }}
                         </div>
                         <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Sexo</label>
+                            {{ form.sexo }}
+                        </div>
+                        <div class="col-md-4 mb-3">
                             <label class="form-label fw-bold">Salário / Bolsa (R$)</label>
                             {{ form.salario_bolsa }}
                         </div>
@@ -96,6 +100,11 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold">Benefícios</label>
                         {{ form.beneficios }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Observações</label>
+                        {{ form.observacoes }}
                     </div>
 
                     <hr>

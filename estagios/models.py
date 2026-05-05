@@ -971,6 +971,11 @@ class Vaga(models.Model):
         PJ = 'P', 'PJ'
         JOVEM_APRENDIZ = 'J', 'Jovem Aprendiz'
 
+    class Sexo(models.TextChoices):
+        MASCULINO = 'M', 'Masculino'
+        FEMININO = 'F', 'Feminino'
+        AMBOS = 'A', 'Ambos'
+
     # A vaga sempre pertence a uma empresa (Parte Concedente)
     empresa = models.ForeignKey(ParteConcedente, on_delete=models.CASCADE, related_name='vagas')
 
@@ -979,6 +984,7 @@ class Vaga(models.Model):
     requisitos = models.TextField(verbose_name='Requisitos da Vaga', null=True, blank=True)
     tipo_vaga = models.CharField(max_length=1, choices=TipoVaga.choices, default=TipoVaga.ESTAGIO)
     status = models.CharField(max_length=1, choices=StatusVaga.choices, default=StatusVaga.ABERTA)
+    sexo = models.CharField(max_length=1, choices=Sexo.choices, null=True, blank=True)
     quantidade_vagas = models.PositiveIntegerField(default=1)
 
     salario_bolsa = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True,
@@ -987,6 +993,7 @@ class Vaga(models.Model):
     horario = models.CharField(max_length=150, null=True, blank=True)
     local_trabalho = models.CharField(max_length=200, null=True, blank=True,
                                       help_text='Ex: Híbrido, Remoto, ou Endereço físico')
+    observacoes = models.TextField(null=True, blank=True, verbose_name='Observações')
 
     data_abertura = models.DateField(auto_now_add=True)
     data_fechamento = models.DateField(null=True, blank=True)

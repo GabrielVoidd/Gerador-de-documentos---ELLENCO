@@ -922,7 +922,7 @@ class RelatorioRSView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesT
 
         # 1. KPI Rápido
         context['total_vagas'] = Vaga.objects.count()
-        context['vagas_abertas'] = Vaga.objects.filter(status='A').aggregate(toal=Sum('quantidade_vagas'))['total'] or 0
+        context['vagas_abertas'] = Vaga.objects.filter(status='AP').aggregate(total=Sum('quantidade_vagas'))['total'] or 0
         context['vagas_fechadas'] = Vaga.objects.filter(status='F').aggregate(total=Sum('quantidade_vagas'))['total'] or 0
 
         # 2. Dados para o Gráfico de Perdas
