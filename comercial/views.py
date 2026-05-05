@@ -1,5 +1,6 @@
+from django.contrib import messages
 from django.db.models import Q
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import CreateView, UpdateView, ListView
 from django.urls import reverse_lazy
@@ -270,3 +271,26 @@ class EmpresaListView(ComercialRequiredMixin, LoginRequiredMixin, UserPassesTest
         context = super().get_context_data(**kwargs)
         context['query'] = self.request.GET.get('q', '')
         return context
+
+
+def editar_empresa(request, pk):
+    # Busca a empresa ou retorna erro 404 se não achar
+    empresa = get_object_or_404(ParteConcedente, pk=pk)
+
+    if request.method == 'POST':
+        # Carrega o formulário com os dados que o usuário digitou + a instância da empresa
+        form = ParteConcedenteForm(request.POST, instance=empresa)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Dados da empresa atualizados com sucesso!')
+            # Redireciona de volta para a tela de perfil da empresa
+            return redirect('perfil_empresa', pk=empresa.pk)
+    else:
+        # Se for um GET (só acessando a página), carrega o formulário preenchido com os dados atuais
+        form = ParteConcedenteForm(instance=empresa)
+
+    context = {
+        'form': form,
+        'empresa': empresa,
+    }
+    return render(request, 'comercial/editar_empresa.html', context)

@@ -8,9 +8,8 @@ class ParteConcedenteForm(forms.ModelForm):
     class Meta:
         model = ParteConcedente
         fields = [
-            'cnpj', 'razao_social', 'nome', 'ramo_atividade',
-            'cep', 'endereco', 'bairro', 'cidade', 'estado',
-            'telefone', 'email', 'representante_legal', 'local_trabalho'
+            'cnpj', 'razao_social', 'nome', 'ramo_atividade', 'cep', 'endereco', 'bairro', 'cidade', 'estado',
+            'telefone', 'email', 'representante_legal', 'local_trabalho', 'observacoes'
         ]
 
         widgets = {
@@ -31,6 +30,7 @@ class ParteConcedenteForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'rh@empresa.com.br'}),
             'representante_legal': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Nome de quem assina os contratos'}),
+            'observacoes': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 

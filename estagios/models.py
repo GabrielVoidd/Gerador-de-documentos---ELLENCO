@@ -48,6 +48,7 @@ class ParteConcedente(models.Model):
     telefone = models.CharField(max_length=15)
     email = models.EmailField()
     ramo_atividade = models.CharField(max_length=200, null=True, verbose_name='Ramo de atividade')
+    observacoes = models.TextField(null=True, blank=True, verbose_name='Observações')
 
     class Meta:
         verbose_name = 'Parte Concedente'
