@@ -189,7 +189,7 @@
     <p>Ramo de atividade: {{ contrato_social.parte_concedente.ramo_atividade }}</p>
     <p>Responsável: {% firstof contrato_social.nome_dono contrato_social.nome_socio %} - CPF:
     {% firstof contrato_social.documentos_dono contrato_social.documentos_socio %}</p>
-    <p>Local de trabalho: {% contrato_social.parte_concedente.local_trabalho %}</p>
+    <p>Local de trabalho: {{ contrato_social.parte_concedente.local_trabalho }}</p>
 
     <div class="clause"><strong>ELLENCO ESTÁGIOS E TREINAMENTOS LTDA.ME - CNPJ: 27.063.179/0001-82</strong></div>
     <p>Endereço: Rua Marret, n°426 - Vila Progresso - CEP: 07095-140 - Guarulhos - SP</p>
