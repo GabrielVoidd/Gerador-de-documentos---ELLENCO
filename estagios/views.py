@@ -358,7 +358,7 @@ class ReciboViewSet(viewsets.ModelViewSet):
 
         # Renderiza o template HTML com o contexto do cadastro
         html_string = render_to_string('estagios/recibo_pagamento.html',
-                                       {'recibo': recibo, 'logo_path': logo_path})
+                                       {'lista_recibos': [recibo], 'logo_path': logo_path})
 
         # Gera o PDF
         pdf_file = HTML(string=html_string).write_pdf()

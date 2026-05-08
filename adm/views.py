@@ -1,4 +1,4 @@
-from django.core.checks import messages
+from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
@@ -205,21 +205,12 @@ class ReciboCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
         return check_adm(self.request.user)
 
     def form_valid(self, form):
-        # 1. Salva o Recibo e roda o cálculo automático do seu model (dias trabalhados, valor_liquido)
+        # 1. Salva o Recibo e roda o cálculo automático do seu model
+        # (dias trabalhados, valor_liquido, etc.)
         response = super().form_valid(form)
-        novo_recibo = self.object
 
-        # 2. Cria o Lançamento padrão (Bolsa Auxílio) garantindo que o TipoEvento exista
-        tipo_bolsa, created = TipoEvento.objects.get_or_create(
-            descricao='Bolsa Auxílio',
-            defaults={'tipo': 'CREDITO'}
-        )
-
-        Lancamento.objects.create(
-            recibo=novo_recibo,
-            tipo_evento=tipo_bolsa,
-            valor=novo_recibo.valor
-        )
+        # Como o valor base já faz parte do Recibo, não precisamos criar um Lançamento extra para ele.
+        # Lançamentos serão adicionados depois (se houver VT, Bônus, etc).
 
         messages.success(self.request, "Recibo gerado com sucesso!")
         return response

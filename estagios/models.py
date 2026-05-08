@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from datetime import date
+from django.db.models import Sum
 from rest_framework.exceptions import ValidationError
 from unidecode import unidecode
 from datetime import date, timedelta
@@ -670,7 +670,7 @@ class Recibo(models.Model):
 
     def save(self, *args, **kwargs):
         # --- 1. POPULANDO O SNAPSHOT ---
-        if self.contrato and not self.valor_bolsa:
+        if self.contrato and (self.valor_bolsa is None or self.valor_bolsa == 0):
             self.estagiario_nome = self.contrato.estagiario.candidato.nome
             self.parte_concedente_nome = self.contrato.parte_concedente.razao_social
             self.valor_bolsa = self.contrato.valor_bolsa
