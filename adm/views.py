@@ -1,14 +1,21 @@
+import os
+
+from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, date
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, CreateView
+from weasyprint import HTML
+
 from adm.forms import ContratoForm, RescisaoForm, ReciboForm, CandidatoExpressoForm, LoteRecibosForm
-from estagios.models import Contrato, Recibo, Rescisao, TipoEvento, Lancamento, Candidato, Estagiario
+from estagios.models import Contrato, Recibo, Rescisao, TipoEvento, Lancamento, Candidato, Estagiario, ParteConcedente
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 
@@ -305,3 +312,62 @@ def gerar_recibos_lote(request):
         form = LoteRecibosForm()
 
     return render(request, 'adm/lote_recibos_form.html', {'form': form})
+
+
+@login_required
+def gerar_recibos_lote(request):
+    if request.method == 'POST':
+        mes_ano_str = request.POST.get('mes_referencia')
+        empresa_id = request.POST.get('empresa_id')
+
+        if not mes_ano_str:
+            messages.error(request, "Selecione um mês de referência.")
+            return redirect('adm_recibos_lote')
+
+        ano, mes = map(int, mes_ano_str.split('-'))
+        data_ref = date(ano, mes, 1)
+
+        # 1. Busca/Cria os recibos no banco (Garante que todos existam)
+        contratos_ativos = Contrato.objects.filter(data_rescisao__isnull=True)
+        if empresa_id:
+            contratos_ativos = contratos_ativos.filter(parte_concedente_id=empresa_id)
+
+        for contrato in contratos_ativos:
+            Recibo.objects.get_or_create(
+                contrato=contrato,
+                data_referencia=data_ref,
+                defaults={'dias_falta': 0}
+            )
+
+        # 2. Agora buscamos TODOS os recibos deste mês/empresa para o PDF
+        recibos_lote = Recibo.objects.filter(
+            data_referencia__year=data_ref.year,
+            data_referencia__month=data_ref.month
+        ).select_related('contrato__estagiario__candidato', 'contrato__parte_concedente')
+
+        if empresa_id:
+            recibos_lote = recibos_lote.filter(contrato__parte_concedente_id=empresa_id)
+
+        # 3. Preparação para o PDF (Caminho da Logo)
+        logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
+        logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
+
+        # 4. Renderiza o HTML com a LISTA de recibos
+        html_string = render_to_string('estagios/recibo_pagamento.html', {
+            'lista_recibos': recibos_lote,
+            'logo_path': logo_path
+        })
+
+        # 5. Gera o PDF contendo todas as páginas
+        pdf_file = HTML(string=html_string).write_pdf()
+
+        # 6. Retorna o arquivo para download/abertura
+        nome_arquivo = f"Lote_Recibos_{mes}_{ano}.pdf"
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{nome_arquivo}"'
+
+        return response
+
+    # GET: Mostra o formulário
+    empresas = ParteConcedente.objects.all().order_by('razao_social')
+    return render(request, 'adm/recibo_lote_form.html', {'empresas': empresas})

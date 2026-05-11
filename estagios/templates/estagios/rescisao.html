@@ -1,288 +1,312 @@
-{% extends 'seu_app/base.html' %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Termo de Conclusão / Rescisão - TCE</title>
+    <style>
+        @page {
+            margin: 1.5cm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 9pt;
+            }
+        }
 
-{% block title %}Termo de Rescisão de Estágio{% endblock %}
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10.5pt;
+            line-height: 1.3;
+        }
 
-{% block page_styles %}
-<style>
-    {% extends 'seu_app/base.html' %}
-{% load static %}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-{% block title %}Termo de Rescisão de Estágio{% endblock %}
+        td {
+            padding: 1px 3px;
+            vertical-align: top;
+        }
 
-{% block page_styles %}
-<style>
-    @page {
-         margin: 1.5cm;
-         @bottom-right {
-             content: "Página " counter(page) " de " counter(pages);
-             font-size: 9pt;
-         }
-    }
-    body {
-        font-family: 'Times New Roman', Times, serif;
-        font-size: 10.5pt;
-        line-height: 1.3; /* Aumentado para melhor legibilidade */
-    }
+        .header-logo {
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            font-size: 14pt;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+        .header-main-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11pt;
+        }
 
-    td {
-        padding: 1px 3px;
-        vertical-align: top;
-    }
+        .contract-box {
+            text-align: center;
+        }
+        .contract-box-title {
+            font-size: 8pt;
+            font-weight: bold;
+            padding: 1px;
+        }
+        .contract-box-content {
+            font-size: 10pt;
+            font-weight: bold;
+            padding: 2px;
+        }
 
-    .header-logo {
-        font-family: Arial, Helvetica, sans-serif;
-        font-weight: bold;
-        font-size: 14pt;
-    }
-
-    .header-main-title {
-        text-align: center;
-        font-weight: bold;
-        font-size: 11pt;
-    }
-
-    .header-subtitle {
-        text-align: center;
-        font-size: 9pt;
-        font-weight: bold;
-    }
-
-    /* --- ESTILO MODIFICADO --- */
-    .contract-box {
-        /* border: 1px solid black; -> REMOVIDO */
-        text-align: center;
-    }
-    .contract-box-title {
-        font-size: 8pt;
-        font-weight: bold;
-        /* border-bottom: 1px solid black; -> REMOVIDO */
-        padding: 1px;
-    }
-    .contract-box-content {
-        font-size: 10pt;
-        font-weight: bold;
-        padding: 2px;
-    }
-
-    .centered-text {
-        text-align: center;
-        font-size: 9pt;
-        margin: 10px 0;
-    }
-
-    .section-title {
-        font-weight: bold;
-        font-size: 9pt;
-        text-transform: uppercase;
-        margin-top: 10px;
-        margin-bottom: 2px;
-    }
-
-    .info-table {
-        width: 100%;
-        border-collapse: collapse;
-        border-bottom: 1px solid black;
-        margin-bottom: 20px; /* ESPAÇAMENTO AUMENTADO */
-    }
-
-    .info-table td {
-        font-size: 9pt;
-        font-weight: bold;
-        text-transform: uppercase;
-        padding: 2px 0;
-        width: 50%;
-    }
-
-    .info-table strong {
-        font-weight: normal;
-        text-transform: none;
-    }
-
-    .lowercase {
-        text-transform: none !important;
-    }
-
-    .conditions-title {
-        text-align: left;
-        font-weight: bold;
-        font-size: 9pt;
-        /* border: 1px solid black; -> REMOVIDO */
-        /* border-bottom: none; -> REMOVIDO */
-        /* padding: 2px; -> REMOVIDO */
-        margin-top: 25px; /* ESPAÇAMENTO AUMENTADO */
-    }
-    .conditions-content {
-        text-align: left; /* Alinhamento padrão para o conteúdo */
-        font-size: 9pt;
-        /* border: 1px solid black; -> REMOVIDO */
-        /* padding: 3px; -> REMOVIDO */
-        margin-top: 5px;
-    }
-
-    /* Estilos específicos para conteúdo que deve ser centralizado ou negrito */
-    .conditions-content.centered {
-         text-align: left;
-    }
-    /*.conditions-content.bold {
-         font-weight: bold;
-    }*/
-
-    .clause {
-         font-size: 9pt;
-         text-align: justify;
-         margin-top: 12px; /* ESPAÇAMENTO AUMENTADO */
-    }
-
-    .signature-date {
-         text-align: center;
-         margin-top: 40px; /* ESPAÇAMENTO AUMENTADO */
-         margin-bottom: 30px;
-         font-size: 10pt;
-    }
-
-    .signature-block {
-         text-align: center;
-         font-size: 9pt;
-    }
-    .signature-line {
-         border-top: 1px solid black;
-         margin: 0 auto 2px auto;
-         width: 70%;
-    }
-    .signature-stamp {
-        font-size: 8pt;
-    }
-    @page {
-        margin: 1.5cm;
-        @bottom-right {
-            content: "Página " counter(page) " de " counter(pages);
+        .centered-text {
+            text-align: center;
             font-size: 9pt;
+            margin: 10px 0;
+            font-weight: normal;
         }
-    }
-    .document-wrapper {
-        font-family: 'Times New Roman', Times, serif;
-        font-size: 10.5pt;
-        line-height: 1.3;
-        color: #000; /* Garante que o texto seja preto no documento */
-    }
-    .document-wrapper table { width: 100%; border-collapse: collapse; }
-    .document-wrapper td { padding: 1px 3px; vertical-align: top; }
-    .header-logo { font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 14pt; }
-    .header-main-title { text-align: center; font-weight: bold; font-size: 11pt; }
-    .contract-box { text-align: center; }
-    .contract-box-title { font-size: 8pt; font-weight: bold; padding: 1px; }
-    .contract-box-content { font-size: 10pt; font-weight: bold; padding: 2px; }
-    .section-title { font-weight: bold; font-size: 9pt; text-transform: uppercase; margin-top: 10px; margin-bottom: 2px; }
-    .info-table { width: 100%; border-collapse: collapse; border-bottom: 1px solid black; margin-bottom: 20px; }
-    .info-table td { font-size: 9pt; font-weight: bold; text-transform: uppercase; padding: 2px 0; width: 50%; }
-    .info-table strong { font-weight: normal; text-transform: none; }
-    .lowercase { text-transform: none !important; }
-    .conditions-title { text-align: left; font-weight: bold; font-size: 9pt; margin-top: 25px; }
-    .clause { font-size: 9pt; text-align: justify; margin-top: 12px; }
-    .signature-date { text-align: center; margin-top: 40px; margin-bottom: 30px; font-size: 10pt; }
-    .signature-block { text-align: center; font-size: 9pt; }
-    .signature-line { border-top: 1px solid black; margin: 0 auto 2px auto; width: 70%; }
-    .signature-stamp { font-size: 8pt; }
 
-    /* Estilo para esconder o layout principal ao imprimir */
-    @media print {
-        .main-header, .main-footer {
-            display: none;
+        .section-title {
+            font-weight: bold;
+            font-size: 9pt;
+            text-transform: uppercase;
+            margin-top: 10px;
+            margin-bottom: 2px;
         }
-        .main-content {
-            padding: 0;
-        }
-        .document-wrapper {
-            border: none;
-            box-shadow: none;
-            padding: 0;
-            max-width: 100%;
-        }
-    }
-</style>
-{% endblock %}
 
-{% block content %}
-<div class="document-wrapper">
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-bottom: 1px solid black;
+            margin-bottom: 20px;
+        }
+
+        .info-table td {
+            font-size: 9pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 2px 0;
+            width: 50%;
+        }
+
+        .info-table strong {
+            font-weight: normal;
+            text-transform: none;
+        }
+
+        .lowercase {
+            text-transform: none !important;
+        }
+
+        .conditions-title {
+            text-align: left;
+            font-weight: bold;
+            font-size: 9pt;
+            margin-top: 20px;
+        }
+        .conditions-content {
+            text-align: left;
+            font-size: 9pt;
+            margin-top: 5px;
+        }
+
+        .clause {
+            font-size: 9pt;
+            text-align: justify;
+            margin-top: 12px;
+        }
+
+        .signature-date {
+            text-align: left;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            font-size: 10pt;
+            font-weight: bold;
+        }
+
+        .signature-block {
+            text-align: left;
+            font-size: 9pt;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .signature-line {
+            border-top: 1px solid black;
+            margin: 0 0 2px 0;
+            width: 80%;
+        }
+        .signature-stamp {
+            font-size: 8pt;
+            font-weight: normal;
+            text-transform: none;
+        }
+        .email-stamp {
+            font-size: 8pt;
+            font-weight: normal;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
     <table style="margin-bottom: 10px;">
-        </table>
+        <tr>
+            <td style="width: 25%;" class="header-logo">
+                <img src="{{ logo_path }}" alt="Logo da Empresa" style="max-width: 100%; height: auto;">
+            </td>
+            <td style="width: 50%;">
+                <div class="header-main-title">Termo de Conclusão / Rescisão do - TCE</div>
+                <div class="centered-text">Instrumento jurídico de Termo de Compromisso de Estágio e Convênio de Concessão de Estágio, previstos na Lei 11.788 de 25/09/2008 que regulamenta e disciplina a contratação de Estagiários.</div>
+            </td>
+            <td style="width: 25%;">
+                <div class="contract-box">
+                    <div class="contract-box-title">Nº Contrato</div>
+                    <div class="contract-box-content">{{ rescisao.contrato.numero_contrato }}</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="clause">As partes a seguir qualificadas,</div>
 
     <div class="section-title">INSTITUIÇÃO DE ENSINO</div>
     <table class="info-table">
         <tr>
             <td colspan="2"><strong>Razão Social:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.razao_social }}</td>
         </tr>
-        </table>
+        <tr>
+            <td colspan="2"><strong>Endereço:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.endereco }}</td>
+        </tr>
+        <tr>
+            <td><strong>Bairro:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.bairro }}</td>
+            <td><strong>Estado:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.estado }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cnpj:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.cnpj }}</td>
+            <td><strong>Representante Legal:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.representante_legal }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cidade:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.cidade }}</td>
+            <td><strong>Cep:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.cep }}</td>
+        </tr>
+        <tr>
+            <td><strong>Telefone:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.telefone }}</td>
+            <td><strong>Email:</strong> <span class="lowercase">{{ rescisao.contrato.estagiario.instituicao_ensino.email }}</span></td>
+        </tr>
+    </table>
 
-    </div>
-{% endblock %}
-    @page {
-        margin: 1.5cm;
-        @bottom-right {
-            content: "Página " counter(page) " de " counter(pages);
-            font-size: 9pt;
-        }
-    }
-    .document-wrapper {
-        font-family: 'Times New Roman', Times, serif;
-        font-size: 10.5pt;
-        line-height: 1.3;
-        color: #000; /* Garante que o texto seja preto no documento */
-    }
-    .document-wrapper table { width: 100%; border-collapse: collapse; }
-    .document-wrapper td { padding: 1px 3px; vertical-align: top; }
-    .header-logo { font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 14pt; }
-    .header-main-title { text-align: center; font-weight: bold; font-size: 11pt; }
-    .contract-box { text-align: center; }
-    .contract-box-title { font-size: 8pt; font-weight: bold; padding: 1px; }
-    .contract-box-content { font-size: 10pt; font-weight: bold; padding: 2px; }
-    .section-title { font-weight: bold; font-size: 9pt; text-transform: uppercase; margin-top: 10px; margin-bottom: 2px; }
-    .info-table { width: 100%; border-collapse: collapse; border-bottom: 1px solid black; margin-bottom: 20px; }
-    .info-table td { font-size: 9pt; font-weight: bold; text-transform: uppercase; padding: 2px 0; width: 50%; }
-    .info-table strong { font-weight: normal; text-transform: none; }
-    .lowercase { text-transform: none !important; }
-    .conditions-title { text-align: left; font-weight: bold; font-size: 9pt; margin-top: 25px; }
-    .clause { font-size: 9pt; text-align: justify; margin-top: 12px; }
-    .signature-date { text-align: center; margin-top: 40px; margin-bottom: 30px; font-size: 10pt; }
-    .signature-block { text-align: center; font-size: 9pt; }
-    .signature-line { border-top: 1px solid black; margin: 0 auto 2px auto; width: 70%; }
-    .signature-stamp { font-size: 8pt; }
-
-    /* Estilo para esconder o layout principal ao imprimir */
-    @media print {
-        .main-header, .main-footer {
-            display: none;
-        }
-        .main-content {
-            padding: 0;
-        }
-        .document-wrapper {
-            border: none;
-            box-shadow: none;
-            padding: 0;
-            max-width: 100%;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="document-wrapper">
-    <table style="margin-bottom: 10px;">
-        </table>
-    
-    <div class="section-title">INSTITUIÇÃO DE ENSINO</div>
+    <div class="section-title">PARTE CONCEDENTE</div>
     <table class="info-table">
         <tr>
-            <td colspan="2"><strong>Razão Social:</strong> {{ rescisao.contrato.estagiario.instituicao_ensino.razao_social }}</td>
+            <td colspan="2"><strong>Razão Social:</strong> {% firstof rescisao.contrato.parte_concedente.razao_social rescisao.contrato.parte_concedente.nome %}</td>
         </tr>
-        </table>
+        <tr>
+            <td colspan="2"><strong>Endereço:</strong> {{ rescisao.contrato.parte_concedente.endereco }}</td>
+        </tr>
+        <tr>
+            <td><strong>Bairro:</strong> {{ rescisao.contrato.parte_concedente.bairro }}</td>
+            <td><strong>Estado:</strong> {{ rescisao.contrato.parte_concedente.estado }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cnpj:</strong> {{ rescisao.contrato.parte_concedente.cnpj }}</td>
+            <td><strong>Representante Legal:</strong> {{ rescisao.contrato.parte_concedente.representante_legal }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cidade:</strong> {{ rescisao.contrato.parte_concedente.cidade }}</td>
+            <td><strong>Cep:</strong> {{ rescisao.contrato.parte_concedente.cep }}</td>
+        </tr>
+        <tr>
+            <td><strong>Telefone:</strong> {{ rescisao.contrato.parte_concedente.telefone }}</td>
+            <td><strong>Email:</strong> <span class="lowercase">{{ rescisao.contrato.parte_concedente.email }}</span></td>
+        </tr>
+    </table>
 
+    <div class="section-title">ESTAGIÁRIO(A)</div>
+    <table class="info-table" style="margin-bottom: 10px;">
+        <tr>
+            <td colspan="2"><strong>Nome:</strong> {{ rescisao.contrato.estagiario.candidato.nome }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Endereço:</strong> {{ rescisao.contrato.estagiario.candidato.endereco }}</td>
+        </tr>
+        <tr>
+            <td><strong>Bairro:</strong> {{ rescisao.contrato.estagiario.candidato.bairro }}</td>
+            <td><strong>Estado:</strong> {{ rescisao.contrato.estagiario.candidato.estado }}</td>
+        </tr>
+        <tr>
+            <td><strong>CPF:</strong> {{ rescisao.contrato.estagiario.candidato.cpf }}</td>
+            <td><strong>Data nascimento:</strong> {{ rescisao.contrato.estagiario.candidato.data_nascimento|date:"d/m/Y" }}</td>
+        </tr>
+        <tr>
+            <td><strong>Cidade:</strong> {{ rescisao.contrato.estagiario.candidato.cidade }}</td>
+            <td><strong>Cep:</strong> {{ rescisao.contrato.estagiario.candidato.cep }}</td>
+        </tr>
+        <tr>
+            <td><strong>Telefone:</strong> {{ rescisao.contrato.estagiario.candidato.celular }}</td>
+            <td><strong>Email:</strong> <span class="lowercase">{{ rescisao.contrato.estagiario.candidato.email }}</span></td>
+        </tr>
+    </table>
+
+    <div class="clause" style="margin-bottom: 20px;">
+        <strong>Agente Responsável:</strong> {{ rescisao.contrato.agente_integrador.razao_social }}
     </div>
-{% endblock %}
+
+    <div class="clause" style="font-weight: bold; border-top: 1px solid black; padding-top: 15px;">
+        Comunicado de Conclusão / Rescisão do - TCE, termos e condições a seguir:
+    </div>
+
+    <div class="conditions-title">1) PERÍODO ESTAGIADO:</div>
+    <div class="conditions-content" style="text-transform: uppercase;">
+        de: {{ rescisao.contrato.data_inicio|date:"d/m/Y" }} a {{ rescisao.data_rescisao|date:"d/m/Y" }}<br>
+        <strong>Horário Estagiado:</strong> {{ rescisao.contrato.jornada_estagio }}
+    </div>
+
+    <div class="conditions-title">2) MOTIVO DA RESCISÃO:</div>
+    <div class="conditions-content" style="text-transform: uppercase;">
+        {{ rescisao.get_motivo_display|default:rescisao.motivo }}
+    </div>
+
+    <div class="conditions-title">3) ATIVIDADE DO ESTAGIÁRIO(A):</div>
+    <div class="conditions-content" style="text-transform: uppercase;">
+        {{ rescisao.contrato.atividades }}<br>
+        <strong>Supervisor(a) do estágio:</strong> {{ rescisao.contrato.supervisor_nome }}
+    </div>
+
+    <div class="signature-date">
+        GUARULHOS, {{ rescisao.data_criacao|date:"d \\d\\e F \\d\\e Y" }}
+    </div>
+
+    <table style="margin-top: 40px;">
+        <tr>
+            <td style="width: 50%; padding: 25px 25px 45px 0;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{% firstof rescisao.contrato.parte_concedente.nome rescisao.contrato.parte_concedente.razao_social %}</div>
+                    <div class="email-stamp">{{ rescisao.contrato.parte_concedente.email }}</div>
+                </div>
+            </td>
+            <td style="width: 50%; padding: 25px 0 45px 25px;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{{ rescisao.contrato.estagiario.instituicao_ensino.razao_social }}</div>
+                    <div class="signature-stamp">(assinatura e carimbo)</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 50%; padding: 25px 25px 20px 0;">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div>{{ rescisao.contrato.estagiario.candidato.nome }}</div>
+                    <div class="signature-stamp">(assinatura do(a) estagiário)</div>
+                </div>
+            </td>
+            <td style="width: 50%; padding: 25px 0 20px 25px;">
+                {% if precisa_responsavel %}
+                    <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div>Pais/Responsável</div>
+                    </div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
