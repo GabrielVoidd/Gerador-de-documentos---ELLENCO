@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy, reverse
@@ -153,25 +153,70 @@ class ContratoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMix
         return initial
 
 
-class RescisaoCreateView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class RescisaoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Rescisao
     form_class = RescisaoForm
     template_name = 'adm/rescisao_form.html'
-    success_url = reverse_lazy('adm_contratos_list')  # Volta para a lista de contratos
 
     def test_func(self):
-        return check_adm(self.request.user)
+        # Substitua pela sua lógica de permissão (ex: return self.request.user.is_staff)
+        return True
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['empresas'] = ParteConcedente.objects.all().order_by('razao_social')
+        return context
 
     def form_valid(self, form):
-        # 1. Salva a Rescisão no banco
-        response = super().form_valid(form)
+        rescisao = form.save()
 
-        # 2. Atualiza a data_rescisao diretamente no Contrato vinculado
-        contrato = form.instance.contrato
-        contrato.data_rescisao = form.instance.data_rescisao
+        # Sincroniza a data no Contrato
+        contrato = rescisao.contrato
+        contrato.data_rescisao = rescisao.data_rescisao
         contrato.save(update_fields=['data_rescisao'])
 
+        # GERAÇÃO DO PDF
+        logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
+        logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
+
+        html_string = render_to_string('estagios/rescisao.html', {
+            'rescisao': rescisao,
+            'logo_path': logo_path,
+            'usuario_logado': self.request.user
+        })
+
+        pdf_file = HTML(string=html_string).write_pdf()
+
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="Rescisao_{contrato.estagiario.candidato.nome}.pdf"'
         return response
+
+
+# API PARA FILTRAR ESTAGIÁRIOS POR EMPRESA
+def api_contratos_ativos(request):
+    empresa_id = request.GET.get('empresa_id')
+    contratos = Contrato.objects.filter(data_rescisao__isnull=True)
+    if empresa_id:
+        contratos = contratos.filter(parte_concedente_id=empresa_id)
+
+    dados = [{'id': c.id, 'texto': f"{c.numero_contrato} - {c.estagiario.candidato.nome}"} for c in contratos]
+    return JsonResponse(dados, safe=False)
+
+
+# API PARA O RAIO-X DO CONTRATO
+def api_detalhes_contrato(request):
+    contrato_id = request.GET.get('contrato_id')
+    c = Contrato.objects.get(id=contrato_id)
+    return JsonResponse({
+        'nome': c.estagiario.candidato.nome,
+        'numero': c.numero_contrato,
+        'empresa': c.parte_concedente.razao_social or c.parte_concedente.nome,
+        'inicio': c.data_inicio.strftime('%d/%m/%Y'),
+        'fim': c.data_termino_prevista.strftime('%d/%m/%Y'),
+        'bolsa': str(c.valor_bolsa),
+        'jornada': c.jornada_estagio,
+        'atividades': c.atividades
+    })
 
 
 class ReciboListView(AdmRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -371,3 +416,64 @@ def gerar_recibos_lote(request):
     # GET: Mostra o formulário
     empresas = ParteConcedente.objects.all().order_by('razao_social')
     return render(request, 'adm/recibo_lote_form.html', {'empresas': empresas})
+
+
+class RescisaoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Rescisao
+    template_name = 'adm/rescisao_list.html'
+    context_object_name = 'rescisicoes'
+    paginate_by = 20
+
+    def test_func(self):
+        # Substitua pela sua lógica de permissão
+        return True
+
+    def get_queryset(self):
+        queryset = Rescisao.objects.select_related(
+            'contrato__estagiario__candidato',
+            'contrato__parte_concedente',
+            'motivo'
+        ).order_by('-data_rescisao')
+
+        # Captura o que o usuário digitou na barra de busca
+        query = self.request.GET.get('q')
+
+        if query:
+            # O 'Q' permite fazer consultas com "OU" (OR)
+            queryset = queryset.filter(
+                Q(contrato__estagiario__candidato__nome__icontains=query) |
+                Q(contrato__parte_concedente__razao_social__icontains=query) |
+                Q(contrato__parte_concedente__nome__icontains=query) |
+                Q(contrato__numero_contrato__icontains=query)
+            )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Envia a palavra pesquisada de volta para o HTML (para manter no campo de texto)
+        context['busca_atual'] = self.request.GET.get('q', '')
+        return context
+
+# 2. A FUNÇÃO DE REIMPRESSÃO (Download do PDF)
+@login_required
+def baixar_pdf_rescisao(request, pk):
+    # Busca a rescisão específica no banco
+    rescisao = get_object_or_404(Rescisao, pk=pk)
+
+    # Prepara a logo e o HTML (mesma lógica do CreateView)
+    logo_path_raw = os.path.join(settings.BASE_DIR, 'static', 'images', 'LOGO.jpg')
+    logo_path = 'file:///' + logo_path_raw.replace('\\', '/')
+
+    html_string = render_to_string('estagios/rescisao.html', {
+        'rescisao': rescisao,
+        'logo_path': logo_path,
+        'usuario_logado': request.user
+    })
+
+    pdf_file = HTML(string=html_string).write_pdf()
+
+    nome_arquivo = f"Rescisao_{rescisao.contrato.estagiario.candidato.nome}.pdf"
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{nome_arquivo}"'
+    return response

@@ -12,4 +12,8 @@ urlpatterns = [
     path('adm/converter-contrato/<int:candidato_id>/', views.converter_para_contrato, name='adm_converter_contrato'),
     path('cadastro-expresso/', views.cadastro_expresso, name='cadastro_expresso'),
     path('adm/recibos/lote/', views.gerar_recibos_lote, name='adm_recibos_lote'),
+    path('adm/contratos-ativos/', views.api_contratos_ativos, name='api_contratos_ativos'),
+    path('adm/detalhes-contrato/', views.api_detalhes_contrato, name='api_detalhes_contrato'),
+    path('adm/rescisao/lista/', views.RescisaoListView.as_view(), name='adm_rescisao_list'),
+    path('adm/rescisao/<int:pk>/pdf/', views.baixar_pdf_rescisao, name='adm_rescisao_pdf'),
 ]

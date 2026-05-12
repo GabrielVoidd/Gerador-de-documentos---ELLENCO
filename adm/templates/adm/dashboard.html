@@ -11,6 +11,11 @@
             <a href="{% url 'adm_recibos_list' %}" class="btn btn-primary btn-sm shadow-sm ms-2">
                 <i class="fas fa-file-invoice-dollar me-1"></i> Gerar Recibos
             </a>
+
+            <a href="{% url 'adm_rescisao_list' %}" class="btn btn-outline-danger btn-sm shadow-sm ms-2">
+                <i class="fas fa-history me-1"></i> Histórico de Rescisões
+            </a>
+
             <a href="{% url 'adm_rescisao_nova' %}" class="btn btn-danger btn-sm shadow-sm ms-2">
                 <i class="fas fa-user-times me-1"></i> Registrar Rescisão
             </a>
@@ -69,6 +74,11 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ rescisoes_mes }}</div>
                         </div>
                         <div class="col-auto"><i class="fas fa-user-slash fa-2x text-gray-300 opacity-50"></i></div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{% url 'adm_rescisao_list' %}" class="text-danger small fw-bold text-decoration-none">
+                            Ver histórico completo <i class="fas fa-arrow-right fa-sm ms-1"></i>
+                        </a>
                     </div>
                 </div>
             </div>
