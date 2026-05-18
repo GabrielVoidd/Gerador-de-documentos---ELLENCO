@@ -1,0 +1,71 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Meus Chamados de TI</h1>
+        <a href="{% url 'novo_chamado' setor=view.kwargs.setor %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50 me-1"></i> Abrir Novo Chamado
+        </a>
+    </div>
+
+    <div class="card shadow mb-4 border-start border-primary border-4">
+        <div class="card-header py-3 bg-white">
+            <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-list me-2"></i> Histórico de Solicitações</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nº</th>
+                            <th>Tipo</th>
+                            <th>Descrição Resumida</th>
+                            <th>Data do Pedido</th>
+                            <th>Status</th>
+                            <th>Previsão / Resposta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for chamado in chamados %}
+                        <tr>
+                            <td class="fw-bold text-secondary">#{{ chamado.id }}</td>
+                            <td>{{ chamado.get_tipo_display }}</td>
+                            <td>{{ chamado.descricao|truncatechars:50 }}</td>
+                            <td>{{ chamado.criado_em|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if chamado.status == 'ABERTO' %}
+                                    <span class="badge bg-warning text-dark">Aguardando Análise</span>
+                                {% elif chamado.status == 'AGENDADO' %}
+                                    <span class="badge bg-info">Agendado</span>
+                                {% elif chamado.status == 'ANDAMENTO' %}
+                                    <span class="badge bg-primary">Em Desenvolvimento</span>
+                                {% elif chamado.status == 'CONCLUIDO' %}
+                                    <span class="badge bg-success">Concluído</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Cancelado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if chamado.data_agendada %}
+                                    <small class="text-muted d-block">Agendado para: <strong>{{ chamado.data_agendada|date:"d/m/Y" }}</strong></small>
+                                {% endif %}
+                                {% if chamado.resposta_dev %}
+                                    <small class="text-info d-block mt-1"><i class="fas fa-comment-dots"></i> Resposta da TI disponível.</small>
+                                {% else %}
+                                    <small class="text-muted">-</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">Você ainda não abriu nenhum chamado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

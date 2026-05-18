@@ -136,8 +136,30 @@
                     </ul>
                 </li>
 
+                <li class="nav-item dropdown border-start ms-lg-2 ps-lg-2">
+                    <a class="nav-link dropdown-toggle text-dark" href="#" id="menuSuporte" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-life-ring me-1 text-warning"></i> Suporte
+                    </a>
+                    <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="menuSuporte">
+                        <li>
+                            <a class="dropdown-item" href="{% if '/comercial/' in request.path %}{% url 'meus_chamados' setor='comercial' %}{% elif '/adm/' in request.path %}{% url 'meus_chamados' setor='adm' %}{% else %}{% url 'meus_chamados' setor='rs' %}{% endif %}">
+                                <i class="fas fa-headset me-2 text-primary"></i> Meus Chamados
+                            </a>
+                        </li>
+
+                        {% if request.user.is_superuser %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item fw-bold text-danger" href="{% if '/comercial/' in request.path %}{% url 'fila_trabalho' setor='comercial' %}{% elif '/adm/' in request.path %}{% url 'fila_trabalho' setor='adm' %}{% else %}{% url 'fila_trabalho' setor='rs' %}{% endif %}">
+                                <i class="fas fa-laptop-code me-2"></i> Fila de Trabalho
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+
                 {% if request.user.is_superuser %}
-                <li class="nav-item">
+                <li class="nav-item border-start ms-lg-2 ps-lg-2">
                     <a class="nav-link" href="/admin/" target="_blank">
                         <i class="fas fa-cog text-secondary"></i> Gerenciamento
                     </a>

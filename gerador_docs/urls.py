@@ -32,6 +32,7 @@ urlpatterns = [
     path('comercial/', include('comercial.urls')),
     path('adm/', include('adm.urls')),
     path('redirecionar/', views.login_dispatcher, name='login_dispatcher'),
+    path('chamados/', include('chamados.urls')),
 ]
 
 # Em produção, o seu servidor web deve ser configurado para servir os arquivos da pasta MEDIA_ROOT.

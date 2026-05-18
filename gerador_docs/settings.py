@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'dashboard',
     'comercial',
     'adm',
+    'chamados',
 ]
 
 MIDDLEWARE = [

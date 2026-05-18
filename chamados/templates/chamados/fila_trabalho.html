@@ -1,0 +1,67 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Fila de Trabalho TI</h1>
+    </div>
+
+    <div class="card shadow mb-4 border-start border-danger border-4">
+        <div class="card-header py-3 bg-white d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-danger"><i class="fas fa-code me-2"></i> Chamados da Agência</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nº</th>
+                            <th>Solicitante</th>
+                            <th>O que precisa ser feito?</th>
+                            <th>Justificativa (Dor)</th>
+                            <th>Urgência</th>
+                            <th>Status</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for chamado in chamados_gerais %}
+                        <tr>
+                            <td class="fw-bold">#{{ chamado.id }}</td>
+                            <td class="fw-bold text-dark">{{ chamado.solicitante.first_name }}</td>
+                            <td><small>{{ chamado.descricao|truncatechars:60 }}</small></td>
+                            <td><small class="text-muted">{{ chamado.justificativa|truncatechars:60 }}</small></td>
+                            <td class="text-center">
+                                {% if chamado.urgencia == 'CRITICA' %}
+                                    <span class="badge bg-danger">CRÍTICA</span>
+                                {% elif chamado.urgencia == 'ALTA' %}
+                                    <span class="badge bg-warning text-dark">ALTA</span>
+                                {% elif chamado.urgencia == 'MEDIA' %}
+                                    <span class="badge bg-primary">MÉDIA</span>
+                                {% elif chamado.urgencia == 'BAIXA' %}
+                                    <span class="badge bg-secondary">BAIXA</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ chamado.get_status_display }}</strong>
+                            </td>
+                            <td class="text-center">
+                                <a href="/admin/chamados/chamado/{{ chamado.id }}/change/" class="btn btn-sm btn-outline-danger" target="_blank">
+                                    <i class="fas fa-edit"></i> Tratar
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">Sua fila está limpa! Nenhum chamado aberto.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
