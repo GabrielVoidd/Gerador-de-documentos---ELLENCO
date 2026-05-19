@@ -7,13 +7,14 @@ from .models import Candidato, Vaga, ParteConcedente, Candidatura, Empresa, Arqu
 class CandidatoForm(forms.ModelForm):
     class Meta:
         model = Candidato
-        exclude =  [
+        exclude = [
             'observacoes', 'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado',
             'nao_compareceu', 'desistiu', 'encaminhado', 'criterio_exclusao'
         ]
 
     def __init__(self, *args, **kwargs):
         super(CandidatoForm, self).__init__(*args, **kwargs)
+
         # Injeta a classe do Bootstrap em todos os campos gerados
         for field_name, field in self.fields.items():
             if isinstance(field.widget, forms.CheckboxInput):
@@ -35,9 +36,15 @@ class CandidatoForm(forms.ModelForm):
                 'placeholder': 'Esse número deve ser diferente do primeiro celular'
             })
 
+        # Garante que o campo tenha a opção "Vazia" para o Select2 colocar o Placeholder
+        if 'instituicao_ensino' in self.fields:
+            self.fields['instituicao_ensino'].empty_label = "Selecione ou digite para pesquisar..."
+
     class Media:
-        js = ('js/admin_custom.js', 'js/jquery.mask.min.js', 'js/mascaras_admin.js', 'js/mascara_cpf_admin.js',
-              'js/mascara_rg_admin.js', 'js/viacep_admin.js', 'js/mascara_nascimento.js')
+        js = (
+            'js/admin_custom.js', 'js/jquery.mask.min.js', 'js/mascaras_admin.js',
+            'js/mascara_cpf_admin.js', 'js/mascara_rg_admin.js', 'js/viacep_admin.js', 'js/mascara_nascimento.js'
+        )
 
 
 class CandidatoStatusForm(forms.ModelForm):

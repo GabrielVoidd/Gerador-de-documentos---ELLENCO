@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha do Candidato</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 </head>
 <body class="bg-light pb-5">
 
@@ -21,13 +25,15 @@
 
                         {% for field in form %}
                             <div class="mb-3">
-                                <label class="form-label fw-bold">
+                                <label class="form-label fw-bold" for="{{ field.id_for_label }}">
                                     {{ field.label }}
                                     {% if field.field.required %}
                                         <span class="text-danger" title="Este campo é obrigatório">*</span>
                                     {% endif %}
                                 </label>
+
                                 {{ field }}
+
                                 {% if field.help_text %}
                                     <div class="form-text">{{ field.help_text }}</div>
                                 {% endif %}
@@ -47,19 +53,19 @@
     </div>
 </div>
 
-<!-- Mantém o form.media caso algum outro componente do Django precise dele -->
 {{ form.media }}
 
-<!-- IMPORTAÇÃO DO JQUERY E DA MÁSCARA -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt-BR.js"></script>
 
 <script>
     $(document).ready(function() {
         // Máscara para a Data de Nascimento
         $('#id_data_nascimento').mask('00/00/0000');
 
-        // BÔNUS: Máscaras extras já configuradas (se existirem no form, já funcionam)
+        // BÔNUS: Máscaras extras já configuradas
         if ($('#id_cpf').length) {
             $('#id_cpf').mask('000.000.000-00', {reverse: true});
         }
@@ -71,6 +77,18 @@
                     'A': {pattern: /[0-9xX]/}
                 },
                 reverse: true
+            });
+        }
+
+        // ==========================================
+        // ATIVA O SELECT2 NO CAMPO DA INSTITUIÇÃO
+        // ==========================================
+        if ($('#id_instituicao_ensino').length) {
+            $('#id_instituicao_ensino').select2({
+                theme: 'bootstrap-5', // Deixa com a mesma cara do Bootstrap
+                language: 'pt-BR',    // Traduz mensagens de erro/busca para PT-BR
+                width: '100%',        // Garante que ocupe a div toda
+                placeholder: 'Selecione ou digite para pesquisar...'
             });
         }
     });
