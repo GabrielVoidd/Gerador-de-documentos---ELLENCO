@@ -81,6 +81,8 @@ def dashboard_adm(request):
         estagiario__contrato__data_termino_prevista__gte=hoje
     ).select_related('instituicao_ensino').distinct()
 
+    ultimos_estagiarios = Candidato.objects.all().order_by('-id')[:6]
+
     context = {
         'total_ativos': total_ativos,
         'vencendo_em_breve': vencendo_em_breve,
@@ -89,6 +91,7 @@ def dashboard_adm(request):
         'ultimos_contratos': ultimos_contratos,
         'contratos_alerta': contratos_alerta,
         'fila_contratacao': fila_contratacao,
+        'ultimos_estagiarios': ultimos_estagiarios,
     }
 
     return render(request, 'adm/dashboard.html', context)

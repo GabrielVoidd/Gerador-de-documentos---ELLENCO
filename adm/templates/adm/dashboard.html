@@ -11,11 +11,9 @@
             <a href="{% url 'adm_recibos_list' %}" class="btn btn-primary btn-sm shadow-sm ms-2">
                 <i class="fas fa-file-invoice-dollar me-1"></i> Gerar Recibos
             </a>
-
             <a href="{% url 'adm_rescisao_list' %}" class="btn btn-outline-danger btn-sm shadow-sm ms-2">
                 <i class="fas fa-history me-1"></i> Histórico de Rescisões
             </a>
-
             <a href="{% url 'adm_rescisao_nova' %}" class="btn btn-danger btn-sm shadow-sm ms-2">
                 <i class="fas fa-user-times me-1"></i> Registrar Rescisão
             </a>
@@ -86,8 +84,8 @@
     </div>
 
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow border-start border-info border-4">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="card shadow border-start border-info border-4 h-100">
                 <div class="card-header py-3 bg-white">
                     <h6 class="m-0 font-weight-bold text-info"><i class="fas fa-user-check me-2"></i> Fila de Contratação (Aguardando TCE)</h6>
                 </div>
@@ -96,8 +94,7 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="small border-0 px-4">Candidato / Data de Aprovação</th>
-                                    <th class="small border-0">Instituição de Ensino</th>
+                                    <th class="small border-0 px-4">Candidato / Data</th>
                                     <th class="small border-0 text-end px-4">Ação</th>
                                 </tr>
                             </thead>
@@ -106,9 +103,8 @@
                                 <tr>
                                     <td class="px-4">
                                         <div class="fw-bold text-dark">{{ cand.nome }}</div>
-                                        <small class="text-muted">Aprovado em: {{ cand.data_cadastro|date:"d/m/Y" }}</small>
+                                        <small class="text-muted">{{ cand.instituicao_ensino.razao_social|truncatechars:35 }}</small>
                                     </td>
-                                    <td class="small">{{ cand.instituicao_ensino.razao_social|truncatechars:40 }}</td>
                                     <td class="text-end px-4">
                                         <a href="{% url 'adm_converter_contrato' cand.id %}" class="btn btn-sm btn-info text-white fw-bold shadow-sm">
                                             <i class="fas fa-file-contract me-1"></i> Gerar TCE
@@ -116,7 +112,58 @@
                                     </td>
                                 </tr>
                                 {% empty %}
-                                <tr><td colspan="3" class="text-center py-4 text-muted small">Nenhum novo aprovado aguardando contrato no momento. A fila está limpa!</td></tr>
+                                <tr><td colspan="2" class="text-center py-4 text-muted small">Nenhum aprovado aguardando contrato no momento.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow border-start border-success border-4 h-100">
+                <div class="card-header py-3 bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-success"><i class="fas fa-users me-2"></i> Novos Cadastros na Base</h6>
+                    <div>
+                        <a href="{% url 'candidato_novo' %}" class="btn btn-sm btn-success shadow-sm">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                        <a href="{% url 'buscar_candidatos' %}" class="btn btn-sm btn-outline-secondary shadow-sm ms-1">
+                            Ver Todos
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="small border-0 px-4">Nome / CPF</th>
+                                    <th class="small border-0 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for estagiario in ultimos_estagiarios %}
+                                <tr>
+                                    <td class="px-4">
+                                        <div class="fw-bold text-dark">{{ estagiario.nome|truncatechars:30 }}</div>
+                                        <small class="text-muted">{{ estagiario.cpf }}</small>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if estagiario.trabalhando %}
+                                            <span class="badge bg-success">Contratado</span>
+                                        {% elif estagiario.aprovado %}
+                                            <span class="badge bg-primary">Na Fila</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Em Análise</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center py-4 text-muted small">Nenhum estagiário cadastrado ainda.</td>
+                                </tr>
                                 {% endfor %}
                             </tbody>
                         </table>

@@ -73,7 +73,8 @@ def login_dispatcher(request):
 
 class RecrutamentoRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(name='Recrutamento').exists()
+        grupos_permitidos = ['Recrutamento', 'RH']
+        return self.request.user.is_superuser or self.request.user.groups.filter(name__in=grupos_permitidos).exists()
 
 
 class InstituicaoEnsinoViewSet(viewsets.ModelViewSet):
@@ -679,13 +680,9 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
     context_object_name = 'candidatos'
     paginate_by = 20
 
-    # O Django roda isso antes de abrir a página
-    def test_func(self):
-        return check_rs(self.request.user)
-
     # (Opcional) Se quiser que dê uma tela de erro 403 ao invés de jogar pro login:
-    def handle_no_permission(self):
-        raise PermissionDenied("Você não tem permissão para acessar a base de candidatos.")
+    # def handle_no_permission(self):
+    #     raise PermissionDenied("Você não tem permissão para acessar a base de candidatos.")
 
     def get_queryset(self):
         # select_related deixa a busca mais rápida (evita o problema N+1)
@@ -786,10 +783,6 @@ class CandidatoPerfilView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPas
     form_class = CandidatoStatusForm
     template_name = 'estagios/candidato_perfil.html'
     context_object_name = 'candidato'
-
-    # Mesma segurança da tela de busca!
-    def test_func(self):
-        return check_rs(self.request.user)
 
     def get_success_url(self):
         # Depois de salvar, recarrega a mesma página do perfil para a pessoa ver que salvou
@@ -1031,9 +1024,6 @@ class CandidatoDocumentosUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixi
     model = Candidato
     form_class = CandidatoDocumentosForm
     template_name = 'estagios/candidato_documentos_form.html'
-
-    def test_func(self):
-        return check_rs(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

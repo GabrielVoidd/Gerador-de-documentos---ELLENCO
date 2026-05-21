@@ -51,6 +51,17 @@
                             <i class="fas fa-chart-line text-primary"></i> Painel ADM
                         </a>
                     </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="menuCandidatos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-users text-secondary"></i> Base de Estagiários
+                        </a>
+                        <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="menuCandidatos">
+                            <li><a class="dropdown-item" href="{% url 'candidato_novo' %}"><i class="fas fa-user-plus me-2 text-muted"></i>Novo Cadastro</a></li>
+                            <li><a class="dropdown-item" href="{% url 'buscar_candidatos' %}"><i class="fas fa-list me-2 text-muted"></i>Consultar Base</a></li>
+                        </ul>
+                    </li>
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="menuContratos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-file-signature text-secondary"></i> Contratos (TCE)
