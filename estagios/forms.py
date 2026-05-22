@@ -1,6 +1,6 @@
 from django import forms
 from django.forms.models import inlineformset_factory
-
+from datetime import date
 from .models import Candidato, Vaga, ParteConcedente, Candidatura, Empresa, Arquivos
 
 
@@ -9,7 +9,7 @@ class CandidatoForm(forms.ModelForm):
         model = Candidato
         exclude = [
             'observacoes', 'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado',
-            'nao_compareceu', 'desistiu', 'encaminhado', 'criterio_exclusao'
+            'nao_compareceu', 'desistiu', 'encaminhado', 'criterio_exclusao', 'serie_semestre'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -39,6 +39,42 @@ class CandidatoForm(forms.ModelForm):
         # Garante que o campo tenha a opção "Vazia" para o Select2 colocar o Placeholder
         if 'instituicao_ensino' in self.fields:
             self.fields['instituicao_ensino'].empty_label = "Selecione ou digite para pesquisar..."
+
+    # Validação condicional da idade
+    def clean(self):
+        # Pega os dados que passaram nas validações básicas
+        cleaned_data = super().clean()
+
+        # Resgata os campos especificos
+        data_nascimento = cleaned_data.get('data_nascimento')
+        nome_responsavel = cleaned_data.get('nome_responsavel_legal')
+        telefone_responsavel = cleaned_data.get('telefone_responsavel_legal')
+
+        if data_nascimento:
+            hoje = date.today()
+            idade = hoje.year - data_nascimento.year
+
+            if hoje.month < data_nascimento.month or (
+                    hoje.month == data_nascimento.month and hoje.day < data_nascimento.day):
+                idade -= 1
+
+            # Regra para menores de 18 anos
+            if idade < 18:
+                # Valida o nome do responsável
+                if not nome_responsavel:
+                    self.add_error(
+                        'nome_responsavel_legal',
+                        'O nome do responsável legal é obrigatório para candidatos menores de 18 anos'
+                    )
+
+                 # Valida o telefone do responsável
+                if not telefone_responsavel:
+                    self.add_error(
+                        'telefone_responsavel_legal',
+                        'O telefone do responsável é obrigatório para candidatos menores de 18 anos'
+                    )
+
+        return cleaned_data
 
     class Media:
         js = (

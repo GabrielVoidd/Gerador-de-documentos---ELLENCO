@@ -252,7 +252,7 @@ class Candidato(models.Model):
     curso = models.CharField(max_length=70, help_text='Nome do curso, caso esteja na faculdade', null=True, blank=True)
     periodo = models.CharField(max_length=2, choices=Periodos.choices, verbose_name='Período')
     ano_semestre = models.CharField(max_length=3, choices=AnosSemestres.choices, null=True, verbose_name='Ano ou semestre')
-    serie_semestre = models.CharField(max_length=50, verbose_name='Último contato / atualização')
+    serie_semestre = models.CharField(max_length=50, verbose_name='Último contato / atualização', null=True, blank=True)
     data_termino = models.DateField(verbose_name='Quando o curso / escola acaba?', null=True, blank=True)
     instituicao_ensino = models.ForeignKey(InstituicaoEnsino, on_delete=models.PROTECT)
     nome_da_instituicao = models.CharField(max_length=150, null=True, blank=True, help_text='Caso não esteja na lista')

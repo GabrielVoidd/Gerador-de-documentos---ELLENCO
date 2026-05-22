@@ -680,10 +680,6 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
     context_object_name = 'candidatos'
     paginate_by = 20
 
-    # (Opcional) Se quiser que dê uma tela de erro 403 ao invés de jogar pro login:
-    # def handle_no_permission(self):
-    #     raise PermissionDenied("Você não tem permissão para acessar a base de candidatos.")
-
     def get_queryset(self):
         # select_related deixa a busca mais rápida (evita o problema N+1)
         queryset = Candidato.objects.select_related('instituicao_ensino').all().order_by('-data_cadastro')
@@ -729,9 +725,8 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
         # Mantemos os filtros na URL para a paginação não perder a busca ao mudar de página
         context['filtros_url'] = self.request.GET.urlencode()
         # Busca todos os bairros preenchidos, sem repetir, em ordem alfabética
-        context['bairros'] = Candidato.objects.exclude(bairro__isnull=True).exclude(bairro='').values_list('bairro',
-                                                                                                           flat=True).distinct().order_by(
-            'bairro')
+        context['bairros'] = Candidato.objects.exclude(bairro__isnull=True).exclude(bairro='').values_list(
+            'bairro', flat=True).distinct().order_by('bairro')
         return context
 
 
