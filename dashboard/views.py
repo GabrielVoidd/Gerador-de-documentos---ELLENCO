@@ -5,6 +5,7 @@ from django.utils import timezone
 from estagios.models import Candidato, Chamados, Vaga, Candidatura
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
+from django.db.models import Sum
 
 
 def check_rs(user):
@@ -21,7 +22,9 @@ def dashboard(request):
 
     # --- 1. KPIs (Cartões Menores) ---
     kpis = {
-        'minhas_vagas': Vaga.objects.filter(status='A').count(),
+        'minhas_vagas': Vaga.objects.aggregate(
+            minhas_vagas=Sum('quantidade_vagas', default=0)
+        )['minhas_vagas'],
         'novas_candidaturas': Candidatura.objects.filter(data_candidatura__gte=trinta_dias_atras).count(),
         'meus_convocados': Candidato.objects.filter(encaminhado=True).count(),
         'minhas_mensagens': Chamados.objects.filter(proposta_enviada=False).count(),

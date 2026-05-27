@@ -909,7 +909,9 @@ class RelatorioRSView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesT
         context = super().get_context_data(**kwargs)
 
         # 1. KPI Rápido
-        context['total_vagas'] = Vaga.objects.count()
+        context['total_vagas'] = Vaga.objects.aggregate(
+            total_vagas=Sum('quantidade_vagas', default=0)
+        )['total_vagas']
         context['vagas_abertas'] = Vaga.objects.filter(status='AP').aggregate(total=Sum('quantidade_vagas'))['total'] or 0
         context['vagas_fechadas'] = Vaga.objects.filter(status='F').aggregate(total=Sum('quantidade_vagas'))['total'] or 0
 
@@ -991,7 +993,7 @@ class RelatorioContratosView(RecrutamentoRequiredMixin, LoginRequiredMixin, User
         daqui_30_dias = hoje + timedelta(days=30)
 
         try:
-            from .models import Contrato  # Agora sabemos que o nome é esse mesmo!
+            from .models import Contrato
 
             # Contratos Ativos: Não foram rescindidos (data_rescisao é nula)
             contratos_ativos = Contrato.objects.filter(data_rescisao__isnull=True)
