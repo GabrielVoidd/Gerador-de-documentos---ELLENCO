@@ -8,7 +8,8 @@ from .views import (
     RegistroContatoEmpresaViewSet, CandidatoCreateView, CandidatoSucessoView, CandidatoListView,
     exportar_candidatos_excel, CandidatoPerfilView, VagaCreateView, ParteConcedenteCreateView, VagaListView,
     CandidaturaCreateView, VagaDetailView, VagaUpdateView, RelatorioRSView, CandidaturaUpdateView, RelatorioBIView,
-    RelatorioContratosView, CandidatoDocumentosUpdateView, CandidaturaPorVagaCreateView, CandidatoUpdateView, clonar_vaga
+    RelatorioContratosView, CandidatoDocumentosUpdateView, CandidaturaPorVagaCreateView, CandidatoUpdateView,
+    clonar_vaga
 )
 
 router = DefaultRouter()

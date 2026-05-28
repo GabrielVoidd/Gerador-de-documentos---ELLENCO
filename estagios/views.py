@@ -36,6 +36,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.db.models import Sum
 from django.contrib import messages
+import json
 
 
 def check_rs(user):
@@ -943,6 +944,22 @@ class RelatorioRSView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesT
         context['grafico_funil_json'] = {
             'labels': labels_funil,
             'data': data_funil
+        }
+
+        # 4. Dados para o Gráfico de Barras de Status
+        contagem_status = {'Aberta': 0, 'Fechada': 0, 'Cancelada': 0, 'Suspensa': 0, 'Reaberta': 0}
+        mapa_siglas_vagas = {'A': 'Aberta', 'F': 'Fechada', 'C': 'Cancelada', 'S': 'Suspensa', 'R': 'Reaberta'}
+
+        vagas_por_status = Vaga.objects.values('status').annotate(total=Count('id'))
+
+        for item in vagas_por_status:
+            sigla = item['status']
+            if sigla in mapa_siglas_vagas:
+                contagem_status[mapa_siglas_vagas[sigla]] = item['total']
+
+        context['grafico_status_vagas_json'] = {
+            'labels': list(contagem_status.keys()),
+            'data': list(contagem_status.values())
         }
 
         return context
