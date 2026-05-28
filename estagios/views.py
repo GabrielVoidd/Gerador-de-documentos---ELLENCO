@@ -912,7 +912,7 @@ class RelatorioRSView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesT
         context['total_vagas'] = Vaga.objects.aggregate(
             total_vagas=Sum('quantidade_vagas', default=0)
         )['total_vagas']
-        context['vagas_abertas'] = Vaga.objects.filter(status='AP').aggregate(total=Sum('quantidade_vagas'))['total'] or 0
+        context['vagas_abertas'] = Vaga.objects.filter(status='A').aggregate(total=Sum('quantidade_vagas'))['total'] or 0
         context['vagas_fechadas'] = Vaga.objects.filter(status='F').aggregate(total=Sum('quantidade_vagas'))['total'] or 0
 
         # 2. Dados para o Gráfico de Perdas
