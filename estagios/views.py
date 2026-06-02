@@ -705,6 +705,14 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
         if escolaridade:
             queryset = queryset.filter(escolaridade=escolaridade)
 
+        ano_semestre = self.request.GET.get('ano_semestre')
+        if ano_semestre:
+            queryset = queryset.filter(ano_semestre=ano_semestre)
+
+        periodo = self.request.GET.get('periodo')
+        if periodo:
+            queryset = queryset.filter(periodo=periodo)
+
         status = self.request.GET.get('status')
         if status:
             # Filtra pelos booleanos do seu banco dinamicamente
@@ -721,13 +729,18 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Passamos os choices para o template montar os selects automaticamente
+        # Choices passados para o template montar os selects automaticamente
         context['escolaridades'] = Candidato.Escolaridades.choices
         # Mantemos os filtros na URL para a paginação não perder a busca ao mudar de página
         context['filtros_url'] = self.request.GET.urlencode()
         # Busca todos os bairros preenchidos, sem repetir, em ordem alfabética
         context['bairros'] = Candidato.objects.exclude(bairro__isnull=True).exclude(bairro='').values_list(
             'bairro', flat=True).distinct().order_by('bairro')
+        # Anos e semestres passados para o template para montar os selects automaticamente
+        context['anos_semestres'] = Candidato.AnosSemestres.choices
+        # Períodos passados para o template para montar os selects automaticamente
+        context['periodos'] = Candidato.Periodos.choices
+
         return context
 
 
