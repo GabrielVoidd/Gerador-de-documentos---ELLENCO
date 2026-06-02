@@ -459,9 +459,10 @@ class InstituicaoEnsinoPesquisa(AutocompleteFilter):
 
 @admin.register(Candidato)
 class CandidatoAdmin(NestedModelAdmin):
+    # botao_whatsapp
     list_display = (
-        'nome', 'rg', 'celular', 'botao_whatsapp', 'email', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro',
-        'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado', 'nao_compareceu', 'desistiu', 'encaminhado')
+        'nome', 'celular', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito', 'stand_by',
+        'trabalhando', 'em_processo', 'aprovado', 'reprovado', 'nao_compareceu', 'desistiu', 'encaminhado')
     search_fields = ('nome', 'bairro', 'cpf', 'rg', 'celular', 'celular2')
     list_filter = (SexoFiltroInteligente, ('bairro', DropdownFilter), ('escolaridade', ChoiceDropdownFilter), ('ano_semestre', DropdownFilter), ('periodo', ChoiceDropdownFilter), InstituicaoEnsinoPesquisa, 'restrito', 'stand_by', 'trabalhando', 'em_processo')
     actions = ['exportar_para_excel']

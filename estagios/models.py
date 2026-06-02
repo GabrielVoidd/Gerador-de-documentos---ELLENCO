@@ -118,6 +118,13 @@ class CriterioExclusao(models.Model):
         return self.criterio
 
 
+class Curso(models.Model):
+    nome = models.CharField(max_length=150, unique=True)
+
+    def __str__(self):
+        return self.nome
+
+
 class Candidato(models.Model):
     class AnosSemestres(models.TextChoices):
         PRIMEIRO_ANO = '1A', '1° Ano'
@@ -250,6 +257,7 @@ class Candidato(models.Model):
     # --- FORMAÇÃO ACADÊMICA ---
     escolaridade = models.CharField(max_length=3, choices=Escolaridades.choices)
     curso = models.CharField(max_length=70, help_text='Nome do curso, caso esteja na faculdade', null=True, blank=True)
+    curso_padronizado = models.ForeignKey(Curso, on_delete=models.SET_NULL, null=True, blank=True)
     periodo = models.CharField(max_length=2, choices=Periodos.choices, verbose_name='Período')
     ano_semestre = models.CharField(max_length=3, choices=AnosSemestres.choices, null=True, verbose_name='Ano ou semestre')
     serie_semestre = models.CharField(max_length=50, verbose_name='Último contato / atualização', null=True, blank=True)
@@ -317,6 +325,7 @@ class Candidato(models.Model):
     nao_compareceu = models.BooleanField(default=False, verbose_name='Não Compareceu')
     desistiu = models.BooleanField(default=False, verbose_name='Desistiu')
     encaminhado = models.BooleanField(default=False)
+    rescindido = models.BooleanField(default=False)
     criterio_exclusao = models.ManyToManyField(CriterioExclusao, verbose_name='Critérios de Exclusão', blank=True)
 
     def clean(self):
