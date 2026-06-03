@@ -5,7 +5,7 @@ from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
     MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, CriterioExclusao, ContratoAceite, \
-    DetalhesContratoAceite, RegistroContatoEmpresa, Chamados, Vaga, Candidatura
+    DetalhesContratoAceite, RegistroContatoEmpresa, Chamados, Vaga, Candidatura, Curso
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 import string, openpyxl
 from django.http import HttpResponse
@@ -807,3 +807,10 @@ class CandidaturaAdmin(admin.ModelAdmin):
     # Como a base de candidatos é gigante, isso aqui evita que o painel trave ao tentar carregar todos os nomes na
     # hora de cadastrar uma candidatura
     autocomplete_fields = ['candidato', 'vaga']
+
+
+@admin.register(Curso)
+class CursoAdmin(admin.ModelAdmin):
+    list_diplay =('nome',)
+    list_filter = ('nome',)
+    search_fields = ('nome',)

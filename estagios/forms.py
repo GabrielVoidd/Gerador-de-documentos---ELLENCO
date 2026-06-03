@@ -9,7 +9,7 @@ class CandidatoForm(forms.ModelForm):
         model = Candidato
         exclude = [
             'observacoes', 'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado',
-            'nao_compareceu', 'desistiu', 'encaminhado', 'criterio_exclusao', 'serie_semestre'
+            'nao_compareceu', 'desistiu', 'encaminhado', 'criterio_exclusao', 'serie_semestre', 'rescindido'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -90,7 +90,7 @@ class CandidatoStatusForm(forms.ModelForm):
         fields = [
             'observacoes', 'restrito', 'stand_by', 'trabalhando',
             'em_processo', 'aprovado', 'reprovado', 'nao_compareceu',
-            'desistiu', 'encaminhado'
+            'desistiu', 'encaminhado', 'rescindido'
         ]
         widgets = {
             'observacoes': forms.Textarea(attrs={'class': 'form-control', 'rows': 5,
@@ -151,8 +151,7 @@ class ParteConcedenteForm(forms.ModelForm):
     class Meta:
         model = ParteConcedente
         fields = [
-            'cnpj', 'razao_social', 'nome', 'ramo_atividade',
-            'cep', 'endereco', 'bairro', 'cidade', 'estado',
+            'cnpj', 'razao_social', 'nome', 'ramo_atividade', 'cep', 'endereco', 'bairro', 'cidade', 'estado',
             'telefone', 'email', 'representante_legal', 'local_trabalho'
         ]
 
