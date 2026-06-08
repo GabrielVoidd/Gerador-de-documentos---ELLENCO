@@ -36,6 +36,16 @@
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label text-muted small">Curso (Caso Superior)</label>
+                        <select name="escolaridade" class="form-select">
+                            <option value="">Selecione um curso</option>
+                            {% for curso in cursos %}
+                                <option value="{{ curso.id }}">{{ curso.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label text-muted small">Ano / Semestre</label>
                         <select name="ano_semestre" class="form-select">
                             <option value="">Todos</option>

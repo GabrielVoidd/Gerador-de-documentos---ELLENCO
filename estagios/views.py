@@ -22,7 +22,7 @@ from weasyprint import HTML
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
     TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, ContratoAceite, \
-    RegistroContatoEmpresa, Chamados, Vaga, Candidatura
+    RegistroContatoEmpresa, Chamados, Vaga, Candidatura, Curso
 from .serializers import (
     InstituicaoEnsinoSerializer, ParteConcedenteSerializer, EstagiarioSerializer, AgenteIntegradorSerializer,
     ContratoSerializer, ContratoCreateSerializer, RescisaoSerializer, RescisaoCreateSerializer, CandidatoSerializer,
@@ -713,6 +713,10 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
         if periodo:
             queryset = queryset.filter(periodo=periodo)
 
+        curso = self.request.GET.get('curso_padronizado')
+        if curso:
+            queryset = queryset.filter(curso=curso)
+
         status = self.request.GET.get('status')
         if status:
             # Filtra pelos booleanos do seu banco dinamicamente
@@ -740,6 +744,8 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
         context['anos_semestres'] = Candidato.AnosSemestres.choices
         # Períodos passados para o template para montar os selects automaticamente
         context['periodos'] = Candidato.Periodos.choices
+        # Cursos passados para o template para montar os selects automaticamente
+        context['cursos'] = Curso.objects.all().order_by('nome')
 
         return context
 
