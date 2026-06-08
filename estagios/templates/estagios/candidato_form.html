@@ -91,6 +91,17 @@
                 placeholder: 'Selecione ou digite para pesquisar...'
             });
         }
+        // ==========================================
+        // ATIVA O SELECT2 NO CAMPO DOS CURSOS
+        // ==========================================
+        if ($('#id_curso_padronizado').length) {
+            $('#id_curso_padronizado').select2({
+                theme: 'bootstrap-5', // Deixa com a mesma cara do Bootstrap
+                language: 'pt-BR',    // Traduz mensagens de erro/busca para PT-BR
+                width: '100%',        // Garante que ocupe a div toda
+                placeholder: 'Selecione ou digite para pesquisar...'
+            });
+        }
     });
 </script>
 

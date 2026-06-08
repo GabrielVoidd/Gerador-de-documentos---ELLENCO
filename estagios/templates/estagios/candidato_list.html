@@ -37,7 +37,7 @@
 
                     <div class="mb-3">
                         <label class="form-label text-muted small">Curso (Caso Superior)</label>
-                        <select name="escolaridade" class="form-select">
+                        <select name="curso" id="filtro_curso" class="form-control">
                             <option value="">Selecione um curso</option>
                             {% for curso in cursos %}
                                 <option value="{{ curso.id }}">{{ curso.nome }}</option>
@@ -197,6 +197,19 @@
             language: {
                 noResults: function () {
                     return "Nenhum bairro cadastrado";
+                }
+            }
+        });
+    });
+
+    $(document).ready(function() {
+        $('#filtro_curso').select2({
+            placeholder: "Buscar curso...",
+            allowClear: true,
+            width: '100%',
+            language: {
+                noResults: function () {
+                    return "Nenhum curso cadastrado";
                 }
             }
         });

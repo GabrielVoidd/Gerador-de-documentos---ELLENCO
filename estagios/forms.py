@@ -8,9 +8,12 @@ class CandidatoForm(forms.ModelForm):
     class Meta:
         model = Candidato
         exclude = [
-            'observacoes', 'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado',
+            'curso', 'observacoes', 'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado',
             'nao_compareceu', 'desistiu', 'encaminhado', 'criterio_exclusao', 'serie_semestre', 'rescindido'
         ]
+        labels = {
+            'curso_padronizado': 'Curso',
+        }
 
     def __init__(self, *args, **kwargs):
         super(CandidatoForm, self).__init__(*args, **kwargs)
