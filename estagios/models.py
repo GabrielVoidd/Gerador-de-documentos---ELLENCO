@@ -152,12 +152,13 @@ class Candidato(models.Model):
         VIUVO = 'V', 'Viúvo(a)'
 
     class Escolaridades(models.TextChoices):
-        ENSINO_MEDIO = 'EM', 'Ensino Médio'
+        ENSINO_MEDIO_INCOMPLETO = 'EMI', 'Ensino Médio Incompleto'
+        ENSINO_MEDIO = 'EM', 'Ensino Médio Cursando'
         ENSINO_MEDIO_COMPLETO = 'EMC', 'Ensino Médio Completo'
         ENSINO_MEDIO_TECNICO = 'EMT', 'Ensino Médio Técnico'
         ENSINO_SUPERIOR_INCOMPLETO = 'ESI', 'Ensino Superior Incompleto'
         ENSINO_SUPERIOR_CURSANDO = 'ESC', 'Ensino Superior Cursando'
-        ENSINO_SUPERIOR = 'ES', 'Ensino Superior'
+        ENSINO_SUPERIOR = 'ES', 'Ensino Superior Completo'
         EDUCACAO_JOVEM_ADULTO = 'EJA', 'Educação de Jovens e Adultos'
 
     class Periodos(models.TextChoices):
@@ -1017,8 +1018,8 @@ class Vaga(models.Model):
 
 class Candidatura(models.Model):
     """
-    Essa classe é a 'ponte' invisível. Ela liga o Candidato à Vaga sem que a gente
-    precise mexer na estrutura original do Candidato.
+    Essa classe é a 'ponte' invisível. Ela liga o Candidato à Vaga sem que seja necessário mexer na estrutura original
+    do Candidato.
     """
 
     class StatusCandidatura(models.TextChoices):

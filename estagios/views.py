@@ -1164,7 +1164,7 @@ def clonar_vaga(request, pk):
     vaga = get_object_or_404(Vaga, pk=pk)
 
     # MÁGICA DA CLONAGEM
-    vaga.pk = None  # Apaga o ID. É isso que diz ao Django para criar um NOVO registro!
+    vaga.pk = None  # Apaga o ID. É isso que diz ao Django para criar um NOVO registro
 
     # Ajustes finos para a nova vaga
     vaga.status = 'A'  # Garante que a nova vaga nasça como Aberta
@@ -1173,9 +1173,22 @@ def clonar_vaga(request, pk):
     # Salva a nova vaga no banco de dados!
     vaga.save()
 
-    # Mensagem de sucesso (aparece se o seu base_dashboard.html tiver o bloco de mensagens do Django)
+    # Mensagem de sucesso
     messages.success(request, 'Vaga clonada com sucesso! Verifique e salve as informações abaixo.')
 
     # Redireciona a recrutadora direto para a tela de edição da NOVA vaga.
-    # OBS: Substitua 'editar_vaga' pelo nome correto da sua URL de edição.
     return redirect('vaga_editar', pk=vaga.pk)
+
+class CandidaturaDeleteView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Candidatura
+
+    def test_func(self):
+        return check_rs(self.request.user)
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Candidato(a) desvinculado(a) com sucesso')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        id_vaga = self.object.vaga.id
+        return reverse('vaga_detalhe', kwargs={'pk': id_vaga})

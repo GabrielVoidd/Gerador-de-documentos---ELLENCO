@@ -26,7 +26,7 @@ def dashboard(request):
             minhas_vagas=Sum('quantidade_vagas', default=0)
         )['minhas_vagas'],
         'novas_candidaturas': Candidatura.objects.filter(data_candidatura__gte=trinta_dias_atras).count(),
-        'meus_convocados': Candidato.objects.filter(encaminhado=True).count(),
+        'candidatos_totais': Candidato.objects.count(),
         'minhas_mensagens': Chamados.objects.filter(proposta_enviada=False).count(),
     }
 

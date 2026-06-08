@@ -83,6 +83,11 @@
                                     <a href="{% url 'perfil_candidato' item.candidato.id %}" class="btn btn-sm btn-outline-primary" title="Ver Perfil Completo">
                                         <i class="fas fa-user"></i>
                                     </a>
+
+                                    <form method="POST" action="{% url 'desvincular_candidatura' item.id %}" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja desvincular este candidato? Esta ação apagará o histórico.');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Desvincular Candidatura</button>
+                                    </form>
                                 </td>
                             </tr>
                             {% empty %}
