@@ -10,9 +10,26 @@
             <div class="card-body">
                 <form method="GET" action="{% url 'lista_vagas' %}">
                     
+                    <div class="mb-3 border-bottom pb-3">
+                        <label class="form-label text-dark fw-bold small">Busca Geral</label>
+                        <input type="text" name="q" class="form-control" value="{{ request.GET.q|default:'' }}" placeholder="Título ou Empresa...">
+                    </div>
+
+                    <h6 class="text-muted small text-uppercase fw-bold mb-3">Filtros Avançados</h6>
+
                     <div class="mb-3">
-                        <label class="form-label text-muted small">Buscar Vaga ou Empresa</label>
-                        <input type="text" name="q" class="form-control" value="{{ request.GET.q }}" placeholder="Digite o cargo ou empresa...">
+                        <label class="form-label text-muted small">Cargo / Título</label>
+                        <input type="text" name="titulo" class="form-control" value="{{ request.GET.titulo|default:'' }}" placeholder="Ex: Desenvolvedor...">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Empresa</label>
+                        <input type="text" name="empresa" class="form-control" value="{{ request.GET.empresa|default:'' }}" placeholder="Nome ou Razão Social...">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Abertas a partir de</label>
+                        <input type="date" name="data_abertura" class="form-control" value="{{ request.GET.data_abertura|default:'' }}">
                     </div>
 
                     <div class="mb-3">
@@ -40,7 +57,7 @@
                     <i class="fas fa-plus me-1"></i> Nova Vaga
                 </a>
             </div>
-            
+
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
@@ -59,7 +76,7 @@
                                 <a href="{% url 'vaga_detalhe' vaga.id %}" class="text-decoration-none text-dark">
                                     <strong class="hover-primary">{{ vaga.titulo }}</strong>
                                 </a>
-                                <small class="text-muted">{{ vaga.get_tipo_vaga_display }} | {{ vaga.quantidade_vagas }} vaga(s)</small>
+                                <small class="text-muted d-block">{{ vaga.get_tipo_vaga_display }} | {{ vaga.quantidade_vagas }} vaga(s)</small>
                             </td>
                             <td>
                                 {{ vaga.empresa.razao_social|truncatechars:25 }}<br>
@@ -78,7 +95,7 @@
                                 <a href="{% url 'vaga_editar' vaga.id %}" class="btn btn-sm btn-outline-primary" title="Editar Vaga">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{% url 'vaga_detalhe' vaga.id %}" class="btn btn-sm btn-outline-success" title="Ver Candidatos (Em breve)">
+                                <a href="{% url 'vaga_detalhe' vaga.id %}" class="btn btn-sm btn-outline-success" title="Ver Candidatos">
                                     <i class="fas fa-users"></i>
                                 </a>
                             </td>

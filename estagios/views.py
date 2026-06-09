@@ -855,6 +855,31 @@ class VagaListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTest
         if status:
             queryset = queryset.filter(status=status)
 
+        # 3. Filtro para os itens dos títulos na listagem
+        filtros = {}
+
+        titulo = self.request.GET.get('titulo')
+        empresa = self.request.GET.get('empresa')
+        status = self.request.GET.get('status')
+        data_abertura = self.request.GET.get('data_abertura')
+
+        if titulo:
+            filtros['titulo__icontains'] = titulo
+
+        if empresa:
+            queryset = queryset.filter(
+                Q(empresa__nome__icontains=empresa) | Q(empresa__razao_social__icontains=empresa)
+            )
+
+        if status:
+            filtros['status'] = status
+
+        if data_abertura:
+            filtros['data_abertura__gte'] = data_abertura
+
+        if filtros:
+            queryset = queryset.filter(**filtros)
+
         return queryset
 
     def get_context_data(self, **kwargs):
