@@ -713,9 +713,10 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
         if periodo:
             queryset = queryset.filter(periodo=periodo)
 
-        curso = self.request.GET.get('curso_padronizado')
-        if curso:
-            queryset = queryset.filter(curso=curso)
+        curso_id = self.request.GET.get('curso')
+
+        if curso_id:
+            queryset = queryset.filter(curso_padronizado=curso_id)
 
         status = self.request.GET.get('status')
         if status:
