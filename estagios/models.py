@@ -317,6 +317,7 @@ class Candidato(models.Model):
     # --- INFORMAÇÕES PARA O(A) RECRUTADOR (A) ---
     observacoes = models.TextField(null=True, blank=True)
     data_cadastro = models.DateField(auto_now_add=True, null=True, blank=True)
+    data_edicao = models.DateField(auto_now=True, null=True, blank=True)
     restrito = models.BooleanField(default=False)
     stand_by = models.BooleanField(default=False)
     trabalhando = models.BooleanField(verbose_name='Ativo', default=False)
