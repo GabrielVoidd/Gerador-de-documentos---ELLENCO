@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal, ROUND_HALF_UP
 import re
 from unicodedata import normalize
+from django.conf import settings
 
 
 class InstituicaoEnsino(models.Model):
@@ -1043,3 +1044,18 @@ class Candidatura(models.Model):
 
     def __str__(self):
         return f'{self.candidato.nome} -> {self.vaga.titulo}'
+
+
+class LogAcaoUsuario(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    acao = models.CharField(max_length=225, verbose_name='Ação Executada')
+    detalhes = models.TextField(blank=True, null=True, verbose_name='Detalhes / Payload')
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Log de Ação'
+        verbose_name_plural = 'Logs de Ações'
+        ordering = ['-data_criacao']
+
+    def __str__(self):
+        return f'{self.usuario} - {self.acao} ({self.data_criacao.strtime('%d/%m/%Y %H:%M')})'

@@ -5,7 +5,7 @@ from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
     MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, CriterioExclusao, ContratoAceite, \
-    DetalhesContratoAceite, RegistroContatoEmpresa, Chamados, Vaga, Candidatura, Curso
+    DetalhesContratoAceite, RegistroContatoEmpresa, Chamados, Vaga, Candidatura, Curso, LogAcaoUsuario
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 import string, openpyxl
 from django.http import HttpResponse
@@ -816,3 +816,20 @@ class CursoAdmin(admin.ModelAdmin):
     list_diplay =('nome',)
     list_filter = ('nome',)
     search_fields = ('nome',)
+
+
+@admin.register(LogAcaoUsuario)
+class LogAcaoUsuarioAdmin(admin.ModelAdmin):
+    list_display = ('data_criacao', 'usuario', 'acao')
+    list_filter = ('acao', 'data_criacao')
+    search_fields = ('usuario__username', 'usuario__email', 'acao', 'detalhes')
+    date_hierarchy = 'data_criacao'
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj = None):
+        return False
+
+    def has_delete_permission(self, request, obj = None):
+        return False
