@@ -192,6 +192,7 @@ class CandidaturaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # O PULO DO GATO: Filtra o campo para mostrar APENAS vagas Abertas ('A')
         self.fields['vaga'].queryset = Vaga.objects.filter(status='A').order_by('-data_abertura')
+        self.fields['vaga'].widget.attrs.update({'class': 'form-select select2-vaga'})
 
 
 class CandidaturaPorVagaForm(forms.ModelForm):
