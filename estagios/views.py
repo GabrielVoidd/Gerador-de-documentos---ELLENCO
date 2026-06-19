@@ -830,6 +830,7 @@ class ParteConcedenteCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, U
         return check_rs(self.request.user)
 
 
+
 class VagaListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Vaga
     template_name = 'estagios/vaga_list.html'
@@ -910,10 +911,11 @@ class CandidaturaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserP
         # Pega o ID do candidato que veio na URL e já vincula automaticamente
         candidato = get_object_or_404(Candidato, pk=self.kwargs['pk'])
         form.instance.candidato = candidato
+        response = super().form_valid(form)
         registrar_acao(
             self.request, 'criar',
             f'Candidato {candidato.nome} lincado a vaga {self.object.titulo}', objeto=self.object)
-        return super().form_valid(form)
+        return response
 
     def get_context_data(self, **kwargs):
         # Passa o nome do candidato para a tela para a recrutadora saber quem ela está vinculando
@@ -1160,7 +1162,7 @@ class CandidaturaPorVagaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin
             vaga.status = 'F'
             vaga.save()
 
-        registrar_acao(self.request, 'criar', f'Candidatura recebida na vaga {vaga.titulo}')
+        registrar_acao(self.request, 'criar', f'Candidatura recebida na vaga {vaga.titulo}', objeto=vaga)
 
         return super().form_valid(form)
 
@@ -1182,6 +1184,10 @@ class CandidatoUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPas
 
     def test_func(self):
         return check_rs(self.request.user)
+
+    def form_valid(self, form):
+        registrar_acao(self.request, 'editar', f'Candidato "{self.object}" editado', objeto=self.object)
+        return super().form_valid(form)
 
     def get_success_url(self):
         # Volta pro perfil após editar
@@ -1205,7 +1211,7 @@ class CandidaturaUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserP
             vaga.status = 'F'
             vaga.save()
 
-        registrar_acao(self.request, 'editar', f'Candidatura editada para {status_selecionado}')
+        registrar_acao(self.request, 'editar', f'Candidatura editada para {status_selecionado}', objeto=self.object)
 
         return super().form_valid(form)
 

@@ -14,6 +14,6 @@ def registrar_acao(request, tipo, descricao, objeto=None):
         tipo=tipo,
         descricao=descricao,
         objeto_tipo=objeto.__class__.__name__ if objeto else '',
-        objeto_id=objeto.ok if objeto else None,
+        objeto_id=objeto.pk if objeto else None,
         ip=get_client_ip(request),
     )
