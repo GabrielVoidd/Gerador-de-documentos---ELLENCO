@@ -2,7 +2,7 @@ from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q, Count
-from django.http import JsonResponse
+from django.http import JsonResponse, request
 from django.conf import settings
 from django.utils import timezone
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView, TemplateView
@@ -20,6 +20,7 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.shortcuts import render, get_object_or_404, redirect
+from .mixins import registrar_acao
 from .models import InstituicaoEnsino, Estagiario, ParteConcedente, Contrato, Rescisao, AgenteIntegrador, Candidato, \
     TipoEvento, Lancamento, Recibo, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, ContratoAceite, \
     RegistroContatoEmpresa, Chamados, Vaga, Candidatura, Curso
@@ -36,7 +37,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.db.models import Sum
 from django.contrib import messages
-import json
 
 
 def check_rs(user):
@@ -259,6 +259,8 @@ class CandidatoViewSet(viewsets.ModelViewSet):
         # Cria a resposta HTTP
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="Ficha_Cadastro_{candidato.nome}.pdf"'
+
+
 
         return response
 
@@ -889,6 +891,12 @@ class VagaListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTest
         context['filtros_url'] = self.request.GET.urlencode()
         return context
 
+    def form_valid(self, form):
+        registrar_acao(
+            self.request, 'visualizar',
+            f'A listagem de vagas foi visualizada por {self.object}')
+        return super().form_valid(form)
+
 
 class CandidaturaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Candidatura
@@ -902,6 +910,9 @@ class CandidaturaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserP
         # Pega o ID do candidato que veio na URL e já vincula automaticamente
         candidato = get_object_or_404(Candidato, pk=self.kwargs['pk'])
         form.instance.candidato = candidato
+        registrar_acao(
+            self.request, 'criar',
+            f'Candidato {candidato.nome} lincado a vaga {self.object.titulo}', objeto=self.object)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -923,6 +934,10 @@ class VagaDetailView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTe
     def test_func(self):
         return check_rs(self.request.user)
 
+    def form_valid(self, form):
+        registrar_acao(self.request, 'editar', f'Vaga {self.object.titulo} acessada', objeto=self.object)
+        return super().form_valid(form)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Troca do .candidatura_set por uma busca direta
@@ -939,6 +954,10 @@ class VagaUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTe
 
     def test_func(self):
         return check_rs(self.request.user)
+
+    def form_valid(self, form):
+        registrar_acao(self.request, 'editar', f'Vaga {self.object.titulo} editada', objeto=self.object)
+        return super().form_valid(form)
 
     def get_success_url(self):
         # Depois de salvar a edição, devolve a recrutadora pra tela de detalhes
@@ -1108,6 +1127,11 @@ class CandidatoDocumentosUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixi
             arquivos_formset.save()
             empresas_formset.instance = self.object
             empresas_formset.save()
+
+            registrar_acao(
+                self.request, 'editar',
+                f'Documentos e empresas do candidato {self.object} alterados', objeto=self.object)
+
             return super().form_valid(form)
         else:
             return self.render_to_response(self.get_context_data(form=form))
@@ -1135,6 +1159,8 @@ class CandidaturaPorVagaCreateView(RecrutamentoRequiredMixin, LoginRequiredMixin
         if status_selecionado == 'AP':
             vaga.status = 'F'
             vaga.save()
+
+        registrar_acao(self.request, 'criar', f'Candidatura recebida na vaga {vaga.titulo}')
 
         return super().form_valid(form)
 
@@ -1179,6 +1205,8 @@ class CandidaturaUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserP
             vaga.status = 'F'
             vaga.save()
 
+        registrar_acao(self.request, 'editar', f'Candidatura editada para {status_selecionado}')
+
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -1209,6 +1237,7 @@ def clonar_vaga(request, pk):
     messages.success(request, 'Vaga clonada com sucesso! Verifique e salve as informações abaixo.')
 
     # Redireciona a recrutadora direto para a tela de edição da NOVA vaga.
+    registrar_acao(request, 'criar', f'Vaga {vaga.titulo} clonada', objeto=vaga)
     return redirect('vaga_editar', pk=vaga.pk)
 
 class CandidaturaDeleteView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -1218,6 +1247,9 @@ class CandidaturaDeleteView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserP
         return check_rs(self.request.user)
 
     def form_valid(self, form):
+        registrar_acao(
+            self.request, 'deletar',
+   f'Candidato {self.object} desvinculado da vaga {self.object.vaga}', objeto=self.object)
         messages.success(self.request, 'Candidato(a) desvinculado(a) com sucesso')
         return super().form_valid(form)
 

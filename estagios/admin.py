@@ -5,7 +5,7 @@ from django.utils.html import format_html
 from .models import Contrato, Rescisao, ParteConcedente, AgenteIntegrador, Estagiario, InstituicaoEnsino, Candidato, \
     CartaEncaminhamento, Arquivos, Empresa, DetalhesEmpresa, DetalhesParteConcedente, TipoEvento, Lancamento, Recibo, \
     MotivoRescisao, ReciboRescisao, LancamentoRescisao, ContratoSocial, Aditivo, CriterioExclusao, ContratoAceite, \
-    DetalhesContratoAceite, RegistroContatoEmpresa, Chamados, Vaga, Candidatura, Curso, LogAcaoUsuario
+    DetalhesContratoAceite, RegistroContatoEmpresa, Chamados, Vaga, Candidatura, Curso, RegistroAcao
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 import string, openpyxl
 from django.http import HttpResponse
@@ -183,7 +183,7 @@ class ContratoAdmin(admin.ModelAdmin):
         wb.save(response)
         return response
 
-    # Função auxiliar para formatar moeda (caso não tenha babel instalado)
+    # Função auxiliar para formatar moeda
     def format_currency(self, value):
         if value is None:
             return "R$ 0,00"
@@ -758,7 +758,6 @@ class CustomUserAdmin(UserAdmin):
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = set(super().get_readonly_fields(request, obj))
 
-        # Se quem está logado NÃO é superuser, tornamos alguns campos sensíveis apenas leitura
         if not request.user.is_superuser:
             readonly_fields.add('is_superuser')
             readonly_fields.add('user_permissions')
@@ -766,10 +765,8 @@ class CustomUserAdmin(UserAdmin):
         return list(readonly_fields)
 
     def get_fieldsets(self, request, obj=None):
-        # Opcional: Se você quiser ESCONDER campos inteiros em vez de apenas travar
         fieldsets = super().get_fieldsets(request, obj)
         if not request.user.is_superuser:
-            # Aqui você poderia filtrar campos específicos se quisesse
             pass
         return fieldsets
 
@@ -818,18 +815,19 @@ class CursoAdmin(admin.ModelAdmin):
     search_fields = ('nome',)
 
 
-@admin.register(LogAcaoUsuario)
-class LogAcaoUsuarioAdmin(admin.ModelAdmin):
-    list_display = ('data_criacao', 'usuario', 'acao')
-    list_filter = ('acao', 'data_criacao')
-    search_fields = ('usuario__username', 'usuario__email', 'acao', 'detalhes')
-    date_hierarchy = 'data_criacao'
+@admin.register(RegistroAcao)
+class RegistroAcaoAdmin(admin.ModelAdmin):
+    list_display = ('criado_em', 'usuario', 'tipo', 'objeto_tipo', 'objeto_id', 'descricao', 'ip')
+    list_filter = ('tipo', 'objeto_tipo', 'usuario')
+    search_fields = ('descricao', 'usuario__username')
+    readonly_fields = ('usuario', 'tipo', 'descricao', 'objeto_tipo', 'objeto_id', 'ip', 'criado_em')
+    ordering = ('-criado_em',)
 
     def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj = None):
-        return False
+        return False # ninguém cria log manualmente
 
     def has_delete_permission(self, request, obj = None):
-        return False
+        return request.user.is_superuser # só superuser deleta
+
+    def has_change_permission(self, request, obj = None):
+        return False # ninguém edita log

@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils import timezone
-from django.db.models import Sum
+from auditlog.registry import auditlog
+from auditlog.models import AuditlogHistoryField
 from rest_framework.exceptions import ValidationError
-from unidecode import unidecode
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal, ROUND_HALF_UP
@@ -11,6 +11,7 @@ from unicodedata import normalize
 from django.conf import settings
 
 
+@auditlog.register()
 class InstituicaoEnsino(models.Model):
     razao_social = models.CharField(max_length=250)
     cnpj = models.CharField(max_length=18, unique=True)
@@ -31,6 +32,7 @@ class InstituicaoEnsino(models.Model):
         return self.razao_social
 
 
+@auditlog.register()
 class ParteConcedente(models.Model):
     class Documentos(models.TextChoices):
         CPF = 'C', 'CPF'
@@ -61,6 +63,7 @@ class ParteConcedente(models.Model):
         return self.razao_social
 
 
+@auditlog.register()
 class DetalhesParteConcedente(models.Model):
     parte_concedente = models.ForeignKey(ParteConcedente, on_delete=models.PROTECT, related_name='detalhes')
     dia_pagamento_estagiario = models.IntegerField(null=True, blank=True)
@@ -70,6 +73,7 @@ class DetalhesParteConcedente(models.Model):
     taxa_cliente = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
 
 
+@auditlog.register()
 class ContratoSocial(models.Model):
     # Informações adicionais da Parte Concedente para a criação do contrato social
     parte_concedente = models.ForeignKey(ParteConcedente, on_delete=models.PROTECT, related_name='adicionais')
@@ -92,6 +96,7 @@ class ContratoSocial(models.Model):
         return f'Contrato_Social_{self.parte_concedente.razao_social}'
 
 
+@auditlog.register()
 class Aditivo(models.Model):
     contrato_social = models.ForeignKey(ContratoSocial, on_delete=models.PROTECT, related_name='contrato_social')
     data_cadastro = models.DateField(auto_now_add=True)
@@ -108,6 +113,7 @@ class Aditivo(models.Model):
         return f'Aditivo_{identificador}'
 
 
+@auditlog.register()
 class CriterioExclusao(models.Model):
     criterio = models.CharField(max_length=100)
 
@@ -119,6 +125,7 @@ class CriterioExclusao(models.Model):
         return self.criterio
 
 
+@auditlog.register()
 class Curso(models.Model):
     nome = models.CharField(max_length=150, unique=True)
 
@@ -126,6 +133,7 @@ class Curso(models.Model):
         return self.nome
 
 
+@auditlog.register()
 class Candidato(models.Model):
     class AnosSemestres(models.TextChoices):
         PRIMEIRO_ANO = '1A', '1° Ano'
@@ -428,6 +436,7 @@ class Candidato(models.Model):
         return self.nome
 
 
+@auditlog.register()
 class CartaEncaminhamento(models.Model):
     candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='cartas')
     arquivo = models.FileField(upload_to='cartas_encaminhamento/', null=True, blank=True)
@@ -441,6 +450,7 @@ class CartaEncaminhamento(models.Model):
         verbose_name_plural = "Cartas de Encaminhamento"
 
 
+@auditlog.register()
 class Arquivos(models.Model):
     candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='arquivos')
     arquivo = models.FileField(upload_to='arquivos/', null=True, blank=True)
@@ -454,6 +464,7 @@ class Arquivos(models.Model):
         verbose_name_plural = 'Arquivos'
 
 
+@auditlog.register()
 class Empresa(models.Model):
     candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='empresas')
     nome = models.CharField(max_length=120, null=True, blank=True)
@@ -468,6 +479,7 @@ class Empresa(models.Model):
         verbose_name_plural = 'Empresas'
 
 
+@auditlog.register()
 class DetalhesEmpresa(models.Model):
     empresa = models.ForeignKey(Empresa, on_delete=models.PROTECT, related_name='detalhes')
     arquivos = models.FileField(upload_to='empresas/', null=True, blank=True)
@@ -477,6 +489,7 @@ class DetalhesEmpresa(models.Model):
         verbose_name_plural = 'Detalhes Empresas'
 
 
+@auditlog.register()
 class Estagiario(models.Model):
     # primary_key=True assegura que existirá somente um registro de Estagiário para Candidato
     candidato = models.OneToOneField(Candidato, on_delete=models.CASCADE, null=True)
@@ -492,6 +505,7 @@ class Estagiario(models.Model):
         return 'Sem candidato(a)'
 
 
+@auditlog.register()
 class AgenteIntegrador(models.Model):
     razao_social = models.CharField(max_length=250)
     endereco = models.CharField(max_length=250)
@@ -512,6 +526,7 @@ class AgenteIntegrador(models.Model):
         return self.razao_social
 
 
+@auditlog.register()
 class Contrato(models.Model):
     numero_contrato = models.CharField(max_length=50, unique=True, blank=True, editable=False)
     estagiario = models.ForeignKey(Estagiario, on_delete=models.PROTECT)
@@ -555,6 +570,7 @@ class Contrato(models.Model):
         return f'Contrato {self.numero_contrato} - {self.estagiario.candidato.nome}'
 
 
+@auditlog.register()
 class ContratoAceite(models.Model):
     class Planos(models.TextChoices):
         PLUS = 'P', 'Plus'
@@ -579,6 +595,7 @@ class ContratoAceite(models.Model):
         return f'{self.parte_concedente.razao_social} - {self.plano}'
 
 
+@auditlog.register()
 class DetalhesContratoAceite(models.Model):
     contrato_aceite = models.ForeignKey(ContratoAceite, on_delete=models.PROTECT, related_name='detalhes')
     quantidade = models.IntegerField()
@@ -594,6 +611,7 @@ class DetalhesContratoAceite(models.Model):
                 f'de {self.salario}')
 
 
+@auditlog.register()
 class MotivoRescisao(models.Model):
     motivo = models.CharField(max_length=100, unique=True)
 
@@ -605,6 +623,7 @@ class MotivoRescisao(models.Model):
         verbose_name_plural = 'Motivos da rescisão'
 
 
+@auditlog.register()
 class Rescisao(models.Model):
     contrato = models.OneToOneField(Contrato, on_delete=models.PROTECT)
     data_rescisao = models.DateField()
@@ -618,6 +637,7 @@ class Rescisao(models.Model):
         return f'Rescisão do Contrato {self.contrato.numero_contrato}'
 
 
+@auditlog.register()
 class TipoEvento(models.Model):
     class TipoTransacao(models.TextChoices):
         CREDITO = 'CREDITO', 'Crédito'
@@ -630,6 +650,7 @@ class TipoEvento(models.Model):
         return f'{self.descricao} ({self.tipo})'
 
 
+@auditlog.register()
 class Recibo(models.Model):
     # --- RASTREABILIDADE ---
     contrato = models.ForeignKey(Contrato, on_delete=models.SET_NULL, null=True, blank=True)
@@ -737,6 +758,7 @@ class Recibo(models.Model):
         return f'Recibo de {self.estagiario_nome} - {mes_ano}'
 
 
+@auditlog.register()
 class ReciboRescisao(models.Model):
     # --- RASTREABILIDADE ---
     contrato = models.ForeignKey(Contrato, on_delete=models.PROTECT, null=True, blank=True)
@@ -904,6 +926,7 @@ class ReciboRescisao(models.Model):
         self.sincronizar_lancamentos_automaticos()
 
 
+@auditlog.register()
 class Lancamento(models.Model):
     recibo = models.ForeignKey(Recibo, on_delete=models.CASCADE, related_name='lancamentos')
     tipo_evento = models.ForeignKey(TipoEvento, on_delete=models.PROTECT)
@@ -913,6 +936,7 @@ class Lancamento(models.Model):
         return f'{self.tipo_evento.descricao} - R${self.valor}'
 
 
+@auditlog.register()
 class LancamentoRescisao(models.Model):
     recibo_rescisao = models.ForeignKey(ReciboRescisao, on_delete=models.CASCADE, related_name='lancamentos_rescisao', null=True)
     tipo_evento = models.ForeignKey(TipoEvento, on_delete=models.PROTECT)
@@ -926,6 +950,7 @@ class LancamentoRescisao(models.Model):
         return f'{self.tipo_evento.descricao} - R${self.valor}'
 
 
+@auditlog.register()
 class RegistroContatoEmpresa(models.Model):
     class Contatos(models.TextChoices):
         TELEFONE = 'T', 'Telefone'
@@ -945,6 +970,7 @@ class RegistroContatoEmpresa(models.Model):
         return f'{self.nome} nos contatou através de {self.contato} no dia {self.data}'
 
 
+@auditlog.register()
 class Chamados(models.Model):
     nome = models.CharField(max_length=200)
     cnpj = models.CharField(max_length=18)
@@ -969,6 +995,7 @@ class Chamados(models.Model):
         return f'{self.nome} pela empresa {self.nome_empresa}'
 
 
+@auditlog.register()
 class Vaga(models.Model):
     class StatusVaga(models.TextChoices):
         ABERTA = 'A', 'Aberta'
@@ -1018,6 +1045,7 @@ class Vaga(models.Model):
         return f'{self.titulo} - {self.empresa.razao_social}'
 
 
+@auditlog.register()
 class Candidatura(models.Model):
     """
     Essa classe é a 'ponte' invisível. Ela liga o Candidato à Vaga sem que seja necessário mexer na estrutura original
@@ -1046,16 +1074,33 @@ class Candidatura(models.Model):
         return f'{self.candidato.nome} -> {self.vaga.titulo}'
 
 
-class LogAcaoUsuario(models.Model):
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
-    acao = models.CharField(max_length=225, verbose_name='Ação Executada')
-    detalhes = models.TextField(blank=True, null=True, verbose_name='Detalhes / Payload')
-    data_criacao = models.DateTimeField(auto_now_add=True)
+class RegistroAcao(models.Model):
+    TIPO_CHOICES = [
+        ('criar', 'Criação'),
+        ('editar', 'Edição'),
+        ('deletar', 'Exclusão'),
+        ('visualizar', 'Visualização'),
+        ('exportar', 'Exportação de PDF'),
+        ('outro', 'Outro'),
+    ]
+
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='acoes'
+    )
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    descricao = models.TextField()
+    objeto_tipo = models.CharField(max_length=100, blank=True) # exemplo: Avaliação
+    objeto_id = models.PositiveIntegerField(null=True, blank=True)
+    ip = models.GenericIPAddressField(null=True, blank=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Log de Ação'
-        verbose_name_plural = 'Logs de Ações'
-        ordering = ['-data_criacao']
+        ordering = ['-criado_em']
+        verbose_name = 'Registro de Ação'
+        verbose_name_plural = 'Registros de Ações'
 
     def __str__(self):
-        return f'{self.usuario} - {self.acao} ({self.data_criacao.strtime('%d/%m/%Y %H:%M')})'
+        return f'{self.usuario} | {self.tipo} | {self.criado_em: %d/%m/%Y %H:%M}'
