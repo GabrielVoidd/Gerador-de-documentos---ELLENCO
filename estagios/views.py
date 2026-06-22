@@ -754,30 +754,58 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
 
 
 @login_required
-@user_passes_test(check_rs)
 def exportar_candidatos_excel(request):
+    # 1. Captura TODOS os parâmetros que vieram da URL (espelho do HTML)
     q = request.GET.get('q')
+    bairro = request.GET.get('bairro')
+    escolaridade = request.GET.get('escolaridade')
+    curso = request.GET.get('curso')
+    ano_semestre = request.GET.get('ano_semestre')
+    periodo = request.GET.get('periodo')
+    status = request.GET.get('status')
 
-    # 1. Fazemos a query apenas no Candidato e nas ForeignKeys diretas dele
+    # Inicia a query básica
     queryset = Candidato.objects.select_related('instituicao_ensino', 'curso_padronizado').all()
 
+    # 2. Aplica os filtros dinamicamente (só filtra se o usuário preencheu algo)
     if q:
         queryset = queryset.filter(Q(nome__icontains=q) | Q(cpf__icontains=q))
+    if bairro:
+        queryset = queryset.filter(bairro__icontains=bairro)
+    if escolaridade:
+        queryset = queryset.filter(escolaridade=escolaridade)
+    if curso:
+        # Como o seu select do HTML manda o ID do curso (value="{{ curso.id }}")
+        queryset = queryset.filter(curso_padronizado_id=curso)
+    if ano_semestre:
+        queryset = queryset.filter(ano_semestre=ano_semestre)
+    if periodo:
+        queryset = queryset.filter(periodo=periodo)
 
+    # 3. Tratamento especial para o Status (traduzindo o select para os Booleanos)
+    if status == 'em_processo':
+        queryset = queryset.filter(em_processo=True)
+    elif status == 'aprovado':
+        queryset = queryset.filter(aprovado=True)
+    elif status == 'trabalhando':
+        queryset = queryset.filter(trabalhando=True)
+    elif status == 'restrito':
+        queryset = queryset.filter(restrito=True)
+
+    # 4. Montagem do Excel
     workbook = openpyxl.Workbook()
     sheet = workbook.active
     sheet.title = 'Candidatos'
 
-    # 2. Cabeçalhos focados APENAS nas informações principais do seu model
+    # Adicionei Ano/Semestre e Período no cabeçalho já que agora eles são filtros úteis!
     headers = [
         'Nome', 'CPF', 'Celular', 'Email',
-        'Escolaridade', 'Ano / Semestre', 'Período', 'Curso', 'Instituição de Ensino',
-        'Bairro', 'Status'
+        'Escolaridade', 'Curso', 'Ano/Semestre', 'Período',
+        'Instituição de Ensino', 'Bairro', 'Status'
     ]
     sheet.append(headers)
 
     for c in queryset:
-        # 3. Lógica simples para definir o status visual com base nos seus booleanos
         status_atual = 'Cadastrado/Stand By'
         if c.trabalhando:
             status_atual = 'Trabalhando'
@@ -787,20 +815,20 @@ def exportar_candidatos_excel(request):
             status_atual = 'Aprovado'
         elif c.reprovado:
             status_atual = 'Reprovado'
+        elif c.restrito:
+            status_atual = 'Restrito'
 
-        # 4. Trata o curso (pode estar no campo texto ou no ForeignKey padronizado)
         nome_curso = c.curso_padronizado.nome if c.curso_padronizado else (c.curso or '')
 
-        # 5. Adiciona a linha no Excel
         sheet.append([
             c.nome,
             c.cpf,
             c.celular,
             c.email,
-            c.get_escolaridade_display(),  # O Django traduz o "EM" para "Ensino Médio" automaticamente
-            c.ano_semestre,
-            c.periodo,
+            c.get_escolaridade_display() if c.escolaridade else '',
             nome_curso,
+            c.get_ano_semestre_display() if c.ano_semestre else '',
+            c.get_periodo_display() if c.periodo else '',
             c.instituicao_ensino.razao_social if c.instituicao_ensino else '',
             c.bairro,
             status_atual
