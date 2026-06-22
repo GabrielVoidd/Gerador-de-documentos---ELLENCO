@@ -756,9 +756,10 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
 @login_required
 @user_passes_test(check_rs)
 def exportar_candidatos_excel(request):
-    # Pega os mesmos parâmetros da URL para exportar só o que foi filtrado
     q = request.GET.get('q')
-    queryset = Candidato.objects.select_related('instituicao_ensino', 'estagiario__contrato__parte_concedente').all()
+
+    # 1. Fazemos a query apenas no Candidato e nas ForeignKeys diretas dele
+    queryset = Candidato.objects.select_related('instituicao_ensino', 'curso_padronizado').all()
 
     if q:
         queryset = queryset.filter(Q(nome__icontains=q) | Q(cpf__icontains=q))
@@ -767,27 +768,42 @@ def exportar_candidatos_excel(request):
     sheet = workbook.active
     sheet.title = 'Candidatos'
 
-    # Cabeçalhos
-    headers = ['Nome', 'CPF', 'Celular', 'Email', 'Instituição de Ensino', 'Status', 'Empresa (Contrato)']
+    # 2. Cabeçalhos focados APENAS nas informações principais do seu model
+    headers = [
+        'Nome', 'CPF', 'Celular', 'Email',
+        'Escolaridade', 'Ano / Semestre', 'Período', 'Curso', 'Instituição de Ensino',
+        'Bairro', 'Status'
+    ]
     sheet.append(headers)
 
     for c in queryset:
-        # Puxa a empresa verificando se o candidato virou estagiário e tem contrato
-        empresa = ''
-        if hasattr(c, 'estagiario') and hasattr(c.estagiario, 'contrato'):
-            empresa = c.estagiario.contrato.parte_concedente.razao_social
-
-        # Define um status legível
-        status_atual = 'Cadastrado'
+        # 3. Lógica simples para definir o status visual com base nos seus booleanos
+        status_atual = 'Cadastrado/Stand By'
         if c.trabalhando:
             status_atual = 'Trabalhando'
         elif c.em_processo:
             status_atual = 'Em Processo'
+        elif c.aprovado:
+            status_atual = 'Aprovado'
+        elif c.reprovado:
+            status_atual = 'Reprovado'
 
+        # 4. Trata o curso (pode estar no campo texto ou no ForeignKey padronizado)
+        nome_curso = c.curso_padronizado.nome if c.curso_padronizado else (c.curso or '')
+
+        # 5. Adiciona a linha no Excel
         sheet.append([
-            c.nome, c.cpf, c.celular, c.email,
+            c.nome,
+            c.cpf,
+            c.celular,
+            c.email,
+            c.get_escolaridade_display(),  # O Django traduz o "EM" para "Ensino Médio" automaticamente
+            c.ano_semestre,
+            c.periodo,
+            nome_curso,
             c.instituicao_ensino.razao_social if c.instituicao_ensino else '',
-            status_atual, empresa
+            c.bairro,
+            status_atual
         ])
 
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
