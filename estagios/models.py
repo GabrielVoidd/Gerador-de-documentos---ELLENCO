@@ -329,7 +329,7 @@ class Candidato(models.Model):
     data_edicao = models.DateField(auto_now=True, null=True, blank=True)
     restrito = models.BooleanField(default=False)
     stand_by = models.BooleanField(default=False)
-    trabalhando = models.BooleanField(verbose_name='Ativo', default=False)
+    trabalhando = models.BooleanField(verbose_name='Trabalhando', default=False)
     em_processo = models.BooleanField(default=False)
     aprovado = models.BooleanField(default=False)
     reprovado = models.BooleanField(default=False)
