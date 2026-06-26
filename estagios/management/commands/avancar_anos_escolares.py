@@ -10,7 +10,7 @@ class Command(BaseCommand):
             Candidato.Escolaridades.ENSINO_MEDIO,
             Candidato.Escolaridades.ENSINO_MEDIO_INCOMPLETO,
             Candidato.Escolaridades.ENSINO_MEDIO_TECNICO
-        ])
+        ], data_cadastro__year=2025)
 
         atualizados_para_segundo = 0
         atualizados_para_terceiro = 0

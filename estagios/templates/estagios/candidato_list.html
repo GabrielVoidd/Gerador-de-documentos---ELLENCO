@@ -73,6 +73,21 @@
                             <option value="aprovado" {% if request.GET.status == 'aprovado' %}selected{% endif %}>Aprovado</option>
                             <option value="trabalhando" {% if request.GET.status == 'trabalhando' %}selected{% endif %}>Trabalhando (Ativo)</option>
                             <option value="restrito" {% if request.GET.status == 'restrito' %}selected{% endif %}>Restrito</option>
+                            <option value="restrito" {% if request.GET.status == 'stand_by' %}selected{% endif %}>Stand By</option>
+                            <option value="restrito" {% if request.GET.status == 'reprovado' %}selected{% endif %}>Reprovado</option>
+                            <option value="restrito" {% if request.GET.status == 'nao_compareceu' %}selected{% endif %}>Não Compareceu</option>
+                            <option value="restrito" {% if request.GET.status == 'desistiu' %}selected{% endif %}>Desistiu</option>
+                            <option value="restrito" {% if request.GET.status == 'encaminhado' %}selected{% endif %}>Encaminhado</option>
+                            <option value="restrito" {% if request.GET.status == 'rescindido' %}selected{% endif %}>Rescindido</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Ordenar por</label>
+                        <select name="ordenacao" class="form-select">
+                            <option value="a_z" {% if request.GET.ordenacao == 'a_z' %}selected{% endif %}>Ordem Alfabética (A-Z)</option>
+                            <option value="z_a" {% if request.GET.ordenacao == 'z_a' %}selected{% endif %}>Ordem Alfabética (Z-A)</option>
+                            <option value="recentes" {% if request.GET.ordenacao == 'recentes' %}selected{% endif %}>Mais Recentes</option>
                         </select>
                     </div>
 

@@ -732,6 +732,15 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
             elif status == 'trabalhando':
                 queryset = queryset.filter(trabalhando=True)
 
+        ordenacao = self.request.GET.get('ordenacao', '-data_cadastro')
+
+        if ordenacao == 'z_a':
+            queryset = queryset.order_by('-nome')
+        elif ordenacao == 'a_z':
+            queryset = queryset.order_by('nome')
+        else:
+            queryset = queryset.order_by('-data_cadastro')
+
         return queryset
 
     def get_context_data(self, **kwargs):
