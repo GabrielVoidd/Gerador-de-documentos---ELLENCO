@@ -91,9 +91,8 @@ class CandidatoStatusForm(forms.ModelForm):
         model = Candidato
         # Apenas os campos gerenciais que o R&S usa!
         fields = [
-            'observacoes', 'restrito', 'stand_by', 'trabalhando',
-            'em_processo', 'aprovado', 'reprovado', 'nao_compareceu',
-            'desistiu', 'encaminhado', 'rescindido'
+            'observacoes', 'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado',
+            'nao_compareceu', 'desistiu', 'encaminhado', 'rescindido', 'efetivado'
         ]
         widgets = {
             'observacoes': forms.Textarea(attrs={'class': 'form-control', 'rows': 5,

@@ -337,6 +337,7 @@ class Candidato(models.Model):
     desistiu = models.BooleanField(default=False, verbose_name='Desistiu')
     encaminhado = models.BooleanField(default=False)
     rescindido = models.BooleanField(default=False)
+    efetivado = models.BooleanField(default=False)
     criterio_exclusao = models.ManyToManyField(CriterioExclusao, verbose_name='Critérios de Exclusão', blank=True)
 
     def clean(self):

@@ -1034,6 +1034,7 @@ class RelatorioRSView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesT
         )['total_vagas']
         context['vagas_abertas'] = Vaga.objects.filter(status='A').aggregate(total=Sum('quantidade_vagas'))['total'] or 0
         context['vagas_fechadas'] = Vaga.objects.filter(status='F').aggregate(total=Sum('quantidade_vagas'))['total'] or 0
+        context['vagas_canceladas'] = Vaga.objects.filter(status='C').aggregate(total=Sum('quantidade_vagas'))['total'] or 0
 
         # 2. Dados para o Gráfico de Perdas
         perdas = Candidato.objects.aggregate(
@@ -1069,12 +1070,14 @@ class RelatorioRSView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPassesT
         contagem_status = {'Aberta': 0, 'Fechada': 0, 'Cancelada': 0, 'Suspensa': 0, 'Reaberta': 0}
         mapa_siglas_vagas = {'A': 'Aberta', 'F': 'Fechada', 'C': 'Cancelada', 'S': 'Suspensa', 'R': 'Reaberta'}
 
-        vagas_por_status = Vaga.objects.values('status').annotate(total=Count('id'))
+        vagas_por_status = Vaga.objects.values('status').annotate(total=Sum('quantidade_vagas'))
 
         for item in vagas_por_status:
             sigla = item['status']
             if sigla in mapa_siglas_vagas:
-                contagem_status[mapa_siglas_vagas[sigla]] = item['total']
+                contagem_status[mapa_siglas_vagas[sigla]] = item['total'] or 0
+
+        total_vagas_grafico = sum(contagem_status.values())
 
         context['grafico_status_vagas_json'] = {
             'labels': list(contagem_status.keys()),
