@@ -33,7 +33,7 @@
                     <div class="col-12">
                         <strong class="text-secondary">Escolaridade:</strong>
                         <p class="mb-1">{{ candidato.get_escolaridade_display }}</p>
-                        <p class="mb-0 text-muted">{{ candidato.instituicao_ensino.razao_social|default:"Nenhuma instituição informada" }}</p>
+                        <p class="mb-0 text-muted">{{ candidato.instituicao_ensino.razao_social|default:"Nenhuma instituição informada" }} - {{ candidato.get_ano_semestre_display }}, {{ candidato.get_periodo_display }}</p>
                     </div>
                 </div>
 
