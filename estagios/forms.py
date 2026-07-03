@@ -9,7 +9,7 @@ class CandidatoForm(forms.ModelForm):
         model = Candidato
         exclude = [
             'curso', 'observacoes', 'restrito', 'stand_by', 'trabalhando', 'em_processo', 'aprovado', 'reprovado',
-            'nao_compareceu', 'desistiu', 'encaminhado', 'criterio_exclusao', 'serie_semestre', 'rescindido'
+            'nao_compareceu', 'desistiu', 'encaminhado', 'criterio_exclusao', 'serie_semestre', 'rescindido', 'efetivado'
         ]
         labels = {
             'curso_padronizado': 'Curso',

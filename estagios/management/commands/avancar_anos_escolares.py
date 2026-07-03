@@ -25,7 +25,7 @@ class Command(BaseCommand):
             elif candidato.ano_semestre == Candidato.AnosSemestres.SEGUNDO_ANO:
                 candidato.ano_semestre = Candidato.AnosSemestres.TERCEIRO_ANO
                 candidato.save(update_fields=['ano_semestre'])
-                atualizados_para_segundo += 1
+                atualizados_para_terceiro += 1
 
             elif candidato.ano_semestre in [Candidato.AnosSemestres.TERCEIRO_ANO, Candidato.AnosSemestres.QUARTO_ANO]:
                 candidato.escolaridade = Candidato.Escolaridades.ENSINO_MEDIO_COMPLETO
