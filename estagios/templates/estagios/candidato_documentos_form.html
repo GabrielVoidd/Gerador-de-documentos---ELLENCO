@@ -62,13 +62,14 @@
                         </div>
                     </div>
 
-                    <h6 class="text-info fw-bold border-bottom pb-2 mb-3 mt-4">2. Folhas de Entrevista (Arquivos Extras)</h6>
+                    <h6 class="text-info fw-bold border-bottom pb-2 mb-3 mt-4">2. Anexos do Candidato</h6>
                     {{ arquivos_formset.management_form }}
                     <div id="arquivos-container">
                         {% for form_arq in arquivos_formset %}
                             <div class="row align-items-center mb-3 arquivo-row border-bottom pb-2">
                                 {{ form_arq.id }}
-                                <div class="col-md-7">
+                                <div class="col-md-5">
+                                    <label class="small fw-bold">Anexo:</label>
                                     {{ form_arq.arquivo }}
                                     {% if form_arq.instance.arquivo %}
                                         <div class="mt-1 small">
@@ -77,6 +78,10 @@
                                             </a>
                                         </div>
                                     {% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="small fw-bold">Observações:</label>
+                                    {{ form_arq.observacoes }}
                                 </div>
                                 <div class="col-md-3 text-end">
                                     {% if form_arq.instance.pk %}
@@ -92,7 +97,11 @@
                     <div id="empty-arquivo-form" class="d-none">
                         <div class="row align-items-center mb-2 arquivo-row">
                             {{ arquivos_formset.empty_form.id }}
-                            <div class="col-md-9">{{ arquivos_formset.empty_form.arquivo }}</div>
+                            <div class="col-md-4">{{ arquivos_formset.empty_form.arquivo }}</div>
+                            <div class="col-md-4">
+                                <label class="small fw-bold">Observações:</label>
+                                {{ arquivos_formset.empty_form.observacoes }}
+                            </div>
                             <div class="col-md-3"></div>
                         </div>
                     </div>
@@ -109,10 +118,6 @@
                                 <div class="col-md-3">
                                     <label class="small fw-bold">Empresa:</label>
                                     {{ form_emp.nome }}
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="small fw-bold">Observações:</label>
-                                    {{ form_emp.observacoes }}
                                 </div>
                                 <div class="col-md-4">
                                     <label class="small fw-bold">Documento/Carta:</label>
@@ -142,10 +147,6 @@
                             <div class="col-md-3">
                                 <label class="small fw-bold">Empresa:</label>
                                 {{ empresas_formset.empty_form.nome }}
-                            </div>
-                            <div class="col-md-3">
-                                <label class="small fw-bold">Observações:</label>
-                                {{ empresas_formset.empty_form.observacoes }}
                             </div>
                             <div class="col-md-4">
                                 <label class="small fw-bold">Documento/Carta:</label>

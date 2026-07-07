@@ -455,6 +455,7 @@ class CartaEncaminhamento(models.Model):
 class Arquivos(models.Model):
     candidato = models.ForeignKey(Candidato, on_delete=models.PROTECT, related_name='arquivos')
     arquivo = models.FileField(upload_to='arquivos/', null=True, blank=True)
+    observacoes = models.TextField(null=True, blank=True)
     data_emissao = models.DateField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):

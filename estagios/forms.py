@@ -239,11 +239,12 @@ class CandidatoDocumentosForm(forms.ModelForm):
 ArquivosFormSet = inlineformset_factory(
     Candidato,   # Modelo Pai
     Arquivos,    # Modelo Filho
-    fields=['arquivo'],
+    fields=['arquivo', 'observacoes'],
     extra=1,     # Cria 1 linha vazia por padrão na tela
     can_delete=True,
     widgets={
-        'arquivo': forms.FileInput(attrs={'class': 'form-control form-control-sm'})
+        'arquivo': forms.FileInput(attrs={'class': 'form-control form-control-sm'}),
+        'observacoes': forms.Textarea(attrs={'class': 'form-control form-control-sm', 'rows': 1, 'placeholder': 'Observações da entrevista...'}),
     }
 )
 
