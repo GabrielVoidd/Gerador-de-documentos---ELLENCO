@@ -125,7 +125,7 @@
                                     {% if form_emp.instance.arquivo %}
                                         <div class="mt-1 small">
                                             <a href="{{ form_emp.instance.arquivo.url }}" target="_blank" class="text-success fw-bold">
-                                                <i class="fas fa-external-link-alt"></i> Baixar Documento
+                                                <i class="fas fa-external-link-alt"></i> {{ form_emp.instance.arquivo.name|truncatechars:30 }}
                                             </a>
                                         </div>
                                     {% endif %}

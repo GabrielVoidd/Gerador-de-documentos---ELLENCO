@@ -1166,7 +1166,7 @@ class CandidatoDocumentosUpdateView(RecrutamentoRequiredMixin, LoginRequiredMixi
         if self.request.POST:
             # Se clicou em Salvar, popula os inlines com os dados enviados
             context['arquivos_formset'] = ArquivosFormSet(self.request.POST, self.request.FILES, instance=self.object)
-            context['empresas_formset'] = EmpresasFormSet(self.request.POST, instance=self.object)
+            context['empresas_formset'] = EmpresasFormSet(self.request.POST, self.request.FILES, instance=self.object)
         else:
             # Se só abriu a página, gera inlines em branco (ou com dados existentes)
             context['arquivos_formset'] = ArquivosFormSet(instance=self.object)
