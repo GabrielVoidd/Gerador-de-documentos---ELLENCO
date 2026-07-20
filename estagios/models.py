@@ -1058,8 +1058,11 @@ class Candidatura(models.Model):
         NOVA = 'N', 'Nova'
         EM_ANALISE = 'A', 'Em Análise'
         ENTREVISTA = 'E', 'Entrevista'
-        APROVADA = 'AP', 'Aprovada'
-        REPROVADA = 'R', 'Reprovada'
+        APROVADO = 'AP', 'Aprovado'
+        REPROVADO = 'R', 'Reprovado'
+        NAO_COMPARECEU = 'NC', 'Não Compareceu'
+        DESISTIU = 'D', 'Desistiu'
+        ENCAMINHADO = 'EN', 'Encaminhado'
 
     vaga = models.ForeignKey(Vaga, on_delete=models.CASCADE, related_name='candidaturas')
     candidato = models.ForeignKey(Candidato, on_delete=models.CASCADE, related_name='minhas_candidaturas')
