@@ -137,13 +137,15 @@
                             </td>
                             <td>
                                 {{ c.instituicao_ensino.razao_social|default:"Não informada"|truncatechars:30 }}<br>
-                                <small class="text-muted">{{ c.get_escolaridade_display }}</small>
+                                <small class="text-muted">{{ c.get_escolaridade_display }} - {{ c.get_periodo_display|default:"Não informado"|truncatechars:30 }}</small>
                             </td>
                             <td>
                                 {% if c.trabalhando %}
                                     <span class="badge bg-primary">Trabalhando</span>
+                                {% elif c.efetivado %}
+                                    <span class="badge bg-primary">Efetivado</span>
                                 {% elif c.aprovado %}
-                                    <span class="badge bg-success">Aprovado</span>
+                                    <span class="badge bg-primary">Aprovado</span>
                                 {% elif c.encaminhado %}
                                     <span class="badge bg-info text-dark">Encaminhado</span>
                                 {% elif c.em_processo %}
@@ -158,6 +160,8 @@
                                     <span class="badge bg-dark">Desistiu</span>
                                 {% elif c.restrito %}
                                     <span class="badge bg-danger">Restrito</span>
+                                {% elif c.rescindido %}
+                                    <span class="badge bg-danger">Rescindido</span>
                                 {% else %}
                                     <span class="badge bg-secondary">Cadastrado</span>
                                 {% endif %}

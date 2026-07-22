@@ -331,11 +331,11 @@ class Candidato(models.Model):
     stand_by = models.BooleanField(default=False)
     trabalhando = models.BooleanField(verbose_name='Trabalhando', default=False)
     em_processo = models.BooleanField(default=False)
-    aprovado = models.BooleanField(default=False)
-    reprovado = models.BooleanField(default=False)
-    nao_compareceu = models.BooleanField(default=False, verbose_name='Não Compareceu')
-    desistiu = models.BooleanField(default=False, verbose_name='Desistiu')
-    encaminhado = models.BooleanField(default=False)
+    aprovado = models.BooleanField(default=False) # omitido da tela de perfil do candidato
+    reprovado = models.BooleanField(default=False) # omitido da tela de perfil do candidato
+    nao_compareceu = models.BooleanField(default=False, verbose_name='Não Compareceu') # omitido da tela de perfil do candidato
+    desistiu = models.BooleanField(default=False, verbose_name='Desistiu') # omitido da tela de perfil do candidato
+    encaminhado = models.BooleanField(default=False) # omitido da tela de perfil do candidato
     rescindido = models.BooleanField(default=False)
     efetivado = models.BooleanField(default=False)
     criterio_exclusao = models.ManyToManyField(CriterioExclusao, verbose_name='Critérios de Exclusão', blank=True)
