@@ -731,6 +731,20 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
                 queryset = queryset.filter(aprovado=True)
             elif status == 'trabalhando':
                 queryset = queryset.filter(trabalhando=True)
+            elif status == 'stand_by':
+                queryset = queryset.filter(stand_by=True)
+            elif status == 'reprovado':
+                queryset = queryset.filter(reprovado=True)
+            elif status == 'nao_compareceu':
+                queryset = queryset.filter(nao_compareceu=True)
+            elif status == 'desistiu':
+                queryset = queryset.filter(desistiu=True)
+            elif status == 'encaminhado':
+                queryset = queryset.filter(encaminhado=True)
+            elif status == 'rescindido':
+                queryset = queryset.filter(rescindido=True)
+            elif status == 'efetivado':
+                queryset = queryset.filter(efetivado=True)
 
         ordenacao = self.request.GET.get('ordenacao', '-data_cadastro')
 
