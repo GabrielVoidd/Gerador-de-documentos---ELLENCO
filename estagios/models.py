@@ -236,7 +236,7 @@ class Candidato(models.Model):
         verbose_name='Anexar CPF',
         upload_to='documentos_candidatos/cpf/%Y%/%m/%d/', null=True, blank=True)
     data_nascimento = models.DateField(verbose_name='Data de Nascimento')
-    estado_civil = models.CharField(max_length=1, choices=EstadosCivis.choices)
+    estado_civil = models.CharField(max_length=1, choices=EstadosCivis.choices, default='S')
     nome_conjuge = models.CharField(max_length=200, verbose_name='Nome do(a) cônjuge', null=True, blank=True)
     idade_conjuge = models.PositiveSmallIntegerField(null=True, blank=True)
     profissao_conjuge = models.CharField(max_length=200, null=True, blank=True)
@@ -255,7 +255,7 @@ class Candidato(models.Model):
     estado = models.CharField(max_length=2)
 
     # --- INFORMAÇÕES ADICIONAIS ---
-    habilitacao = models.CharField(max_length=2, choices=Habilitacoes.choices, verbose_name='Habilitação')
+    habilitacao = models.CharField(max_length=2, choices=Habilitacoes.choices, verbose_name='Habilitação', default='NP')
     fumante = models.BooleanField(help_text='É fumante?', default=False)
     religiao = models.CharField(
         max_length=100, null=True, blank=True, help_text='Possui alguma religião? Se sim, qual?', verbose_name='Religião')
@@ -288,7 +288,8 @@ class Candidato(models.Model):
         upload_to='documentos_candidatos/carteiras_trabalho/%Y%/%m/%d/', null=True, blank=True)
     disponibilidade_final_semana = models.BooleanField(help_text='Pode trabalhar de final de semana?', default=False)
     microsoft_365 = models.CharField(
-        max_length=2, choices=Microsoft_365.choices, help_text='Nível de conhecimento do pacote office')
+        max_length=2, choices=Microsoft_365.choices,
+        help_text='Nível de conhecimento do pacote office', verbose_name='Nível do Pacote Office')
     experiencia_profissional = models.TextField(
         help_text='Exemplo: Empresa X, 08/23-03/25, atividades que desempenhava', null=True, blank=True)
     area_interesse = models.CharField(max_length=100, help_text='Qual a sua área de interesse?', verbose_name='Área de interesse')
@@ -308,7 +309,8 @@ class Candidato(models.Model):
     tem_problema_saude = models.CharField(max_length=1, choices=ProblemaSaude.choices, blank=True, default='N',
         verbose_name='Tem algum problema de saúde?')
     nome_problema_saude = models.CharField(max_length=100, blank=True, default='', verbose_name='Nome do(s) problema(s)')
-    pcd = models.CharField(max_length=3, help_text='Você é uma pessoa com deficiência (PCD)?', choices=PCD.choices)
+    pcd = models.CharField(max_length=3, help_text='Você é uma pessoa com deficiência (PCD)?',
+                           choices=PCD.choices, verbose_name='PCD', default='N')
     pcd_detalhes = models.CharField(max_length=150, help_text='Se sim, qual(is)?', null=True, blank=True)
 
     # --- INFORMAÇÕES DOS RESPONSÁVEIS ---

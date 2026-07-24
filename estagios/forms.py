@@ -39,6 +39,11 @@ class CandidatoForm(forms.ModelForm):
                 'placeholder': 'Esse número deve ser diferente do primeiro celular'
             })
 
+        if 'data_termino' in self.fields:
+            self.fields['data_termino'].widget.attrs.update({
+                'placeholder': 'DD/MM/AAAA'
+            })
+
         # Garante que o campo tenha a opção "Vazia" para o Select2 colocar o Placeholder
         if 'instituicao_ensino' in self.fields:
             self.fields['instituicao_ensino'].empty_label = "Selecione ou digite para pesquisar..."

@@ -137,7 +137,8 @@
                             </td>
                             <td>
                                 {{ c.instituicao_ensino.razao_social|default:"Não informada"|truncatechars:30 }}<br>
-                                <small class="text-muted">{{ c.get_escolaridade_display }} - {{ c.get_periodo_display|default:"Não informado"|truncatechars:30 }}</small>
+                                <small class="text-muted">{{ c.get_escolaridade_display }} - {{ c.get_periodo_display|default:"Não informado"|truncatechars:30 }}</small><br>
+                                <small class="text-muted">{{ c.curso|default:"Curso não informado"|truncatechars:30 }}</small>
                             </td>
                             <td>
                                 {% if c.trabalhando %}
