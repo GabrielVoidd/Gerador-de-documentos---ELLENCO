@@ -266,7 +266,7 @@ class Candidato(models.Model):
 
     # --- FORMAÇÃO ACADÊMICA ---
     escolaridade = models.CharField(max_length=3, choices=Escolaridades.choices)
-    curso = models.CharField(max_length=70, help_text='Nome do curso, caso esteja na faculdade', null=True, blank=True)
+    curso = models.CharField(max_length=70, null=True, blank=True)
     curso_padronizado = models.ForeignKey(Curso, on_delete=models.SET_NULL, null=True, blank=True)
     periodo = models.CharField(max_length=2, choices=Periodos.choices, verbose_name='Período')
     ano_semestre = models.CharField(max_length=3, choices=AnosSemestres.choices, null=True, verbose_name='Ano ou semestre')
@@ -278,7 +278,7 @@ class Candidato(models.Model):
                                    help_text='Não / Nome do aplicativo da escola/faculdade caso tenha',
                                    verbose_name='Aplicativo da escola/faculdade')
     vale_transporte = models.CharField(max_length=2, choices=ValeTransporte.choices, default='E')
-    curso_extracurricular = models.CharField(max_length=200, help_text='Sim, de informática das 08h as 10h / Não')
+    curso_extracurricular = models.CharField(max_length=200)
     anexar_declaracao = models.FileField(null=True, blank=True, upload_to='documentos_candidatos/declaracao/%Y%/%m/%d/')
 
     # --- INFORMAÇÕES PROFISSIONAIS ---

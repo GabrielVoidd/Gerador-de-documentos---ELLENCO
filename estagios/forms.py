@@ -12,7 +12,7 @@ class CandidatoForm(forms.ModelForm):
             'nao_compareceu', 'desistiu', 'encaminhado', 'criterio_exclusao', 'serie_semestre', 'rescindido', 'efetivado'
         ]
         labels = {
-            'curso_padronizado': 'Curso',
+            'curso_padronizado': 'Curso (se técnico, tecnólogo ou bacharelado)',
         }
 
     def __init__(self, *args, **kwargs):
@@ -42,6 +42,11 @@ class CandidatoForm(forms.ModelForm):
         if 'data_termino' in self.fields:
             self.fields['data_termino'].widget.attrs.update({
                 'placeholder': 'DD/MM/AAAA'
+            })
+
+        if 'curso_extracurricular' in self.fields:
+            self.fields['curso_extracurricular'].widget.attrs.update({
+                'placeholder': 'Sim, de informática das 08h as 10h / Não'
             })
 
         # Garante que o campo tenha a opção "Vazia" para o Select2 colocar o Placeholder
