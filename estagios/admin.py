@@ -461,8 +461,9 @@ class InstituicaoEnsinoPesquisa(AutocompleteFilter):
 class CandidatoAdmin(NestedModelAdmin):
     # botao_whatsapp
     list_display = (
-        'nome', 'celular', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro', 'restrito', 'stand_by',
-        'trabalhando', 'em_processo', 'aprovado', 'reprovado', 'nao_compareceu', 'desistiu', 'encaminhado')
+        'nome', 'idade', 'celular', 'instituicao_ensino', 'gerar_termo_link', 'data_cadastro')
+    # , 'restrito', 'stand_by',
+    #         'trabalhando', 'em_processo', 'aprovado', 'reprovado', 'nao_compareceu', 'desistiu', 'encaminhado'
     search_fields = ('nome', 'bairro', 'cpf', 'rg', 'celular', 'celular2', 'data_cadastro')
     list_filter = (SexoFiltroInteligente, ('bairro', DropdownFilter), ('escolaridade', ChoiceDropdownFilter),
                    ('ano_semestre', DropdownFilter), ('periodo', ChoiceDropdownFilter), InstituicaoEnsinoPesquisa,
