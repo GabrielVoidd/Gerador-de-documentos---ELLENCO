@@ -78,9 +78,9 @@ class ContratoSocial(models.Model):
     # Informações adicionais da Parte Concedente para a criação do contrato social
     parte_concedente = models.ForeignKey(ParteConcedente, on_delete=models.PROTECT, related_name='adicionais')
     nome_dono = models.CharField(max_length=100, null=True, blank=True, verbose_name='Nome do(a) dono(a)')
-    documentos_dono = models.CharField(verbose_name='CPF do(a) dono(a)', null=True, unique=True, blank=True)
+    documentos_dono = models.CharField(verbose_name='CPF do(a) dono(a)', null=True, blank=True)
     nome_socio = models.CharField(max_length=100, null=True, blank=True, verbose_name='Nome do(a) sócio(a)')
-    documentos_socio = models.CharField(verbose_name='CPF do(a) sócio(a)', null=True, unique=True, blank=True)
+    documentos_socio = models.CharField(verbose_name='CPF do(a) sócio(a)', null=True, blank=True)
     nome_resp_rh = models.CharField(max_length=100, verbose_name='Nome do(a) responsável do RH')
     numero_resp_rh = models.CharField(max_length=11, help_text='Número do telefone com DDD e sem traços',
          verbose_name='Número do(a) responsável do RH')
