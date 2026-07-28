@@ -811,7 +811,7 @@ def exportar_candidatos_excel(request):
     if periodo:
         queryset = queryset.filter(periodo=periodo)
     if data:
-        queryset = queryset.filter(data_termino=data)
+        queryset = queryset.filter(data_cadastro=data)
 
     # 3. Tratamento especial para o Status (traduzindo o select para os Booleanos)
     if status == 'em_processo':
@@ -835,7 +835,7 @@ def exportar_candidatos_excel(request):
     sheet.title = 'Candidatos'
 
     headers = [
-        'Nome', 'Data de Cadastro', 'CPF', 'Celular', 'Email',
+        'Nome', 'CPF', 'Celular', 'Email',
         'Escolaridade', 'Curso', 'Ano/Semestre', 'Período',
         'Instituição de Ensino', 'Bairro', 'Status'
     ]
@@ -862,7 +862,6 @@ def exportar_candidatos_excel(request):
 
         sheet.append([
             c.nome,
-            c.data_cadastro,
             c.cpf,
             c.celular,
             c.email,
