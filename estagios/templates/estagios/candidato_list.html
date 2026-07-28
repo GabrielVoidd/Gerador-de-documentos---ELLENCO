@@ -92,6 +92,11 @@
                         </select>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Buscar pela data de cadastro</label>
+                        <input type="date" name="data" value="{{ data }}" class="form-control">
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100 mb-2">Aplicar Filtros</button>
                     <a href="{% url 'buscar_candidatos' %}" class="btn btn-outline-secondary w-100">Limpar</a>
                 </form>
@@ -138,8 +143,8 @@
                             <td>
                                 {{ c.instituicao_ensino.razao_social|default:"Não informada"|truncatechars:30 }}<br>
                                 <small class="text-muted">{{ c.get_escolaridade_display }} - {{ c.get_periodo_display|default:"Não informado"|truncatechars:30 }}</small><br>
-                                {% if c.curso or c.curso.nome %}
-                                    <small class="text-muted">{{ c.curso|truncatechars:30 }}</small>
+                                {% if c.curso_padronizado or c.curso_padronizado.nome %}
+                                    <small class="text-muted">{{ c.curso_padronizado|truncatechars:30 }}</small>
                                 {% else %}
                                     <small class="text-muted">Curso não informado</small>
                                 {% endif %}

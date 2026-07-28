@@ -62,10 +62,13 @@
 
 <script>
     $(document).ready(function() {
-        // Máscara para a Data de Nascimento
+        // Máscara para a data de nascimento
         $('#id_data_nascimento').mask('00/00/0000');
 
-        // BÔNUS: Máscaras extras já configuradas
+        // Máscara para a data de término da escolaridade
+        $('#id_data_termino').mask('00/00/0000');
+
+        // Máscaras extras já configuradas
         if ($('#id_cpf').length) {
             $('#id_cpf').mask('000.000.000-00', {reverse: true});
         }

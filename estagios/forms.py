@@ -92,7 +92,8 @@ class CandidatoForm(forms.ModelForm):
     class Media:
         js = (
             'js/admin_custom.js', 'js/jquery.mask.min.js', 'js/mascaras_admin.js',
-            'js/mascara_cpf_admin.js', 'js/mascara_rg_admin.js', 'js/viacep_admin.js', 'js/mascara_nascimento.js'
+            'js/mascara_cpf_admin.js', 'js/mascara_rg_admin.js', 'js/viacep_admin.js', 'js/mascara_nascimento.js',
+            'js/mascara_data_termino_escolaridade.js'
         )
 
 
@@ -119,14 +120,14 @@ class CandidatoStatusForm(forms.ModelForm):
 class VagaForm(forms.ModelForm):
     class Meta:
         model = Vaga
-        # Removemos o status e datas, o Django preenche sozinho!
+        # Django preenche sozinho!
         fields = [
             'empresa', 'titulo', 'descricao', 'requisitos',
             'tipo_vaga', 'quantidade_vagas', 'salario_bolsa',
             'beneficios', 'horario', 'local_trabalho', 'observacoes', 'sexo'
         ]
 
-        # Colocando as classes do Bootstrap para ficar bonito
+        # Colocando as classes do Bootstrap
         widgets = {
             'empresa': forms.Select(attrs={'class': 'form-select'}),
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Estagiário de Marketing'}),

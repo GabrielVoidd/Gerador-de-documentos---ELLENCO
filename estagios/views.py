@@ -720,6 +720,10 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
         if curso_id:
             queryset = queryset.filter(curso_padronizado=curso_id)
 
+        data = self.request.GET.get('data')
+        if data:
+            queryset = queryset.filter(data_cadastro=data)
+
         status = self.request.GET.get('status')
         if status:
             # Filtra pelos booleanos do seu banco dinamicamente
@@ -772,6 +776,8 @@ class CandidatoListView(RecrutamentoRequiredMixin, LoginRequiredMixin, UserPasse
         context['periodos'] = Candidato.Periodos.choices
         # Cursos passados para o template para montar os selects automaticamente
         context['cursos'] = Curso.objects.all().order_by('nome')
+        # Data de cadastro passada para o template
+        context['data'] = self.request.GET.get('data', '')
 
         return context
 
