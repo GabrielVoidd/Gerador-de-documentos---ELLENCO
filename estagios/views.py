@@ -792,6 +792,7 @@ def exportar_candidatos_excel(request):
     ano_semestre = request.GET.get('ano_semestre')
     periodo = request.GET.get('periodo')
     status = request.GET.get('status')
+    data = request.GET.get('data')
 
     # Inicia a query básica
     queryset = Candidato.objects.select_related('instituicao_ensino', 'curso_padronizado').all()
@@ -804,12 +805,13 @@ def exportar_candidatos_excel(request):
     if escolaridade:
         queryset = queryset.filter(escolaridade=escolaridade)
     if curso:
-        # Como o seu select do HTML manda o ID do curso (value="{{ curso.id }}")
         queryset = queryset.filter(curso_padronizado_id=curso)
     if ano_semestre:
         queryset = queryset.filter(ano_semestre=ano_semestre)
     if periodo:
         queryset = queryset.filter(periodo=periodo)
+    if data:
+        queryset = queryset.filter(data_termino=data)
 
     # 3. Tratamento especial para o Status (traduzindo o select para os Booleanos)
     if status == 'em_processo':
@@ -820,15 +822,20 @@ def exportar_candidatos_excel(request):
         queryset = queryset.filter(trabalhando=True)
     elif status == 'restrito':
         queryset = queryset.filter(restrito=True)
+    elif status == 'stand_by':
+        queryset = queryset.filter(stand_by=True)
+    elif status == 'rescindido':
+        queryset = queryset.filter(rescindido=True)
+    elif status == 'efetivado':
+        queryset = queryset.filter(efetivado=True)
 
     # 4. Montagem do Excel
     workbook = openpyxl.Workbook()
     sheet = workbook.active
     sheet.title = 'Candidatos'
 
-    # Adicionei Ano/Semestre e Período no cabeçalho já que agora eles são filtros úteis!
     headers = [
-        'Nome', 'CPF', 'Celular', 'Email',
+        'Nome', 'Data de Cadastro', 'CPF', 'Celular', 'Email',
         'Escolaridade', 'Curso', 'Ano/Semestre', 'Período',
         'Instituição de Ensino', 'Bairro', 'Status'
     ]
@@ -846,11 +853,16 @@ def exportar_candidatos_excel(request):
             status_atual = 'Reprovado'
         elif c.restrito:
             status_atual = 'Restrito'
+        elif c.rescindido:
+            status_atual = 'Rescindido'
+        elif c.efetivado:
+            status_atual = 'Efetivado'
 
         nome_curso = c.curso_padronizado.nome if c.curso_padronizado else (c.curso or '')
 
         sheet.append([
             c.nome,
+            c.data_cadastro,
             c.cpf,
             c.celular,
             c.email,
