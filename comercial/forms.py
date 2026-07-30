@@ -80,7 +80,6 @@ class ChamadoForm(forms.ModelForm):
             'numero', 'numero2', 'data_contato', 'observacoes'
         ]
         widgets = {
-            'data_contato': forms.DateInput(attrs={'type': 'date'}),
             'observacoes': forms.Textarea(attrs={'rows': 3}),
         }
 
@@ -88,6 +87,15 @@ class ChamadoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+
+        if 'data_contato' in self.fields:
+            self.fields['data_contato'].widget.input_type = 'text'
+            self.fields['data_contato'].widget.attrs['placeholder'] = 'DD/MM/AAAA'
+
+    class Media:
+        js = (
+            'js/mascara_data_lead.js',
+        )
 
 
 class ChamadoUpdateForm(forms.ModelForm):
@@ -99,7 +107,6 @@ class ChamadoUpdateForm(forms.ModelForm):
             'proposta_enviada', 'contrato_assinado', 'contrato'
         ]
         widgets = {
-            'data_contato': forms.DateInput(attrs={'type': 'date'}),
             'observacoes': forms.Textarea(attrs={'rows': 4}),
         }
 
@@ -112,6 +119,15 @@ class ChamadoUpdateForm(forms.ModelForm):
             # Aplica classe de checkbox do Bootstrap para os booleanos
             if field_name in ['proposta_enviada', 'contrato_assinado']:
                 field.widget.attrs['class'] = 'form-check-input'
+
+        if 'data_contato' in self.fields:
+            self.fields['data_contato'].widget.input_type = 'text'
+            self.fields['data_contato'].widget.attrs['placeholder'] = 'DD/MM/AAAA'
+
+    class Media:
+        js = (
+            'js/mascara_data_lead.js',
+        )
 
 
 class AditivoForm(forms.ModelForm):
